@@ -57,3 +57,4 @@ Temporary Items
 # PyCharm folders and files
 # =========================
 #PyCharm config folders
+*/.idea/*
