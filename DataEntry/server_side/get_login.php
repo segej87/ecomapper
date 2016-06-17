@@ -7,15 +7,25 @@
  
 // array for JSON response
 $response = array();
- 
-// import database connection variables
-require_once __DIR__ . '/db_config.php';
+
+function OpenConnection() {
+    try
+	{
+	// Connecting to mysql database
+	$serverName = "tcp:map-it.database.windows.net,1433";
+	$connectionOptions = array("Database"=>"geojson", "Uid"=>"segej87", "PWD"=>"J0nathan5!");
+	$conn = sqlsrv_connect($serverName, $connectionOptions);
+	if($conn == false)
+		die(FormatErrors(sqlsrv_errors()));
+	}
+	catch(Exception $e)
+	{
+		echo("Error!");
+	}
+}
  
 // Connecting to mysql database
-$con = mysqli_connect(DB_SERVER, DB_USER, DB_PASSWORD) or die(mysqli_error());
- 
-// Selecing database
-$db = mysqli_select_db($con, DB_DATABASE) or die(mysqli_error()) or die(mysqli_error());
+$con = OpenConnection();
  
 // check for post data
 if (isset($_POST["username"]) && isset($_POST["password"])) {
@@ -23,21 +33,21 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
 	$password = $_POST["password"];
  
     // get a product from products table
-    $result = mysqli_query($con,"SELECT * FROM Login WHERE Username =\"" . $username . "\"");
+	$tsql = "SELECT * FROM Login WHERE Username =\"" . $username . "\"";
+    $result = sqlsrv_query($con, $tsql);
  
     if (!empty($result)) {
         // check for empty result
-        if (mysqli_num_rows($result) > 0) {
+        if (sqlsrv_num_rows($result) > 0) {
  
-            $result = mysqli_fetch_array($result);
+            $result = sqlsrv_fetch_array($result);
  
             $login = array();
             $login["UID"] = $result["UID"];
-            $login["Username"] = $result["Username"];
-            $login["Password"] = $result["Password"];
+            $login["username"] = $result["username"];
+            $login["password"] = $result["password"];
 			
-			if ($login["Password"] == $password) {
-				// user node
+			if ($login["password"] == $password) {
 				$response["UID"] = $result["UID"];
 				
 				echo $response["UID"];
@@ -66,6 +76,6 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
 	echo $response["message"];
 }
 
-mysqli_close($con);
+sqlsrv_close($con);
 
 ?>
