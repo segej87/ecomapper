@@ -210,7 +210,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+        return email.length() > 4;
     }
 
     private boolean isPasswordValid(String password) {
@@ -381,7 +381,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 is.close();
                 conn.disconnect();
                 return response;
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 return e.getMessage();
             }
             // TODO: register the new account here.

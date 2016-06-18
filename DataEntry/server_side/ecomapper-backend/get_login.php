@@ -6,7 +6,7 @@ $response = array();
 // Connect to mysql database
 try
 {
-    $connectionInfo = array("UID" => "segej87@map-it", "pwd" => "{J0nathan5!}", "Database" => "geojson", "LoginTimeout" => 30, "Encrypt" => 1, "TrustServerCertificate" => 0);
+    $connectionInfo = array("UID" => "ecoCollector@map-it", "pwd" => "{173394aBzZqR!}", "Database" => "geojson", "LoginTimeout" => 30, "Encrypt" => 1, "TrustServerCertificate" => 0);
     $serverName = "tcp:map-it.database.windows.net,1433";
     $conn = sqlsrv_connect($serverName, $connectionInfo);
     if($conn == false)
