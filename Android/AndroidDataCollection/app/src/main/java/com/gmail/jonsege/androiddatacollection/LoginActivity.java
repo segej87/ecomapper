@@ -68,6 +68,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     // UI references.
     private AutoCompleteTextView mUsernameView;
     private EditText mPasswordView;
+    private TextView uidText;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -98,6 +99,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 attemptLogin();
             }
         });
+
+        uidText = (TextView) findViewById(R.id.tmpText);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -340,21 +343,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     public class UserLoginTask extends AsyncTask<Void, Void, String> {
 
-        private final String mEmail;
+        private final String mUsername;
         private final String mPassword;
         private final String loginURL = getString(R.string.php_server_root) + getString(R.string.php_get_login);
 
         UserLoginTask(String email, String password) {
-            mEmail = email;
+            mUsername = email;
             mPassword = password;
         }
 
         @Override
         protected String doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
             String response = new String();
-
             try {
                 URL url = new URL(loginURL);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -393,7 +393,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (!(result.contains("Error"))) {
-                finish();
+                uidText.setText(result);
+                //finish();
             } else {
                 if (result.contains("do not match")) {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
