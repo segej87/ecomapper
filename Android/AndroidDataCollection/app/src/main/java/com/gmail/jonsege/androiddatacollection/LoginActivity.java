@@ -11,6 +11,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -33,13 +34,16 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -52,7 +56,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
-
+    static final String UID = "com.gmail.jonsege.androiddatacollection.UID";
+    static final String UNAME = "com.gmail.jonsege.androiddatacollection.UNAME";
     /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
@@ -355,31 +360,37 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected String doInBackground(Void... params) {
             String response = new String();
+            Map<String,Object> pars = new LinkedHashMap<>();
+            pars.put("username", mUsername);
+            pars.put("password", mPassword);
+
             try {
+                StringBuilder postData = new StringBuilder();
+                for (Map.Entry<String,Object> par : pars.entrySet()) {
+                    if (postData.length() != 0) postData.append('&');
+                    postData.append(URLEncoder.encode(par.getKey(), "UTF-8"));
+                    postData.append('=');
+                    postData.append(URLEncoder.encode(String.valueOf(par.getValue()), "UTF-8"));
+                }
+                byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+
                 URL url = new URL(loginURL);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                conn.setRequestProperty( "Content-Length", String.valueOf(postDataBytes.length));
                 conn.setDoOutput(true);
-                conn.setDoInput(true);
+                conn.getOutputStream().write(postDataBytes);
 
-                OutputStream os = conn.getOutputStream();
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os,"UTF-8"));
-                String data = URLEncoder.encode("username", "UTF-8")+"="+URLEncoder.encode(mUsername,"UTF-8")+"&"+
-                        URLEncoder.encode("password","UTF-8")+"="+URLEncoder.encode(mPassword,"UTF-8");
-                bw.write(data);
-                bw.flush();
-                bw.close();
-                os.close();
+                Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 
-                InputStream is = conn.getInputStream();
-                BufferedReader br = new BufferedReader(new InputStreamReader(is,"iso-8859-1"));
-                String line = "";
-                while ((line = br.readLine()) != null){
-                    response += line;
-                }
-                br.close();
-                is.close();
+                StringBuilder sb = new StringBuilder();
+                for (int c; (c = in.read()) >= 0;)
+                    sb.append((char)c);
+                response = sb.toString();
+
                 conn.disconnect();
+
                 return response;
             } catch (Exception e) {
                 return e.getMessage();
@@ -392,9 +403,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
 
-            if (!(result.contains("Error"))) {
-                uidText.setText(result);
+            if (!(result.contains("Error:"))) {
+                String uid = result;
+                String uName = mUsername.toString();
+                uidText.setText(uid);
                 //finish();
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.putExtra(UNAME, uName);
+                intent.putExtra(UID, uid);
+                startActivity(intent);
             } else {
                 if (result.contains("do not match")) {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));

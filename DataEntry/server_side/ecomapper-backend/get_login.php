@@ -6,7 +6,7 @@ $response = array();
 // Connect to mysql database
 try
 {
-    $connectionInfo = array("UID" => "ecoCollector@map-it", "pwd" => "{173394aBzZqR!}", "Database" => "geojson", "LoginTimeout" => 30, "Encrypt" => 1, "TrustServerCertificate" => 0);
+    $connectionInfo = array("UID" => "ecoCollector@map-it", "pwd" => "{173394aBzZqR!}", "Database" => "geojson", "LoginTimeout" => 30, "Encrypt" => 1, "TrustServerCertificate" => 0, "CharacterSet" => "UTF-8");
     $serverName = "tcp:map-it.database.windows.net,1433";
     $conn = sqlsrv_connect($serverName, $connectionInfo);
     if($conn == false)
@@ -20,10 +20,10 @@ catch(Exception $e)
 }
     
 // check for post data
-if (isset($_GET['username']) && isset($_GET['password']))
+if (isset($_POST['username']) && isset($_POST['password']))
 {
-    $username = $_GET['username'];
-    $password = $_GET['password'];
+    $username = $_POST['username'];
+    $password = $_POST['password'];
      // get the row corresponding to the user
     $tsql = "SELECT * FROM login WHERE username ='" . $username . "'";
     $result = sqlsrv_query($conn, $tsql, array(), array("Scrollable"=>"buffered"));
