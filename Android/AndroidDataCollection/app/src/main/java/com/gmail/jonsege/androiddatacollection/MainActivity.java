@@ -16,6 +16,6 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         mUname = (TextView) findViewById(R.id.userText);
-        mUname.setText(intent.getStringExtra(LoginActivity.UNAME));
+        mUname.setText("Logged in as: " + intent.getStringExtra(LoginActivity.UNAME));
     }
 }
