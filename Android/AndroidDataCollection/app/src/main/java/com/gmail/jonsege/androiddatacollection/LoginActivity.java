@@ -73,7 +73,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     // UI references.
     private AutoCompleteTextView mUsernameView;
     private EditText mPasswordView;
-    private TextView uidText;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -104,8 +103,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 attemptLogin();
             }
         });
-
-        uidText = (TextView) findViewById(R.id.tmpText);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -406,7 +403,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if (!(result.contains("Error:"))) {
                 String uid = result;
                 String uName = mUsername.toString();
-                uidText.setText(uid);
                 //finish();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 intent.putExtra(UNAME, uName);
