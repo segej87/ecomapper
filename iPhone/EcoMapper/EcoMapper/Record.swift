@@ -12,13 +12,13 @@ class Record {
     
     // MARK: Properties
     
-    var coords: [Float]
+    var coords: [Double]
     var photo: UIImage?
     var props: [String:AnyObject]
     
     // MARK: Initialization
     
-    init?(coords: [Float], photo: UIImage?, props: [String:AnyObject]){
+    init?(coords: [Double], photo: UIImage?, props: [String:AnyObject]){
         self.coords = coords
         self.photo = photo
         self.props = props

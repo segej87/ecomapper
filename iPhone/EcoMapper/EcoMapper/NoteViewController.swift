@@ -1,14 +1,14 @@
 //
-//  ViewController.swift
+//  NoteViewController.swift
 //  EcoMapper
 //
-//  Created by Jon on 6/20/16.
+//  Created by Jon on 6/21/16.
 //  Copyright © 2016 Sege Industries. All rights reserved.
 //
 
 import UIKit
 
-class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class NoteViewController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     // MARK: Properties
     
@@ -25,28 +25,17 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
     @IBOutlet weak var measStackView: UIStackView!
     @IBOutlet weak var noteLabel: UILabel!
     
+    var photoHeightVisible: CGFloat!
+    
     // MARK: Initialization
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Handle the name field's user input through delegate callbacks.
         nameTextField.delegate = self
-        
-        let type: String = "note"
-        
-        switch type {
-            case "meas": photoStackView.hidden = true
-            case "photo": measStackView.hidden = true
-            case "note":
-                photoStackView.hidden = true
-                measStackView.hidden = true
-        default:
-            photoStackView.hidden = true
-            measStackView.hidden = true
-        }
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -129,14 +118,13 @@ class ViewController: UIViewController, UITextFieldDelegate, UIImagePickerContro
         }
         
     }
-
+    
     @IBAction func setDefaultNameText(sender: UIButton) {
         let currentDate = NSDate()
         let dateFormatter = NSDateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         let dateTime = dateFormatter.stringFromDate(currentDate)
-        nameTextField.text = "Record - " + dateTime
+        nameTextField.text = "Record" + " - " + dateTime
     }
     
 }
-
