@@ -8,8 +8,9 @@
 
 import UIKit
 import CoreLocation
+import QuartzCore
 
-class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
+class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
     
     // MARK: Properties
     
@@ -53,13 +54,15 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Add border to text view
+        self.notesTextField.layer.borderWidth = 0.5
+        self.notesTextField.layer.cornerRadius = 10
+        self.notesTextField.layer.borderColor = UIColor.init(red: 200/255.0, green: 199/255.0, blue: 204/255.0, alpha: 1.0).CGColor
+        
         // If location is authorized, start location services
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestLocation()
-        
-        // Get the current datetime
-        getDateTime()
         
         // Handle text fields' user input through delegate callbacks.
         nameTextField.delegate = self
@@ -71,9 +74,35 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         // Handle the notes field's user input through delegate callbacks.
         notesTextField.delegate = self
         
-        // Handle the access picker's user input
+        // Handle the access picker's user input.
         accessPicker.dataSource = self
         accessPicker.delegate = self
+        
+        // Set up views if editing an existing Record.
+        if let record = record {
+            navigationItem.title = "Editing Measurement"
+            nameTextField.text = record.props["name"] as? String
+            accessPicker.selectRow(pickerData.indexOf(record.props["access"] as! String)!, inComponent: 0, animated: true)
+            accessLevel = pickerData[accessPicker.selectedRowInComponent(0)]
+            measTextField.text = record.props["species"] as? String
+            valTextField.text = record.props["value"] as? String
+            unitsTextField.text = record.props["units"] as? String
+            notesTextField.text = record.props["text"] as? String
+            tagTextField.text = record.props["tags"] as? String
+            dateTime = record.props["datetime"] as? String
+        } else {
+            // Set a default index for the picker to prevent errors.
+            //TODO: Set default access from another menu
+            let defaultRowForAccess = 0
+            accessPicker.selectRow(defaultRowForAccess, inComponent: 0, animated: false)
+            accessLevel = pickerData[accessPicker.selectedRowInComponent(0)]
+            
+            // Get the current datetime
+            getDateTime()
+        }
+        
+        // Enable the Save button only if the required text fields have a valid name.
+        checkValidName()
     }
 
     override func didReceiveMemoryWarning() {
@@ -83,6 +112,21 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     
     // MARK: UITextFieldDelegate
     
+    func textFieldDidBeginEditing(textField: UITextField) {
+        // Disable the Save button while editing.
+        saveButton.enabled = false
+    }
+    
+    func checkValidName() {
+        // Disable the Save button if the required text fields are empty.
+        let text1 = nameTextField.text ?? ""
+        let text2 = measTextField.text ?? ""
+        let text3 = valTextField.text ?? ""
+        let text4 = unitsTextField.text ?? ""
+        let text5 = tagTextField.text ?? ""
+        saveButton.enabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty || text4.isEmpty || text5.isEmpty)
+    }
+    
     func textFieldShouldReturn(textField: UITextField) -> Bool {
         
         //Hide the keyboard.
@@ -91,7 +135,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     }
     
     func textFieldDidEndEditing(textField: UITextField) {
-        
+        checkValidName()
     }
     
     // MARK: UITextViewDelegate
@@ -144,6 +188,16 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     }
     
     // MARK: Navigation
+    
+    @IBAction func cancel(sender: UIBarButtonItem) {
+        // Depending on style of presentation (modal or push), dismiss the view controller differently
+        let isPresentingInAddRecordMode = presentingViewController is UINavigationController
+        if isPresentingInAddRecordMode {
+            dismissViewControllerAnimated(true, completion: nil)
+        } else {
+            navigationController!.popViewControllerAnimated(true)
+        }
+    }
     
     // This method lets you configure a view controller before it's presented.
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {

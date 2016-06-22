@@ -18,6 +18,7 @@
 		FC84B3B01D18EFE800251003 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */; };
 		FC84B3BB1D18EFE800251003 /* EcoMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3BA1D18EFE800251003 /* EcoMapperTests.swift */; };
 		FC84B3C61D1919D400251003 /* Record.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3C51D1919D400251003 /* Record.swift */; };
+		FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCCE99311D1A23C300A675BE /* NoteViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 		FC84B3BA1D18EFE800251003 /* EcoMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoMapperTests.swift; sourceTree = "<group>"; };
 		FC84B3BC1D18EFE800251003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FC84B3C51D1919D400251003 /* Record.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Record.swift; sourceTree = "<group>"; };
+		FCCE99311D1A23C300A675BE /* NoteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +94,7 @@
 				FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */,
 				FC84B3C51D1919D400251003 /* Record.swift */,
 				FC84B3A91D18EFE800251003 /* Main.storyboard */,
+				FCCE99311D1A23C300A675BE /* NoteViewController.swift */,
 				FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */,
 				FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */,
 				FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */,
@@ -214,6 +217,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */,
 				FC84B3A81D18EFE800251003 /* MeasViewController.swift in Sources */,
 				FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */,
 				FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */,
