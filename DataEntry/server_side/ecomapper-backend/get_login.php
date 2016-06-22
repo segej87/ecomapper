@@ -25,8 +25,9 @@ if (isset($_POST['username']) && isset($_POST['password']))
     $username = $_POST['username'];
     $password = $_POST['password'];
      // get the row corresponding to the user
-    $tsql = "SELECT * FROM login WHERE username ='" . $username . "'";
-    $result = sqlsrv_query($conn, $tsql, array(), array("Scrollable"=>"buffered"));
+    $tsql = "SELECT * FROM login WHERE username = (?)";
+    $params = array($username);
+    $result = sqlsrv_query($conn, $tsql, $params, array("Scrollable"=>"buffered"));
         
     // check for empty result
     if (!empty($result))
