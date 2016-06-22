@@ -13,6 +13,7 @@ class RecordTableViewController: UITableViewController {
     // MARK: Properties
     
     var records = [Record]()
+    var guid = "7b5586d5-b297-473f-adbc-ec352ede4f26"
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -131,6 +132,59 @@ class RecordTableViewController: UITableViewController {
     */
     
     // MARK: Actions
+    
+    @IBAction func attemptSync(sender: UIBarButtonItem) {
+        if Reachability.isConnectedToNetwork() {
+            var bigDict = [AnyObject]()
+            for record in records {
+                let dictItem = record.prepareForJSON()
+                bigDict.append(dictItem)
+            }
+            let biggerDict = ["type":"FeatureCollection", "features": bigDict]
+            
+            var msg: String?
+            do {
+                let biggestDict = try NSJSONSerialization.dataWithJSONObject(biggerDict, options: NSJSONWritingOptions())
+                let dataString = NSString(data: biggestDict, encoding: NSUTF8StringEncoding)
+                print(dataString!)
+                
+                let request = NSMutableURLRequest(URL: NSURL(string: "http://ecocollector.azurewebsites.net/add_records.php")!)
+                request.HTTPMethod = "POST"
+                let postString = "GUID=\(guid) & geojson=\(dataString!)"
+                request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
+                let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in guard error == nil && data != nil else {
+                    print("error=\(error!)")
+                    msg = "error = \(error!)"
+                    return
+                    }
+                    
+                    if let httpStatus = response as? NSHTTPURLResponse where httpStatus.statusCode != 200 {
+                        print("statusCode should be 200, but is \(httpStatus.statusCode)")
+                        print("response = \(response!)")
+                        msg = "error = \(response)"
+                    }
+                    
+                    let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
+                    print("responseString = \(responseString!)")
+                    msg = "Result: \(responseString!)"
+                }
+                task.resume()
+            } catch let error as NSError {
+                print(error)
+            }
+            
+            let alertVC = UIAlertController(title: "Sync status", message: msg, preferredStyle: .Alert)
+            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+            alertVC.addAction(okAction)
+            self.presentViewController(alertVC, animated: true, completion: nil)
+        } else {
+            let alertVC = UIAlertController(title: "No connection detected", message: "Can't sync without a data connection", preferredStyle: .Alert)
+            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+            alertVC.addAction(okAction)
+            presentViewController(alertVC, animated: true, completion: nil)
+        }
+    }
+    
     
 //    @IBAction func selectCell(sender: UITapGestureRecognizer) {
 //        selectCell(sender)

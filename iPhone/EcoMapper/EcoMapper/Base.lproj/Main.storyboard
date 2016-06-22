@@ -4,9 +4,10 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
     </dependencies>
     <scenes>
-        <!--Records Since Last Sync-->
+        <!--Records-->
         <scene sceneID="gQo-VO-UQm">
             <objects>
                 <tableViewController id="IBr-jA-5Zj" customClass="RecordTableViewController" customModule="EcoMapper" customModuleProvider="target" sceneMemberID="viewController">
@@ -58,13 +59,21 @@
                             <outlet property="delegate" destination="IBr-jA-5Zj" id="Bky-of-rja"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Records Since Last Sync" id="xNm-dn-QOM">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="o33-9u-Gob">
-                            <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                            <connections>
-                                <segue destination="eMq-QN-4yf" kind="show" identifier="PushToNew" id="ADG-fg-zXP"/>
-                            </connections>
-                        </barButtonItem>
+                    <navigationItem key="navigationItem" title="Records" id="xNm-dn-QOM">
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="o33-9u-Gob">
+                                <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <segue destination="eMq-QN-4yf" kind="show" identifier="PushToNew" id="ADG-fg-zXP"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Sync" id="hrT-ma-CpP">
+                                <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <action selector="attemptSync:" destination="IBr-jA-5Zj" id="Zu5-xr-KV3"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <segue destination="BYZ-38-t0r" kind="show" identifier="ShowMeasDetail" id="wcK-Tt-d9F"/>

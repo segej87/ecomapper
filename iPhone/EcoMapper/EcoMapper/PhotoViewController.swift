@@ -57,11 +57,6 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         self.notesTextField.layer.cornerRadius = 10
         self.notesTextField.layer.borderColor = UIColor.init(red: 200/255.0, green: 199/255.0, blue: 204/255.0, alpha: 1.0).CGColor
         
-        // If location is authorized, start location services
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.requestLocation()
-        
         // Handle text fields' user input through delegate callbacks.
         nameTextField.delegate = self
         tagTextField.delegate = self
@@ -92,6 +87,11 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             
             // Get the current datetime
             getDateTime()
+            
+            // If location is authorized, start location services
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.requestLocation()
         }
         
         // Enable the Save button only if the required text fields have a valid name.

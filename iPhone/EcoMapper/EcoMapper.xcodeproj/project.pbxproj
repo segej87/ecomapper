@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */; };
+		FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3349DB1D1B365F00D112EA /* Reachability.swift */; };
 		FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */; };
 		FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */; };
 		FC8244E11D199D290048C3A7 /* RecordTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */; };
@@ -33,6 +34,7 @@
 
 /* Begin PBXFileReference section */
 		FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
+		FC3349DB1D1B365F00D112EA /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
 		FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewController.swift; sourceTree = "<group>"; };
 		FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecordTableViewController.xib; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 				FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */,
 				FC84B3C51D1919D400251003 /* Record.swift */,
 				FC84B3A91D18EFE800251003 /* Main.storyboard */,
+				FC3349DB1D1B365F00D112EA /* Reachability.swift */,
 				FCCE99311D1A23C300A675BE /* NoteViewController.swift */,
 				FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */,
 				FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */,
@@ -223,6 +226,7 @@
 				FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */,
 				FC84B3C61D1919D400251003 /* Record.swift in Sources */,
 				FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */,
+				FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */,
 				FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

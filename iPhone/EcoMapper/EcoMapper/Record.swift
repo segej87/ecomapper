@@ -39,6 +39,20 @@ class Record: NSObject, NSCoding {
         }
     }
     
+    // MARK: JSON formatting
+    
+    func prepareForJSON() -> [String:AnyObject] {
+        let geomDict = ["type":"Point", "coordinates":self.coords]
+        let typeDict = "Feature"
+        var propDict = self.props
+        if propDict.keys.contains("value") {
+            let val = (propDict["value"] as! NSString).floatValue
+            propDict.updateValue(val, forKey: "value")
+        }
+        let bigDict = ["geometry":geomDict, "type":typeDict, "properties":propDict]
+        return bigDict
+    }
+    
     // MARK: NSCoding
     
     func encodeWithCoder(aCoder: NSCoder) {
