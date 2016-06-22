@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		FC0E5D331D19B99F008B26E3 /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0E5D321D19B99F008B26E3 /* NoteViewController.swift */; };
-		FC0E5D351D19B9E4008B26E3 /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0E5D341D19B9E4008B26E3 /* PhotoViewController.swift */; };
+		FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */; };
 		FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */; };
 		FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */; };
 		FC8244E11D199D290048C3A7 /* RecordTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */; };
@@ -32,8 +31,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		FC0E5D321D19B99F008B26E3 /* NoteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
-		FC0E5D341D19B9E4008B26E3 /* PhotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
+		FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
 		FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
 		FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewController.swift; sourceTree = "<group>"; };
 		FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecordTableViewController.xib; sourceTree = "<group>"; };
@@ -91,8 +89,7 @@
 			children = (
 				FC84B3A51D18EFE800251003 /* AppDelegate.swift */,
 				FC84B3A71D18EFE800251003 /* MeasViewController.swift */,
-				FC0E5D321D19B99F008B26E3 /* NoteViewController.swift */,
-				FC0E5D341D19B9E4008B26E3 /* PhotoViewController.swift */,
+				FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */,
 				FC84B3C51D1919D400251003 /* Record.swift */,
 				FC84B3A91D18EFE800251003 /* Main.storyboard */,
 				FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */,
@@ -221,9 +218,8 @@
 				FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */,
 				FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */,
 				FC84B3C61D1919D400251003 /* Record.swift in Sources */,
-				FC0E5D351D19B9E4008B26E3 /* PhotoViewController.swift in Sources */,
-				FC0E5D331D19B99F008B26E3 /* NoteViewController.swift in Sources */,
 				FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */,
+				FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

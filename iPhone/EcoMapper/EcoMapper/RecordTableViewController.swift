@@ -129,6 +129,11 @@ class RecordTableViewController: UITableViewController {
             let newIndexPath = NSIndexPath(forRow: records.count, inSection: 0)
             records.append(record)
             tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Bottom)
+        } else if let sourceViewController = sender.sourceViewController as? PhotoViewController, record = sourceViewController.record {
+            // Add a new record
+            let newIndexPath = NSIndexPath(forRow: records.count, inSection: 0)
+            records.append(record)
+            tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Bottom)
         }
     }
     
