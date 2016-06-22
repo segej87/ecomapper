@@ -64,7 +64,7 @@ class RecordTableViewController: UITableViewController {
         let dispTags = recTags.stringByReplacingOccurrencesOfString(";", withString: ", ", options: NSStringCompareOptions.LiteralSearch, range: nil)
         switch dt {
             case "meas":
-                cell.tagLabel.text = record.props["species"] as? String
+                cell.tagLabel.text = "\(record.props["species"]!):  \(record.props["value"]!) \(record.props["units"]!)"
         default:
             cell.tagLabel.text = dispTags
         }
