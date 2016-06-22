@@ -25,75 +25,6 @@ catch(Exception $e)
     echo $e.text();
 }
 
-/* temporary values for testing:
- * 
- */
-$_POST['GUID'] = "7b5586d5-b297-473f-adbc-ec352ede4f26";
-$_POST['geojson'] = '{
- "type": "FeatureCollection", 
- "features": [ 
-  {
-   "geometry": {
-    "type": "Point", 
-    "coordinates": [
-     -58.4622398, 
-     -34.6166197, 
-     0
-    ]
-   }, 
-   "type": "Feature", 
-   "properties": {
-    "name": "Second streamwater nitrate measurement", 
-    "tags": "water;streamwater", 
-    "datatype": "meas", 
-    "value": 312.93, 
-    "datetime": "2016-06-07 14:56:15", 
-    "access": "institution", 
-    "units": "ug/l", 
-    "species": "nitrate"
-   }
-  },
-  {
-   "geometry": {
-    "type": "Point", 
-    "coordinates": [
-     -99.2252831, 
-     19.3197409, 
-     0
-    ]
-   }, 
-   "type": "Feature", 
-   "properties": {
-    "name": "dirty well", 
-    "tags": "well water;water;thesis", 
-    "datatype": "note", 
-    "text": "there is a very dirty well here", 
-    "datetime": "2016-06-08 09:55:03", 
-    "access": "institution"
-   }
-  },
-  {
-   "geometry": {
-    "type": "Point", 
-    "coordinates": [
-     -99.2252831, 
-     19.3197409, 
-     0
-    ]
-   }, 
-   "type": "Feature", 
-   "properties": {
-    "name": "well-dirty.jpg", 
-    "tags": "water;well water;dirty", 
-    "datatype": "photo", 
-    "filepath": "c:/users/jon sege/dropbox/kumpi mayu/mapdev/samplePhotos/", 
-    "datetime": "2013-08-11 10:49:00", 
-    "access": "institution"
-   }
-  }
- ]
-}';
-
 // check for post data
 if (isset($_POST['GUID']) && isset($_POST['geojson']))
 {
@@ -207,7 +138,7 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
             }
             
             // json encode the new info to send
-            $geojsonOut = json_encode($geojsonNew);
+            $geojsonOut = json_encode($geojsonNew, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             
              // write the new geojson file to the server
             $tsql2 = "UPDATE personal SET geojsonText = (?) WHERE UID = (?)";
