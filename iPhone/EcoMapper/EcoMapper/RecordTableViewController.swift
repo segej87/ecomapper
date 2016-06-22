@@ -19,6 +19,11 @@ class RecordTableViewController: UITableViewController {
         
         // Use the edit button item provided by the table view controller.
         navigationItem.leftBarButtonItem = editButtonItem()
+        
+        // Load any saved records, otherwise, load nothing
+        if let savedRecords = loadRecords() {
+            records += savedRecords
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -97,6 +102,7 @@ class RecordTableViewController: UITableViewController {
         if editingStyle == .Delete {
             // Delete the row from the data source
             records.removeAtIndex(indexPath.row)
+            saveRecords()
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         } else if editingStyle == .Insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
@@ -170,6 +176,9 @@ class RecordTableViewController: UITableViewController {
                 records.append(record)
                 tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Bottom)
             }
+            
+            // Save the records.
+            saveRecords()
         } else if let sourceViewController = sender.sourceViewController as? PhotoViewController, record = sourceViewController.record {
             if let selectedIndexPath = tableView.indexPathForSelectedRow {
                 // Update an existing record.
@@ -181,6 +190,9 @@ class RecordTableViewController: UITableViewController {
                 records.append(record)
                 tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Bottom)
             }
+            
+            // Save the records.
+            saveRecords()
         } else if let sourceViewController = sender.sourceViewController as? NoteViewController, record = sourceViewController.record {
             if let selectedIndexPath = tableView.indexPathForSelectedRow {
                 // Update an existing record.
@@ -192,7 +204,24 @@ class RecordTableViewController: UITableViewController {
                 records.append(record)
                 tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Bottom)
             }
+            
+            // Save the records.
+            saveRecords()
         }
+    }
+    
+    // MARK: NSCoding
+    
+    func saveRecords() {
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(records, toFile: Record.ArchiveURL.path!)
+        
+        if !isSuccessfulSave {
+            print("Failed to save meals...")
+        }
+    }
+    
+    func loadRecords() -> [Record]? {
+        return NSKeyedUnarchiver.unarchiveObjectWithFile(Record.ArchiveURL.path!) as? [Record]
     }
     
 }

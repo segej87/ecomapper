@@ -8,13 +8,21 @@
 
 import UIKit
 
-class Record {
+class Record: NSObject, NSCoding {
     
     // MARK: Properties
     
     var coords: [Double]
     var photo: UIImage?
     var props: [String:AnyObject]
+    
+    // MARK: Types
+    
+    struct PropertyKey {
+        static let coordKey = "coordinates"
+        static let photoKey = "photo"
+        static let propsKey = "properties"
+    }
     
     // MARK: Initialization
     
@@ -23,9 +31,34 @@ class Record {
         self.photo = photo
         self.props = props
         
+        super.init()
+        
         // Make initializer failable
         if coords.count < 2 || !props.keys.contains("name") {
             return nil
         }
     }
+    
+    // MARK: NSCoding
+    
+    func encodeWithCoder(aCoder: NSCoder) {
+        aCoder.encodeObject(coords, forKey: PropertyKey.coordKey)
+        aCoder.encodeObject(photo, forKey: PropertyKey.photoKey)
+        aCoder.encodeObject(props, forKey: PropertyKey.propsKey)
+    }
+    
+    required convenience init?(coder aDecoder: NSCoder) {
+        let coords = aDecoder.decodeObjectForKey(PropertyKey.coordKey) as! [Double]
+        let photo = aDecoder.decodeObjectForKey(PropertyKey.photoKey) as? UIImage
+        let props = aDecoder.decodeObjectForKey(PropertyKey.propsKey) as! [String:AnyObject]
+        
+        // Must call designated initializer
+        self.init(coords: coords, photo: photo, props: props)
+    }
+    
+    // MARK: Archiving Paths
+    
+    static let DocumentsDirectory = NSFileManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
+    static let ArchiveURL = DocumentsDirectory.URLByAppendingPathComponent("ecoRecords")
+    
 }
