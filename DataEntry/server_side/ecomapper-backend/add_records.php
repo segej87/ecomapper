@@ -56,10 +56,10 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
             // check if any of the new features are already in the sql database
             $samesArray = array();
             if ($num_new_feats > 0) {
-                for ($j = 0; $j < $num_new_feats; ++$j) {
+                for ($j = 0; $j < $num_new_feats; $j++) {
                     $newfeat = $new_feats[$j];
                     if ($num_old_feats > 0) {
-                        for ($i = 0; $i < $num_old_feats; ++$i) {
+                        for ($i = 0; $i < $num_old_feats; $i++) {
                             $oldfeat = $old_feats[$i];
                             unset($oldfeat['id']);
                             if ($newfeat == $oldfeat) {
@@ -72,10 +72,11 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
             }
             
             // remove any identical features and recount
-            for ($i = 0; $i < count($samesArray); ++$i) {
+            for ($i = 0; $i < count($samesArray); $i++) {
                 unset($new_feats[$samesArray[$i]]);
             }
-            $num_new_clean_feats = count($new_feats);
+            $clean_feats = array_values($new_feats); // reindex the array
+            $num_new_clean_feats = count($clean_feats);
             
             if ($num_new_clean_feats == 0) {
                 die("No new records detected");
@@ -83,43 +84,51 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
             
             // get old indexes
             $oldInds = [];
-            for ($i = 0; $i < count($old_feats); ++$i) {
+            for ($i = 0; $i < count($old_feats); $i++) {
                 array_push($oldInds, $old_feats[$i]['id']);
             }
             
             // assign indexes to the new features, making sure they are unique
-            for ($i = 0; $i < count($new_feats); ++$i) {
+            for ($i = 0; $i < $num_new_clean_feats; $i++) {
                 $newId = rand(1000000, 9999999);
-                while (in_array($newID, $oldInds)) {
+                while (in_array($newId, $oldInds)) {
                     $newId = rand(1000000, 9999999);
-                    echo $newId;
                 }
-                $new_feats[$i]['id'] = $newId;
+                $clean_feats[$i]['id'] = $newId;
                 array_push($oldInds, $newId);
+                $indTest = $i + 1;
+                if ($clean_feats[$i]['id'] = $newId) {
+                    $idTest = $newId . " added";
+                } else {
+                    $idTest = $newId . " not added";
+                }
+
             }
             
             // combine old and new features
-            $addFeats = array_merge($old_feats, $new_feats);
+            $addFeats = array_merge($old_feats, $clean_feats);
             
             // check processes
             $checkArray = array();
             
             // check that all old features were added back
-            for ($i = 0; $i < count($old_feats); ++$i) {
+            for ($i = 0; $i < count($old_feats); $i++) {
                 if (!in_array($old_feats[$i], $addFeats)) {
                     array_push($checkArray, "Old feature " . $i . " not added");
                 }
             }
             
-            for ($i = 0; $i < count($new_feats); ++$i) {
-                if (!in_array($new_feats[$i], $addFeats)) {
+            for ($i = 0; $i < $num_new_clean_feats; $i++) {
+                if (!in_array($clean_feats[$i], $addFeats)) {
                     array_push($checkArray, "New feature " . $i . " not added");
                 }
             }
             
-            for ($i = 0; $i < count($addFeats); ++$i) {
+            for ($i = 0; $i < count($addFeats); $i++) {
                 if (!array_key_exists('id', $addFeats[$i])) {
-                    array_push($checkArray, "Key not added to feature " . $i);
+                    array_push($checkArray, "Number of new clean features: " . $num_new_clean_feats);
+                    array_push($checkArray, "New ID " . $idTest . " in loop of length " . $indTest);
+                    array_push($checkArray, "Key not added to feature " . ($i + 1));
                 }
             }
             
@@ -147,9 +156,9 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
             if ($stmt === false ) {
                 die( print_r (sqlsrv_errors(), true));
             } else {
-                echo "Success! Report: Old features: " . $num_old_feats . 
-                        ". New features: " . $num_new_feats . 
-                        ". New clean features: " . $num_new_clean_feats;
+                echo "Success! Features before sync: " . $num_old_feats . 
+                        ". Total new features: " . $num_new_feats . 
+                        ". New features added: " . $num_new_clean_feats;
             }
         }
         else
