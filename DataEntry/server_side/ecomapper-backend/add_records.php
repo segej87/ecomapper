@@ -79,7 +79,7 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
             $num_new_clean_feats = count($clean_feats);
             
             if ($num_new_clean_feats == 0) {
-                die("No new records detected");
+                die("Total in: " . $num_new_feats . ". No new records detected");
             }
             
             // get old indexes
