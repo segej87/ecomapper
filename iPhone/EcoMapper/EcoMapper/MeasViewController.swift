@@ -38,6 +38,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
      This value will be filled with the user's location by the CLLocationManager delegate
      */
     var userLoc: [Double]?
+    var gpsAcc: Double?
     
     /*
      This value will be filled with the date and time recorded when the view was opened
@@ -91,6 +92,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             notesTextField.text = record.props["text"] as? String
             tagTextField.text = record.props["tags"] as? String
             dateTime = record.props["datetime"] as? String
+            userLoc = record.coords
         } else {
             // Set a default index for the picker to prevent errors.
             //TODO: Set default access from another menu
@@ -104,6 +106,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             // If location is authorized, start location services
             locationManager.delegate = self
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.requestWhenInUseAuthorization()
             locationManager.requestLocation()
         }
         
@@ -130,7 +133,18 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         let text3 = valTextField.text ?? ""
         let text4 = unitsTextField.text ?? ""
         let text5 = tagTextField.text ?? ""
-        saveButton.enabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty || text4.isEmpty || text5.isEmpty)
+        let loc1 = userLoc ?? nil
+        
+        saveButton.enabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty || text4.isEmpty || text5.isEmpty || loc1 == nil || !checkMeasFloatVal())
+    }
+    
+    // TODO: Improve this check (if string starts with valid float it will pass, even if letter is in there)
+    func checkMeasFloatVal() -> Bool {
+        let valFloat = (valTextField.text! as NSString).floatValue
+        if (valFloat == 0.0 && !(valTextField.text! == "0.0")) {
+            return false
+        }
+        return true
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
@@ -148,6 +162,13 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     
     func textViewDidChange(textView: UITextView) {
         
+    }
+    
+    func textViewShouldReturn(textView: UITextView) -> Bool {
+        
+        //Hide the keyboard.
+        textView.resignFirstResponder()
+        return true
     }
     
     // MARK: UIPicker delegate and data sources
@@ -170,18 +191,36 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     }
     
     // MARK: Location methods
-        // TODO: only take if available, otherwise throw up error
-        // TODO: implement stability check before allowing reading
+    
+    func noGPS() {
+        let alertVC = UIAlertController(title: "No GPS", message: "Can't pinpoint your location, using default", preferredStyle: .Alert)
+        let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+        alertVC.addAction(okAction)
+        presentViewController(alertVC, animated: true, completion: nil)
+    }
+    
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.first {
-            let lon = location.coordinate.longitude
-            let lat = location.coordinate.latitude
-            self.userLoc = [lon, lat]
+        if let location = locations.last {
+            // TODO: improve stability check before allowing reading
+            if location.horizontalAccuracy <= 30.0 {
+                let lon = location.coordinate.longitude
+                let lat = location.coordinate.latitude
+                self.userLoc = [lon, lat]
+                print("Location found:  \(userLoc!)")
+            } else {
+                manager.requestLocation()
+            }
         }
     }
     
     func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
         print("Failed to find user's location: \(error.localizedDescription)")
+        print("No location found, using default")
+        noGPS()
+        let lon = -123.45
+        let lat = 67.89
+        self.userLoc = [lon, lat]
+        checkValidName()
     }
     
     // MARK: Date methods
@@ -210,21 +249,10 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         if saveButton === sender {
             let name = nameTextField.text ?? ""
             
-            // TODO: Make this pull from GPS (if available)
-            var coords: [Double]?
-            if userLoc == nil {
-                print("No location found, using default")
-                coords = [-123.45, 67.89]
-            } else {
-                print("Location found:  \(userLoc)")
-                coords = userLoc
-            }
-            //let coords = userLoc!
-            
             let props = ["name": name, "tags": tagTextField.text, "datatype": "meas", "datetime": dateTime, "access": accessLevel, "text": notesTextField.text, "value": valTextField.text, "species": measTextField.text, "units": unitsTextField.text]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
-            record = Record(coords: coords!, photo: nil, props: props)
+            record = Record(coords: self.userLoc!, photo: nil, props: props)
         }
     }
     

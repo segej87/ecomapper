@@ -25,6 +25,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     let pickerData = ["public", "institution", "private"]
     
     var accessLevel: String?
+    var photoURL: NSURL?
     
     /*
      This value will be filled with the user's location by the CLLocationManager delegate
@@ -78,6 +79,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             notesTextField.text = record.props["text"] as? String
             tagTextField.text = record.props["tags"] as? String
             dateTime = record.props["datetime"] as? String
+            userLoc = record.coords
         } else {
             // Set a default index for the picker to prevent errors.
             //TODO: Set default access from another menu
@@ -91,6 +93,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             // If location is authorized, start location services
             locationManager.delegate = self
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.requestWhenInUseAuthorization()
             locationManager.requestLocation()
         }
         
@@ -120,6 +123,12 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         // The info dictionary contains multiple representations of the image, and this uses the original.
         let selectedImage = info[UIImagePickerControllerOriginalImage] as! UIImage
         
+        // Get the URL of the image
+        let imageURL = info[UIImagePickerControllerReferenceURL] as! NSURL
+        
+        // Set the URL of the image on the phone's disk
+        photoURL = imageURL
+        
         // Set photoImageView to display the selected image.
         photoImageView.image = selectedImage
         
@@ -140,7 +149,8 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         let text1 = nameTextField.text ?? ""
         let text2 = tagTextField.text ?? ""
         let photo1 = photoImageView.image ?? nil
-        saveButton.enabled = !(text1.isEmpty || text2.isEmpty || photo1 == nil)
+        let loc1 = userLoc ?? nil
+        saveButton.enabled = !(text1.isEmpty || text2.isEmpty || photo1 == nil || loc1 == nil)
     }
     
     func textFieldShouldReturn(textField: UITextField) -> Bool {
@@ -180,18 +190,36 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     }
     
     // MARK: Location methods
-    // TODO: only take if available, otherwise throw up error
-    // TODO: implement stability check before allowing reading
+    
+    func noGPS() {
+        let alertVC = UIAlertController(title: "No GPS", message: "Can't pinpoint your location, using default", preferredStyle: .Alert)
+        let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+        alertVC.addAction(okAction)
+        presentViewController(alertVC, animated: true, completion: nil)
+    }
+    
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.first {
-            let lon = location.coordinate.longitude
-            let lat = location.coordinate.latitude
-            self.userLoc = [lon, lat]
+        if let location = locations.last {
+            // TODO: improve stability check before allowing reading
+            if location.horizontalAccuracy <= 30.0 {
+                let lon = location.coordinate.longitude
+                let lat = location.coordinate.latitude
+                self.userLoc = [lon, lat]
+                print("Location found:  \(userLoc!)")
+            } else {
+                manager.requestLocation()
+            }
         }
     }
     
     func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
         print("Failed to find user's location: \(error.localizedDescription)")
+        print("No location found, using default")
+        noGPS()
+        let lon = -123.45
+        let lat = 67.89
+        self.userLoc = [lon, lat]
+        checkValidName()
     }
     
     // MARK: Date methods
@@ -219,22 +247,12 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if saveButton === sender {
             let name = nameTextField.text ?? ""
+            let urlOut = photoURL!.absoluteString
             
-            // TODO: Make this pull from GPS (if available)
-            var coords: [Double]?
-            if userLoc == nil {
-                print("No location found, using default")
-                coords = [-123.45, 67.89]
-            } else {
-                print("Location found:  \(userLoc)")
-                coords = userLoc
-            }
-            //let coords = userLoc!
-            
-            let props = ["name": name, "tags": tagTextField.text, "datatype": "photo", "datetime": dateTime, "access": accessLevel, "text": notesTextField.text]
+            let props = ["name": name, "tags": tagTextField.text, "datatype": "photo", "datetime": dateTime, "access": accessLevel, "text": notesTextField.text, "filepath": urlOut]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
-            record = Record(coords: coords!, photo: photoImageView.image, props: props)
+            record = Record(coords: userLoc!, photo: photoImageView.image, props: props)
         }
     }
     

@@ -75,6 +75,7 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             notesTextField.text = record.props["text"] as? String
             tagTextField.text = record.props["tags"] as? String
             dateTime = record.props["datetime"] as? String
+            userLoc = record.coords
         } else {
             // Set a default index for the picker to prevent errors.
             //TODO: Set default access from another menu
@@ -88,6 +89,7 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             // If location is authorized, start location services
             locationManager.delegate = self
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.requestWhenInUseAuthorization()
             locationManager.requestLocation()
         }
         
@@ -120,7 +122,8 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         let text1 = nameTextField.text ?? ""
         let text2 = notesTextField.text ?? ""
         let text3 = tagTextField.text ?? ""
-        saveButton.enabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty)
+        let loc1 = userLoc ?? nil
+        saveButton.enabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty || loc1 == nil)
     }
     
     func textViewDidChange(textView: UITextView) {
@@ -147,18 +150,36 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     }
     
     // MARK: Location methods
-    // TODO: only take if available, otherwise throw up error
-    // TODO: implement stability check before allowing reading
+
+    func noGPS() {
+        let alertVC = UIAlertController(title: "No GPS", message: "Can't pinpoint your location, using default", preferredStyle: .Alert)
+        let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+        alertVC.addAction(okAction)
+        presentViewController(alertVC, animated: true, completion: nil)
+    }
+    
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.first {
-            let lon = location.coordinate.longitude
-            let lat = location.coordinate.latitude
-            self.userLoc = [lon, lat]
+        if let location = locations.last {
+            // TODO: improve stability check before allowing reading
+            if location.horizontalAccuracy <= 30.0 {
+                let lon = location.coordinate.longitude
+                let lat = location.coordinate.latitude
+                self.userLoc = [lon, lat]
+                print("Location found:  \(userLoc!)")
+            } else {
+                manager.requestLocation()
+            }
         }
     }
     
     func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
         print("Failed to find user's location: \(error.localizedDescription)")
+        print("No location found, using default")
+        noGPS()
+        let lon = -123.45
+        let lat = 67.89
+        self.userLoc = [lon, lat]
+        checkValidName()
     }
     
     // MARK: Date methods
@@ -187,21 +208,10 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         if saveButton === sender {
             let name = nameTextField.text ?? ""
             
-            // TODO: Make this pull from GPS (if available)
-            var coords: [Double]?
-            if userLoc == nil {
-                print("No location found, using default")
-                coords = [-123.45, 67.89]
-            } else {
-                print("Location found:  \(userLoc)")
-                coords = userLoc
-            }
-            //let coords = userLoc!
-            
             let props = ["name": name, "tags": tagTextField.text, "datatype": "note", "datetime": dateTime, "access": accessLevel, "text": notesTextField.text]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
-            record = Record(coords: coords!, photo: nil, props: props)
+            record = Record(coords: userLoc!, photo: nil, props: props)
         }
     }
     

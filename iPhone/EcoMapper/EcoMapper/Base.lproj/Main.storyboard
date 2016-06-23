@@ -183,7 +183,7 @@
                                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter the value of the measurement" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="djJ-rh-69J">
                                                         <rect key="frame" x="0.0" y="26" width="560" height="30"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences" keyboardType="decimalPad" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
+                                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences" keyboardType="numbersAndPunctuation" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                                     </textField>
                                                 </subviews>
                                                 <constraints>
@@ -281,6 +281,7 @@
                         <constraints>
                             <constraint firstItem="b5q-rY-dM0" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="D4m-x1-9Lo"/>
                             <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="b5q-rY-dM0" secondAttribute="bottom" constant="8" symbolic="YES" id="MKW-v5-afV"/>
+                            <constraint firstItem="b5q-rY-dM0" firstAttribute="trailing" secondItem="8bC-Xf-vdC" secondAttribute="trailingMargin" id="cK0-mg-TaW"/>
                             <constraint firstItem="b5q-rY-dM0" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="16" id="fft-Ve-QdM"/>
                         </constraints>
                     </view>
@@ -668,13 +669,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="nMn-tj-6Sx">
-                                <rect key="frame" x="70" y="114" width="460" height="260"/>
+                                <rect key="frame" x="70" y="114" width="460" height="200"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="80" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2V7-78-A2C">
-                                        <rect key="frame" x="0.0" y="0.0" width="460" height="80"/>
+                                    <button opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="60" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2V7-78-A2C">
+                                        <rect key="frame" x="0.0" y="0.0" width="460" height="60"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="80" id="Ree-QV-2vp"/>
+                                            <constraint firstAttribute="height" constant="60" id="Ree-QV-2vp"/>
                                         </constraints>
                                         <state key="normal" title="Add Measurement">
                                             <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -683,11 +684,11 @@
                                             <segue destination="YtV-2J-P65" kind="presentation" identifier="AddMeas" id="jLi-3N-7gU"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="80" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GZw-yE-T2x">
-                                        <rect key="frame" x="0.0" y="90" width="460" height="80"/>
+                                    <button opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="60" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GZw-yE-T2x">
+                                        <rect key="frame" x="0.0" y="70" width="460" height="60"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="80" id="jd7-0B-ZE1"/>
+                                            <constraint firstAttribute="height" constant="60" id="jd7-0B-ZE1"/>
                                         </constraints>
                                         <state key="normal" title="Add Note">
                                             <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -696,11 +697,11 @@
                                             <segue destination="oLy-Iz-yzX" kind="presentation" id="Y9s-2v-xf8"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="80" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V92-vf-b4n">
-                                        <rect key="frame" x="0.0" y="180" width="460" height="80"/>
+                                    <button opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="60" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V92-vf-b4n">
+                                        <rect key="frame" x="0.0" y="140" width="460" height="60"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.29803921570000003" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="80" id="TOB-Io-dzj"/>
+                                            <constraint firstAttribute="height" constant="60" id="TOB-Io-dzj"/>
                                         </constraints>
                                         <state key="normal" title="Add Photo">
                                             <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
