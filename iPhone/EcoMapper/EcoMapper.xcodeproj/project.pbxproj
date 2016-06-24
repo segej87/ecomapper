@@ -1,0 +1,444 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */; };
+		FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3349DB1D1B365F00D112EA /* Reachability.swift */; };
+		FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */; };
+		FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */; };
+		FC8244E11D199D290048C3A7 /* RecordTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */; };
+		FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3A51D18EFE800251003 /* AppDelegate.swift */; };
+		FC84B3A81D18EFE800251003 /* MeasViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3A71D18EFE800251003 /* MeasViewController.swift */; };
+		FC84B3AB1D18EFE800251003 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FC84B3A91D18EFE800251003 /* Main.storyboard */; };
+		FC84B3AD1D18EFE800251003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FC84B3AC1D18EFE800251003 /* Assets.xcassets */; };
+		FC84B3B01D18EFE800251003 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */; };
+		FC84B3BB1D18EFE800251003 /* EcoMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3BA1D18EFE800251003 /* EcoMapperTests.swift */; };
+		FC84B3C61D1919D400251003 /* Record.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3C51D1919D400251003 /* Record.swift */; };
+		FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCCE99311D1A23C300A675BE /* NoteViewController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FC84B3B71D18EFE800251003 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FC84B39A1D18EFE800251003 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FC84B3A11D18EFE800251003;
+			remoteInfo = EcoMapper;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
+		FC3349DB1D1B365F00D112EA /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
+		FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
+		FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewController.swift; sourceTree = "<group>"; };
+		FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecordTableViewController.xib; sourceTree = "<group>"; };
+		FC84B3A21D18EFE800251003 /* EcoMapper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EcoMapper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC84B3A51D18EFE800251003 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		FC84B3A71D18EFE800251003 /* MeasViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasViewController.swift; sourceTree = "<group>"; };
+		FC84B3AA1D18EFE800251003 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FC84B3AC1D18EFE800251003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FC84B3AF1D18EFE800251003 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		FC84B3B11D18EFE800251003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FC84B3B61D18EFE800251003 /* EcoMapperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EcoMapperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC84B3BA1D18EFE800251003 /* EcoMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoMapperTests.swift; sourceTree = "<group>"; };
+		FC84B3BC1D18EFE800251003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FC84B3C51D1919D400251003 /* Record.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Record.swift; sourceTree = "<group>"; };
+		FCCE99311D1A23C300A675BE /* NoteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FC84B39F1D18EFE800251003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC84B3B31D18EFE800251003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FC84B3991D18EFE800251003 = {
+			isa = PBXGroup;
+			children = (
+				FC84B3A41D18EFE800251003 /* EcoMapper */,
+				FC84B3B91D18EFE800251003 /* EcoMapperTests */,
+				FC84B3A31D18EFE800251003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FC84B3A31D18EFE800251003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FC84B3A21D18EFE800251003 /* EcoMapper.app */,
+				FC84B3B61D18EFE800251003 /* EcoMapperTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FC84B3A41D18EFE800251003 /* EcoMapper */ = {
+			isa = PBXGroup;
+			children = (
+				FC84B3A51D18EFE800251003 /* AppDelegate.swift */,
+				FC84B3A71D18EFE800251003 /* MeasViewController.swift */,
+				FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */,
+				FC84B3C51D1919D400251003 /* Record.swift */,
+				FC84B3A91D18EFE800251003 /* Main.storyboard */,
+				FC3349DB1D1B365F00D112EA /* Reachability.swift */,
+				FCCE99311D1A23C300A675BE /* NoteViewController.swift */,
+				FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */,
+				FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */,
+				FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */,
+				FC84B3AC1D18EFE800251003 /* Assets.xcassets */,
+				FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */,
+				FC84B3B11D18EFE800251003 /* Info.plist */,
+			);
+			path = EcoMapper;
+			sourceTree = "<group>";
+		};
+		FC84B3B91D18EFE800251003 /* EcoMapperTests */ = {
+			isa = PBXGroup;
+			children = (
+				FC84B3BA1D18EFE800251003 /* EcoMapperTests.swift */,
+				FC84B3BC1D18EFE800251003 /* Info.plist */,
+			);
+			path = EcoMapperTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FC84B3A11D18EFE800251003 /* EcoMapper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC84B3BF1D18EFE800251003 /* Build configuration list for PBXNativeTarget "EcoMapper" */;
+			buildPhases = (
+				FC84B39E1D18EFE800251003 /* Sources */,
+				FC84B39F1D18EFE800251003 /* Frameworks */,
+				FC84B3A01D18EFE800251003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EcoMapper;
+			productName = EcoMapper;
+			productReference = FC84B3A21D18EFE800251003 /* EcoMapper.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FC84B3B51D18EFE800251003 /* EcoMapperTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FC84B3C21D18EFE800251003 /* Build configuration list for PBXNativeTarget "EcoMapperTests" */;
+			buildPhases = (
+				FC84B3B21D18EFE800251003 /* Sources */,
+				FC84B3B31D18EFE800251003 /* Frameworks */,
+				FC84B3B41D18EFE800251003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FC84B3B81D18EFE800251003 /* PBXTargetDependency */,
+			);
+			name = EcoMapperTests;
+			productName = EcoMapperTests;
+			productReference = FC84B3B61D18EFE800251003 /* EcoMapperTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FC84B39A1D18EFE800251003 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0730;
+				LastUpgradeCheck = 0730;
+				ORGANIZATIONNAME = "Sege Industries";
+				TargetAttributes = {
+					FC84B3A11D18EFE800251003 = {
+						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = N6RMATL4MH;
+					};
+					FC84B3B51D18EFE800251003 = {
+						CreatedOnToolsVersion = 7.3.1;
+						TestTargetID = FC84B3A11D18EFE800251003;
+					};
+				};
+			};
+			buildConfigurationList = FC84B39D1D18EFE800251003 /* Build configuration list for PBXProject "EcoMapper" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FC84B3991D18EFE800251003;
+			productRefGroup = FC84B3A31D18EFE800251003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FC84B3A11D18EFE800251003 /* EcoMapper */,
+				FC84B3B51D18EFE800251003 /* EcoMapperTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FC84B3A01D18EFE800251003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC8244E11D199D290048C3A7 /* RecordTableViewController.xib in Resources */,
+				FC84B3B01D18EFE800251003 /* LaunchScreen.storyboard in Resources */,
+				FC84B3AD1D18EFE800251003 /* Assets.xcassets in Resources */,
+				FC84B3AB1D18EFE800251003 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC84B3B41D18EFE800251003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FC84B39E1D18EFE800251003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */,
+				FC84B3A81D18EFE800251003 /* MeasViewController.swift in Sources */,
+				FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */,
+				FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */,
+				FC84B3C61D1919D400251003 /* Record.swift in Sources */,
+				FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */,
+				FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */,
+				FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC84B3B21D18EFE800251003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC84B3BB1D18EFE800251003 /* EcoMapperTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FC84B3B81D18EFE800251003 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FC84B3A11D18EFE800251003 /* EcoMapper */;
+			targetProxy = FC84B3B71D18EFE800251003 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		FC84B3A91D18EFE800251003 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FC84B3AA1D18EFE800251003 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FC84B3AF1D18EFE800251003 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		FC84B3BD1D18EFE800251003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		FC84B3BE1D18EFE800251003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		FC84B3C01D18EFE800251003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				INFOPLIST_FILE = EcoMapper/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gmail.jonsege.EcoMapper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+			};
+			name = Debug;
+		};
+		FC84B3C11D18EFE800251003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				INFOPLIST_FILE = EcoMapper/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gmail.jonsege.EcoMapper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+			};
+			name = Release;
+		};
+		FC84B3C31D18EFE800251003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = EcoMapperTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gmail.jonsege.EcoMapperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EcoMapper.app/EcoMapper";
+			};
+			name = Debug;
+		};
+		FC84B3C41D18EFE800251003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = EcoMapperTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gmail.jonsege.EcoMapperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EcoMapper.app/EcoMapper";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FC84B39D1D18EFE800251003 /* Build configuration list for PBXProject "EcoMapper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC84B3BD1D18EFE800251003 /* Debug */,
+				FC84B3BE1D18EFE800251003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FC84B3BF1D18EFE800251003 /* Build configuration list for PBXNativeTarget "EcoMapper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC84B3C01D18EFE800251003 /* Debug */,
+				FC84B3C11D18EFE800251003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FC84B3C21D18EFE800251003 /* Build configuration list for PBXNativeTarget "EcoMapperTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FC84B3C31D18EFE800251003 /* Debug */,
+				FC84B3C41D18EFE800251003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FC84B39A1D18EFE800251003 /* Project object */;
+}
