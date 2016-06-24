@@ -89,8 +89,16 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             // If location is authorized, start location services
             locationManager.delegate = self
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager.requestWhenInUseAuthorization()
-            locationManager.requestLocation()
+            if #available(iOS 8.0, *) {
+                locationManager.requestWhenInUseAuthorization()
+            } else {
+                // Fallback on earlier versions
+            }
+            if #available(iOS 9.0, *) {
+                locationManager.requestLocation()
+            } else {
+                // Fallback on earlier versions
+            }
         }
         
         // Enable the Save button only if the required text fields have a valid name.
@@ -152,10 +160,14 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     // MARK: Location methods
 
     func noGPS() {
-        let alertVC = UIAlertController(title: "No GPS", message: "Can't pinpoint your location, using default", preferredStyle: .Alert)
-        let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
-        alertVC.addAction(okAction)
-        presentViewController(alertVC, animated: true, completion: nil)
+        if #available(iOS 8.0, *) {
+            let alertVC = UIAlertController(title: "No GPS", message: "Can't pinpoint your location, using default", preferredStyle: .Alert)
+            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+            alertVC.addAction(okAction)
+            presentViewController(alertVC, animated: true, completion: nil)
+        } else {
+            // Fallback on earlier versions
+        }
     }
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -167,7 +179,11 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
                 self.userLoc = [lon, lat]
                 print("Location found:  \(userLoc!)")
             } else {
-                manager.requestLocation()
+                if #available(iOS 9.0, *) {
+                    manager.requestLocation()
+                } else {
+                    // Fallback on earlier versions
+                }
             }
         }
     }

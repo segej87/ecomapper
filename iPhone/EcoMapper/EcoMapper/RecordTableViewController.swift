@@ -185,15 +185,23 @@ class RecordTableViewController: UITableViewController {
                 print(error)
             }
             
-            let alertVC = UIAlertController(title: "Sync status", message: msg.newVal, preferredStyle: .Alert)
-            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
-            alertVC.addAction(okAction)
-            self.presentViewController(alertVC, animated: true, completion: nil)
+            if #available(iOS 8.0, *) {
+                let alertVC = UIAlertController(title: "Sync status", message: msg.newVal, preferredStyle: .Alert)
+                let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+                alertVC.addAction(okAction)
+                self.presentViewController(alertVC, animated: true, completion: nil)
+            } else {
+                // Fallback on earlier versions
+            }
         } else {
-            let alertVC = UIAlertController(title: "No connection detected", message: "Can't sync without a data connection", preferredStyle: .Alert)
-            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
-            alertVC.addAction(okAction)
-            presentViewController(alertVC, animated: true, completion: nil)
+            if #available(iOS 8.0, *) {
+                let alertVC = UIAlertController(title: "No connection detected", message: "Can't sync without a data connection", preferredStyle: .Alert)
+                let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+                alertVC.addAction(okAction)
+                presentViewController(alertVC, animated: true, completion: nil)
+            } else {
+                // Fallback on earlier versions
+            }
         }
     }
     

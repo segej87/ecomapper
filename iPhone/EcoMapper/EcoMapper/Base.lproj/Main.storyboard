@@ -301,7 +301,6 @@
                     <size key="freeformSize" width="600" height="750"/>
                     <connections>
                         <outlet property="accessPicker" destination="5oC-mv-YKX" id="FSX-gh-mfo"/>
-                        <outlet property="measStackView" destination="8Bz-nG-R27" id="jAh-oF-W5T"/>
                         <outlet property="measTextField" destination="R5s-eq-C6y" id="Cei-wO-Hap"/>
                         <outlet property="nameTextField" destination="l52-Hn-tHi" id="Yal-yd-lbw"/>
                         <outlet property="noteLabel" destination="whk-2W-rU7" id="bbd-sk-huv"/>
