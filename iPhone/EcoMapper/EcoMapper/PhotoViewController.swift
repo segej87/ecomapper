@@ -41,6 +41,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
      This value is either passed by 'RecordTableViewController' in 'prepareForSegue(_:sender:)' or constructed as part of adding a new record.
      */
     var record: Record?
+    var media: Media?
     
     // MARK: Initialization
     
@@ -273,6 +274,10 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: userLoc!, photo: photoImageView.image, props: props)
+            
+            // Set the media reference to be passed to RecordTableViewController after the unwind segue.
+            let medOutName = "Photo_\(dateTime!.stringByReplacingOccurrencesOfString("-", withString: "").stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString(" ", withString: "_")).\(urlOut.substringFromIndex(urlOut.rangeOfString("ext=")!.endIndex))"
+            media = Media(name: medOutName, path: photoURL)
         }
     }
     

@@ -13,6 +13,7 @@ class RecordTableViewController: UITableViewController {
     // MARK: Properties
     
     var records = [Record]()
+    var medias = [Media]()
     var guid = "7b5586d5-b297-473f-adbc-ec352ede4f26"
     struct syncMsg {
         var curVal = String()
@@ -41,6 +42,11 @@ class RecordTableViewController: UITableViewController {
         // Load any saved records, otherwise, load nothing
         if let savedRecords = loadRecords() {
             records += savedRecords
+        }
+        
+        // Load any saved media, otherwise, load nothing
+        if let savedMedia = loadMedia() {
+            medias += savedMedia
         }
     }
 
@@ -118,9 +124,21 @@ class RecordTableViewController: UITableViewController {
     // Override to support editing the table view.
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
+            if records[indexPath.row].props["datatype"] as! String == "photo" {
+                // Before updating the photo, find its corresponding record in the media list.
+                let oldMediaName = records[indexPath.row].props["filepath"] as! String
+                let oldMediaIndex = indexOfMedia(oldMediaName)
+                
+                if oldMediaIndex != -1 {
+                    // Before deleting the record row, delete the media reference
+                    medias.removeAtIndex(oldMediaIndex)
+                }
+            }
+            
             // Delete the row from the data source
             records.removeAtIndex(indexPath.row)
             saveRecords()
+            saveMedia()
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         } else if editingStyle == .Insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
@@ -209,6 +227,19 @@ class RecordTableViewController: UITableViewController {
 //    @IBAction func selectCell(sender: UITapGestureRecognizer) {
 //        selectCell(sender)
 //    }
+    
+    // MARK: Helper methods
+    
+    func indexOfMedia(needle: String) -> Int {
+        var oldMediaIndex = 0
+        while oldMediaIndex < medias.count{
+            if medias[oldMediaIndex].mediaName == needle {
+                return oldMediaIndex
+            }
+            oldMediaIndex += 1
+        }
+        return -1
+    }
 
     // MARK: Navigation
 
@@ -259,20 +290,38 @@ class RecordTableViewController: UITableViewController {
             
             // Save the records.
             saveRecords()
-        } else if let sourceViewController = sender.sourceViewController as? PhotoViewController, record = sourceViewController.record {
+        } else if let sourceViewController = sender.sourceViewController as? PhotoViewController, record = sourceViewController.record, media = sourceViewController.media {
             if let selectedIndexPath = tableView.indexPathForSelectedRow {
-                // Update an existing record.
+
+                // Before updating the photo, find its corresponding record in the media list.
+                let oldMediaName = records[selectedIndexPath.row].props["filepath"] as! String
+                let oldMediaIndex = indexOfMedia(oldMediaName)
+                if oldMediaIndex != -1 {
+                    medias[oldMediaIndex] = media
+                }
+                
+                record.props["filepath"] = media.mediaName
+                
+                // Update the existing record.
                 records[selectedIndexPath.row] = record
+                
                 tableView.reloadRowsAtIndexPaths([selectedIndexPath], withRowAnimation: .None)
             } else {
                 // Add a new record
                 let newIndexPath = NSIndexPath(forRow: records.count, inSection: 0)
+                record.props["filepath"] = media.mediaName
                 records.append(record)
                 tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Bottom)
+                
+                // Add a new media reference
+                medias.append(media)
             }
             
             // Save the records.
             saveRecords()
+            
+            // Save the media.
+            saveMedia()
         } else if let sourceViewController = sender.sourceViewController as? NoteViewController, record = sourceViewController.record {
             if let selectedIndexPath = tableView.indexPathForSelectedRow {
                 // Update an existing record.
@@ -300,8 +349,20 @@ class RecordTableViewController: UITableViewController {
         }
     }
     
+    func saveMedia() {
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(medias, toFile: Media.ArchiveURL.path!)
+        
+        if !isSuccessfulSave {
+            print("Failed to save media...")
+        }
+    }
+    
     func loadRecords() -> [Record]? {
         return NSKeyedUnarchiver.unarchiveObjectWithFile(Record.ArchiveURL.path!) as? [Record]
+    }
+    
+    func loadMedia() -> [Media]? {
+        return NSKeyedUnarchiver.unarchiveObjectWithFile(Media.ArchiveURL.path!) as? [Media]
     }
     
 }

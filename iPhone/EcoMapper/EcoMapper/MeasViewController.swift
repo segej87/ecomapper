@@ -26,6 +26,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     @IBOutlet weak var tagTextField: UITextField!
     @IBOutlet weak var noteLabel: UILabel!
     @IBOutlet weak var saveButton: UIBarButtonItem!
+    @IBOutlet weak var mainScrollView: UIScrollView!
     
     let locationManager = CLLocationManager()
     
