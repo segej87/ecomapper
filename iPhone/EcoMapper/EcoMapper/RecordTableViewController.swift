@@ -16,17 +16,7 @@ class RecordTableViewController: UITableViewController {
     var records = [Record]()
     var medias = [Media]()
     var guid = "7b5586d5-b297-473f-adbc-ec352ede4f26"
-    struct syncMsg {
-        var curVal = String()
-        var newVal: String? {
-            get {
-                return curVal
-            }
-            set(msg) {
-                curVal = msg!
-            }
-        }
-    }
+    var mediaNamesToRemove = [String?]()
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -172,7 +162,8 @@ class RecordTableViewController: UITableViewController {
     
     @IBAction func attemptSync(sender: UIBarButtonItem) {
         if Reachability.isConnectedToNetwork() {
-            var msg = syncMsg(curVal: "No message")
+            
+            // Upload all records at once and delete all if successful
             var bigDict = [AnyObject]()
             for i in 0..<records.count {
                 let record = records[i]
@@ -181,41 +172,29 @@ class RecordTableViewController: UITableViewController {
             }
             
             let biggerDict = ["type":"FeatureCollection", "features": bigDict]
+            uploadRecords(biggerDict)
             
-            let ru = RecordUpload(guid: guid, bigDict: biggerDict)
-            ru.uploadData { responseString in
-                print(responseString)
-            }
-            
-            let upload: UploadMedia = UploadMedia()
-            if #available(iOS 8.0, *) {
-                for i in 0..<medias.count {
-                    let media = medias[i]
-                    let asset = PHAsset.fetchAssetsWithALAssetURLs([media.mediaPath!], options: nil)
-                    guard let result = asset.firstObject where result is PHAsset else {
-                        print("No asset found")
-                        return
-                    }
-                    
-                    let imageManager = PHImageManager.defaultManager()
-                    
-                    imageManager.requestImageForAsset(result as! PHAsset, targetSize: CGSize(width: 200, height: 200), contentMode: PHImageContentMode.AspectFill, options: nil) { (image, dict) -> Void in
-                        if let image = image {
-                            upload.uploadBlobToContainer(self.guid, image, media.mediaName)
+            let  priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
+            dispatch_async(dispatch_get_global_queue(priority, 0)){
+                // Upload each media individually and delete individually if successful
+                let upload: UploadMedia = UploadMedia()
+                self.mediaNamesToRemove = [String?]()
+                for i in self.medias.indices {
+                    self.uploadMedium(i, upload: upload)
+                }
+                
+                dispatch_async(dispatch_get_main_queue()) {
+                    /* TODO: This is potentially unstable, since the main thread could delete the medium
+                     from the array before the background thread has a chance to upload it
+                     */
+                    for r in self.mediaNamesToRemove {
+                        let indexToRemove = self.indexOfMedia(r!)
+                        if indexToRemove != -1 {
+                            self.medias.removeAtIndex(indexToRemove)
                         }
                     }
+                    self.saveMedia()
                 }
-            } else {
-                // Fallback on earlier versions
-            }
-            
-            if #available(iOS 8.0, *) {
-                let alertVC = UIAlertController(title: "Sync status", message: msg.newVal, preferredStyle: .Alert)
-                let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
-                alertVC.addAction(okAction)
-                self.presentViewController(alertVC, animated: true, completion: nil)
-            } else {
-                // Fallback on earlier versions
             }
         } else {
             if #available(iOS 8.0, *) {
@@ -247,28 +226,19 @@ class RecordTableViewController: UITableViewController {
         return -1
     }
     
-    class RecordUpload {
-        var guid: String?
-        var bigDict: NSDictionary?
-        
-        init(guid: String, bigDict: NSDictionary) {
-            self.guid = guid
-            self.bigDict = bigDict
-        }
-        
-        func uploadData(completion: (NSString) -> ()) {
+    func uploadRecords(biggerDict: NSDictionary) {
+        if #available(iOS 8.0, *) {
             do {
-                let biggestDict = try NSJSONSerialization.dataWithJSONObject(bigDict!, options: NSJSONWritingOptions())
+                let biggestDict = try NSJSONSerialization.dataWithJSONObject(biggerDict, options: NSJSONWritingOptions())
                 
                 let dataString = NSString(data: biggestDict, encoding: NSUTF8StringEncoding)
                 let request = NSMutableURLRequest(URL: NSURL(string: "http://ecocollector.azurewebsites.net/add_records.php")!)
                 request.HTTPMethod = "POST"
-                let postString = "GUID=\(guid!) & geojson=\(dataString!)"
+                let postString = "GUID=\(self.guid) & geojson=\(dataString!)"
                 request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
                 
                 let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in guard error == nil && data != nil else {
                     print("error=\(error!)")
-                    completion("\(error)")
                     return
                     }
                     
@@ -278,13 +248,56 @@ class RecordTableViewController: UITableViewController {
                     }
                     
                     let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
-                    completion(responseString!)
+                    
+                    // Once background task finishes uploading, if successful, delete all records
+                    dispatch_async(dispatch_get_main_queue()) {
+                        print(responseString!)
+                        if responseString!.containsString("Success!") {
+                            var iPs = [NSIndexPath]()
+                            for i in 0..<self.records.count{
+                                let iP = NSIndexPath(forRow: i, inSection: 0)
+                                iPs.append(iP)
+                            }
+                            
+                            self.records.removeAll()
+                            self.tableView.deleteRowsAtIndexPaths(iPs, withRowAnimation: .Fade)
+                            self.saveRecords()
+                        }
+                    }
                 }
                 task.resume()
             } catch let error as NSError {
                 print(error)
-                completion("\(error)")
             }
+            
+        } else {
+            // Fallback on earlier versions
+        }
+    }
+    
+    func uploadMedium(i: Int, upload: UploadMedia) {
+        let media = medias[i]
+        if #available(iOS 8.0, *) {
+            let asset = PHAsset.fetchAssetsWithALAssetURLs([media.mediaPath!], options: nil)
+            guard let result = asset.firstObject where result is PHAsset else {
+                print("No asset found")
+                return
+            }
+            
+            let imageManager = PHImageManager.defaultManager()
+            
+            imageManager.requestImageForAsset(result as! PHAsset, targetSize: CGSize(width: 200, height: 200), contentMode: PHImageContentMode.AspectFill, options: nil) { (image, dict) -> Void in
+                if let image = image {
+                    
+                    upload.uploadBlobToContainer(self.guid, image, media.mediaName)
+                    
+                    // Mark to be deleted from medias array if uploaded successfully
+                    // TODO: Add logic to check for successful upload
+                    self.mediaNamesToRemove.append(media.mediaName)
+                }
+            }
+        } else {
+            // Fallback on earlier versions
         }
     }
     

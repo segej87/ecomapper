@@ -10,7 +10,6 @@ import UIKit
 import CoreLocation
 import QuartzCore
 
-//@available(iOS 9.0, *)
 class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
     
     // MARK: Properties
