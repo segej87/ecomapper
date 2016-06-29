@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Photos
 
 class RecordTableViewController: UITableViewController {
     
@@ -42,11 +43,17 @@ class RecordTableViewController: UITableViewController {
         // Load any saved records, otherwise, load nothing
         if let savedRecords = loadRecords() {
             records += savedRecords
+            for r in records {
+                print(r.props["name"])
+            }
         }
         
         // Load any saved media, otherwise, load nothing
         if let savedMedia = loadMedia() {
             medias += savedMedia
+            for m in medias {
+                print(m.mediaPath)
+            }
         }
     }
 
@@ -126,7 +133,8 @@ class RecordTableViewController: UITableViewController {
         if editingStyle == .Delete {
             if records[indexPath.row].props["datatype"] as! String == "photo" {
                 // Before updating the photo, find its corresponding record in the media list.
-                let oldMediaName = records[indexPath.row].props["filepath"] as! String
+                let oldMediaPath = records[indexPath.row].props["filepath"] as! String
+                let oldMediaName = oldMediaPath.stringByReplacingOccurrencesOfString("https://ecomapper.blob.core.windows.net/\(guid)/", withString: "")
                 let oldMediaIndex = indexOfMedia(oldMediaName)
                 
                 if oldMediaIndex != -1 {
@@ -164,43 +172,41 @@ class RecordTableViewController: UITableViewController {
     
     @IBAction func attemptSync(sender: UIBarButtonItem) {
         if Reachability.isConnectedToNetwork() {
+            var msg = syncMsg(curVal: "No message")
             var bigDict = [AnyObject]()
-            for record in records {
+            for i in 0..<records.count {
+                let record = records[i]
                 let dictItem = record.prepareForJSON()
                 bigDict.append(dictItem)
             }
+            
             let biggerDict = ["type":"FeatureCollection", "features": bigDict]
             
-            var msg = syncMsg(curVal: "No message")
-            do {
-                let biggestDict = try NSJSONSerialization.dataWithJSONObject(biggerDict, options: NSJSONWritingOptions())
-                let dataString = NSString(data: biggestDict, encoding: NSUTF8StringEncoding)
-                let request = NSMutableURLRequest(URL: NSURL(string: "http://ecocollector.azurewebsites.net/add_records.php")!)
-                request.HTTPMethod = "POST"
-                let postString = "GUID=\(guid) & geojson=\(dataString!)"
-                request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
-                let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in guard error == nil && data != nil else {
-                    print("error=\(error!)")
-                    msg.newVal = "Error: \(error!)"
-                    //self.syncMsg = "Error: \(error!)"
-                    return
+            let ru = RecordUpload(guid: guid, bigDict: biggerDict)
+            ru.uploadData { responseString in
+                print(responseString)
+            }
+            
+            let upload: UploadMedia = UploadMedia()
+            if #available(iOS 8.0, *) {
+                for i in 0..<medias.count {
+                    let media = medias[i]
+                    let asset = PHAsset.fetchAssetsWithALAssetURLs([media.mediaPath!], options: nil)
+                    guard let result = asset.firstObject where result is PHAsset else {
+                        print("No asset found")
+                        return
                     }
                     
-                    if let httpStatus = response as? NSHTTPURLResponse where httpStatus.statusCode != 200 {
-                        print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                        print("response = \(response!)")
-                        msg.newVal = "Error: \(response)"
-                        //self.syncMsg = "Error: \(response)"
-                    }
+                    let imageManager = PHImageManager.defaultManager()
                     
-                    let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
-                    print("responseString = \(responseString!)")
-                    msg.newVal = "Result: \(responseString!)"
-                    //set { self.syncMsg = "Result: \(responseString!)" }
+                    imageManager.requestImageForAsset(result as! PHAsset, targetSize: CGSize(width: 200, height: 200), contentMode: PHImageContentMode.AspectFill, options: nil) { (image, dict) -> Void in
+                        if let image = image {
+                            upload.uploadBlobToContainer(self.guid, image, media.mediaName)
+                        }
+                    }
                 }
-                task.resume()
-            } catch let error as NSError {
-                print(error)
+            } else {
+                // Fallback on earlier versions
             }
             
             if #available(iOS 8.0, *) {
@@ -240,7 +246,48 @@ class RecordTableViewController: UITableViewController {
         }
         return -1
     }
-
+    
+    class RecordUpload {
+        var guid: String?
+        var bigDict: NSDictionary?
+        
+        init(guid: String, bigDict: NSDictionary) {
+            self.guid = guid
+            self.bigDict = bigDict
+        }
+        
+        func uploadData(completion: (NSString) -> ()) {
+            do {
+                let biggestDict = try NSJSONSerialization.dataWithJSONObject(bigDict!, options: NSJSONWritingOptions())
+                
+                let dataString = NSString(data: biggestDict, encoding: NSUTF8StringEncoding)
+                let request = NSMutableURLRequest(URL: NSURL(string: "http://ecocollector.azurewebsites.net/add_records.php")!)
+                request.HTTPMethod = "POST"
+                let postString = "GUID=\(guid!) & geojson=\(dataString!)"
+                request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
+                
+                let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in guard error == nil && data != nil else {
+                    print("error=\(error!)")
+                    completion("\(error)")
+                    return
+                    }
+                    
+                    if let httpStatus = response as? NSHTTPURLResponse where httpStatus.statusCode != 200 {
+                        print("Status code should be 200, but it's \(httpStatus.statusCode)")
+                        print("response = \(response!)")
+                    }
+                    
+                    let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
+                    completion(responseString!)
+                }
+                task.resume()
+            } catch let error as NSError {
+                print(error)
+                completion("\(error)")
+            }
+        }
+    }
+    
     // MARK: Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -294,13 +341,15 @@ class RecordTableViewController: UITableViewController {
             if let selectedIndexPath = tableView.indexPathForSelectedRow {
 
                 // Before updating the photo, find its corresponding record in the media list.
-                let oldMediaName = records[selectedIndexPath.row].props["filepath"] as! String
+                let oldMediaPath = records[selectedIndexPath.row].props["filepath"] as! String
+                let oldMediaName = oldMediaPath.stringByReplacingOccurrencesOfString("https://ecomapper.blob.core.windows.net/\(guid)/", withString: "")
+                print(oldMediaName)
                 let oldMediaIndex = indexOfMedia(oldMediaName)
                 if oldMediaIndex != -1 {
                     medias[oldMediaIndex] = media
                 }
                 
-                record.props["filepath"] = media.mediaName
+                record.props["filepath"] = "https://ecomapper.blob.core.windows.net/\(guid)/\(media.mediaName!)"
                 
                 // Update the existing record.
                 records[selectedIndexPath.row] = record
@@ -309,7 +358,7 @@ class RecordTableViewController: UITableViewController {
             } else {
                 // Add a new record
                 let newIndexPath = NSIndexPath(forRow: records.count, inSection: 0)
-                record.props["filepath"] = media.mediaName
+                record.props["filepath"] = "https://ecomapper.blob.core.windows.net/\(guid)/\(media.mediaName!)"
                 records.append(record)
                 tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Bottom)
                 

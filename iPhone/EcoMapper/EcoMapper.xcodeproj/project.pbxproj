@@ -10,6 +10,9 @@
 		FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */; };
 		FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3349DB1D1B365F00D112EA /* Reachability.swift */; };
 		FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4E22221D21B93F00A57ED6 /* Media.swift */; };
+		FC5DFFE31D22E9D400C31A31 /* UploadMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5DFFDB1D22E6CE00C31A31 /* UploadMedia.m */; };
+		FC5DFFE51D22EB2D00C31A31 /* AZSClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */; };
+		FC5DFFE71D22EBB100C31A31 /* libxml2.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */; };
 		FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */; };
 		FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */; };
 		FC8244E11D199D290048C3A7 /* RecordTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */; };
@@ -20,6 +23,7 @@
 		FC84B3B01D18EFE800251003 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */; };
 		FC84B3BB1D18EFE800251003 /* EcoMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3BA1D18EFE800251003 /* EcoMapperTests.swift */; };
 		FC84B3C61D1919D400251003 /* Record.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3C51D1919D400251003 /* Record.swift */; };
+		FCA943431D23123F00C5C24D /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCA943421D23123F00C5C24D /* AssetsLibrary.framework */; };
 		FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCCE99311D1A23C300A675BE /* NoteViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +41,10 @@
 		FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
 		FC3349DB1D1B365F00D112EA /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		FC4E22221D21B93F00A57ED6 /* Media.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
+		FC5DFFDA1D22E6CE00C31A31 /* EcoMapper-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EcoMapper-Bridging-Header.h"; sourceTree = "<group>"; };
+		FC5DFFDB1D22E6CE00C31A31 /* UploadMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UploadMedia.m; sourceTree = "<group>"; };
+		FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AZSClient.framework; path = ../../../AZSClient.framework; sourceTree = "<group>"; };
+		FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.2.tbd; path = usr/lib/libxml2.2.tbd; sourceTree = SDKROOT; };
 		FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
 		FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewController.swift; sourceTree = "<group>"; };
 		FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecordTableViewController.xib; sourceTree = "<group>"; };
@@ -51,6 +59,8 @@
 		FC84B3BA1D18EFE800251003 /* EcoMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoMapperTests.swift; sourceTree = "<group>"; };
 		FC84B3BC1D18EFE800251003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FC84B3C51D1919D400251003 /* Record.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Record.swift; sourceTree = "<group>"; };
+		FCA943411D22F69500C5C24D /* UploadMedia.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UploadMedia.h; sourceTree = "<group>"; };
+		FCA943421D23123F00C5C24D /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		FCCE99311D1A23C300A675BE /* NoteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -59,6 +69,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCA943431D23123F00C5C24D /* AssetsLibrary.framework in Frameworks */,
+				FC5DFFE71D22EBB100C31A31 /* libxml2.2.tbd in Frameworks */,
+				FC5DFFE51D22EB2D00C31A31 /* AZSClient.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +88,9 @@
 		FC84B3991D18EFE800251003 = {
 			isa = PBXGroup;
 			children = (
+				FCA943421D23123F00C5C24D /* AssetsLibrary.framework */,
+				FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */,
+				FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */,
 				FC84B3A41D18EFE800251003 /* EcoMapper */,
 				FC84B3B91D18EFE800251003 /* EcoMapperTests */,
 				FC84B3A31D18EFE800251003 /* Products */,
@@ -101,12 +117,15 @@
 				FC3349DB1D1B365F00D112EA /* Reachability.swift */,
 				FCCE99311D1A23C300A675BE /* NoteViewController.swift */,
 				FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */,
+				FC5DFFDB1D22E6CE00C31A31 /* UploadMedia.m */,
 				FC4E22221D21B93F00A57ED6 /* Media.swift */,
 				FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */,
 				FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */,
 				FC84B3AC1D18EFE800251003 /* Assets.xcassets */,
 				FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */,
 				FC84B3B11D18EFE800251003 /* Info.plist */,
+				FC5DFFDA1D22E6CE00C31A31 /* EcoMapper-Bridging-Header.h */,
+				FCA943411D22F69500C5C24D /* UploadMedia.h */,
 			);
 			path = EcoMapper;
 			sourceTree = "<group>";
@@ -223,6 +242,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC5DFFE31D22E9D400C31A31 /* UploadMedia.m in Sources */,
 				FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */,
 				FC84B3A81D18EFE800251003 /* MeasViewController.swift in Sources */,
 				FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */,
@@ -363,14 +383,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = /Users/jon/Desktop;
 				INFOPLIST_FILE = EcoMapper/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gmail.jonsege.EcoMapper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "EcoMapper/EcoMapper-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -380,14 +404,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = /Users/jon/Desktop;
 				INFOPLIST_FILE = EcoMapper/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gmail.jonsege.EcoMapper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "EcoMapper/EcoMapper-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

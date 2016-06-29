@@ -346,6 +346,7 @@
                     <connections>
                         <outlet property="accessPicker" destination="5oC-mv-YKX" id="FSX-gh-mfo"/>
                         <outlet property="mainScrollView" destination="oHw-bp-Oga" id="JmP-Sh-Yb6"/>
+                        <outlet property="mainView" destination="8bC-Xf-vdC" id="x0P-8M-ePB"/>
                         <outlet property="measTextField" destination="R5s-eq-C6y" id="Cei-wO-Hap"/>
                         <outlet property="nameTextField" destination="l52-Hn-tHi" id="Yal-yd-lbw"/>
                         <outlet property="noteLabel" destination="whk-2W-rU7" id="bbd-sk-huv"/>
