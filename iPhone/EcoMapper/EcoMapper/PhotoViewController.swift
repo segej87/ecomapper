@@ -97,12 +97,12 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             if #available(iOS 8.0, *) {
                 locationManager.requestWhenInUseAuthorization()
             } else {
-                // Fallback on earlier versions
+                // Do nothing
             }
             if #available(iOS 9.0, *) {
                 locationManager.requestLocation()
             } else {
-                // Fallback on earlier versions
+                locationManager.startUpdatingLocation()
             }
         }
         
@@ -114,12 +114,13 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     
     func noCamera() {
         if #available(iOS 8.0, *) {
-            let alertVC = UIAlertController(title: "No Camera", message: "Sorry, this device has no camera", preferredStyle: .Alert)
+            let alertVC = UIAlertController(title: "No Camera", message: "Sorry, this device doesn't have a camera", preferredStyle: .Alert)
             let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
             alertVC.addAction(okAction)
             presentViewController(alertVC, animated: true, completion: nil)
         } else {
-            // Fallback on earlier versions
+            let alertVC = UIAlertView(title: "No Camera", message: "Sorry, this device doesn't have a camera", delegate: self, cancelButtonTitle: "OK")
+            alertVC.show()
         }
     }
     
@@ -211,7 +212,8 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             alertVC.addAction(okAction)
             presentViewController(alertVC, animated: true, completion: nil)
         } else {
-            // Fallback on earlier versions
+            let alertVC = UIAlertView(title: "No GPS", message: "Can't pinpoint your location, using default", delegate: self, cancelButtonTitle: "OK")
+            alertVC.show()
         }
     }
     
@@ -223,11 +225,16 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
                 let lat = location.coordinate.latitude
                 self.userLoc = [lon, lat]
                 print("Location found:  \(userLoc!)")
+                if #available(iOS 9.0, *) {
+                    // Do nothing
+                } else {
+                    manager.stopUpdatingLocation()
+                }
             } else {
                 if #available(iOS 9.0, *) {
                     manager.requestLocation()
                 } else {
-                    // Fallback on earlier versions
+                    // Do nothing
                 }
             }
         }

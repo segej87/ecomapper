@@ -10,7 +10,6 @@
 		FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */; };
 		FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3349DB1D1B365F00D112EA /* Reachability.swift */; };
 		FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4E22221D21B93F00A57ED6 /* Media.swift */; };
-		FC5DFFE31D22E9D400C31A31 /* UploadMedia.m in Sources */ = {isa = PBXBuildFile; fileRef = FC5DFFDB1D22E6CE00C31A31 /* UploadMedia.m */; };
 		FC5DFFE51D22EB2D00C31A31 /* AZSClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */; };
 		FC5DFFE71D22EBB100C31A31 /* libxml2.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */; };
 		FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */; };
@@ -25,6 +24,9 @@
 		FC84B3C61D1919D400251003 /* Record.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3C51D1919D400251003 /* Record.swift */; };
 		FCA943431D23123F00C5C24D /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCA943421D23123F00C5C24D /* AssetsLibrary.framework */; };
 		FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCCE99311D1A23C300A675BE /* NoteViewController.swift */; };
+		FCEBA2581D24E6AE00AB6A9F /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */; };
+		FCEBA25A1D258F1700AB6A9F /* UserVars.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEBA2591D258F1700AB6A9F /* UserVars.swift */; };
+		FCEBA25C1D2597EE00AB6A9F /* LoginInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEBA25B1D2597EE00AB6A9F /* LoginInfo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,7 +44,6 @@
 		FC3349DB1D1B365F00D112EA /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		FC4E22221D21B93F00A57ED6 /* Media.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		FC5DFFDA1D22E6CE00C31A31 /* EcoMapper-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EcoMapper-Bridging-Header.h"; sourceTree = "<group>"; };
-		FC5DFFDB1D22E6CE00C31A31 /* UploadMedia.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UploadMedia.m; sourceTree = "<group>"; };
 		FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AZSClient.framework; path = ../../../AZSClient.framework; sourceTree = "<group>"; };
 		FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.2.tbd; path = usr/lib/libxml2.2.tbd; sourceTree = SDKROOT; };
 		FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
@@ -59,9 +60,11 @@
 		FC84B3BA1D18EFE800251003 /* EcoMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoMapperTests.swift; sourceTree = "<group>"; };
 		FC84B3BC1D18EFE800251003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FC84B3C51D1919D400251003 /* Record.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Record.swift; sourceTree = "<group>"; };
-		FCA943411D22F69500C5C24D /* UploadMedia.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UploadMedia.h; sourceTree = "<group>"; };
 		FCA943421D23123F00C5C24D /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		FCCE99311D1A23C300A675BE /* NoteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
+		FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		FCEBA2591D258F1700AB6A9F /* UserVars.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserVars.swift; sourceTree = "<group>"; };
+		FCEBA25B1D2597EE00AB6A9F /* LoginInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginInfo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,11 +116,13 @@
 				FC84B3A71D18EFE800251003 /* MeasViewController.swift */,
 				FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */,
 				FC84B3C51D1919D400251003 /* Record.swift */,
+				FCEBA25B1D2597EE00AB6A9F /* LoginInfo.swift */,
+				FCEBA2591D258F1700AB6A9F /* UserVars.swift */,
 				FC84B3A91D18EFE800251003 /* Main.storyboard */,
+				FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */,
 				FC3349DB1D1B365F00D112EA /* Reachability.swift */,
 				FCCE99311D1A23C300A675BE /* NoteViewController.swift */,
 				FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */,
-				FC5DFFDB1D22E6CE00C31A31 /* UploadMedia.m */,
 				FC4E22221D21B93F00A57ED6 /* Media.swift */,
 				FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */,
 				FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */,
@@ -125,7 +130,6 @@
 				FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */,
 				FC84B3B11D18EFE800251003 /* Info.plist */,
 				FC5DFFDA1D22E6CE00C31A31 /* EcoMapper-Bridging-Header.h */,
-				FCA943411D22F69500C5C24D /* UploadMedia.h */,
 			);
 			path = EcoMapper;
 			sourceTree = "<group>";
@@ -242,15 +246,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC5DFFE31D22E9D400C31A31 /* UploadMedia.m in Sources */,
 				FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */,
 				FC84B3A81D18EFE800251003 /* MeasViewController.swift in Sources */,
+				FCEBA25A1D258F1700AB6A9F /* UserVars.swift in Sources */,
+				FCEBA25C1D2597EE00AB6A9F /* LoginInfo.swift in Sources */,
 				FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */,
 				FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */,
 				FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */,
 				FC84B3C61D1919D400251003 /* Record.swift in Sources */,
 				FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */,
 				FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */,
+				FCEBA2581D24E6AE00AB6A9F /* LoginViewController.swift in Sources */,
 				FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

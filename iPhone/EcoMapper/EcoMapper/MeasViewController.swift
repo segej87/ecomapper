@@ -108,12 +108,12 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             if #available(iOS 8.0, *) {
                 locationManager.requestWhenInUseAuthorization()
             } else {
-                // Fallback on earlier versions
+                // Do nothing
             }
             if #available(iOS 9.0, *) {
                 locationManager.requestLocation()
             } else {
-                // Fallback on earlier versions
+                locationManager.startUpdatingLocation()
             }
         }
         
@@ -131,6 +131,17 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     func textFieldDidBeginEditing(textField: UITextField) {
         // Disable the Save button while editing.
         saveButton.enabled = false
+    }
+    
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        
+        //Hide the keyboard.
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func textFieldDidEndEditing(textField: UITextField) {
+        checkValidName()
     }
     
     func checkValidName() {
@@ -152,17 +163,6 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             return false
         }
         return true
-    }
-    
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
-        
-        //Hide the keyboard.
-        textField.resignFirstResponder()
-        return true
-    }
-    
-    func textFieldDidEndEditing(textField: UITextField) {
-        checkValidName()
     }
     
     // MARK: UITextViewDelegate
@@ -206,7 +206,8 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             alertVC.addAction(okAction)
             presentViewController(alertVC, animated: true, completion: nil)
         } else {
-            // Fallback on earlier versions
+            let alertVC = UIAlertView(title: "No GPS", message: "Can't pinpoint your location, using default", delegate: self, cancelButtonTitle: "OK")
+            alertVC.show()
         }
     }
     
@@ -218,11 +219,16 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
                 let lat = location.coordinate.latitude
                 self.userLoc = [lon, lat]
                 print("Location found:  \(userLoc!)")
+                if #available(iOS 9.0, *) {
+                    // Do nothing
+                } else {
+                    manager.stopUpdatingLocation()
+                }
             } else {
                 if #available(iOS 9.0, *) {
                     manager.requestLocation()
                 } else {
-                    // Fallback on earlier versions
+                    // Do nothing
                 }
             }
         }
