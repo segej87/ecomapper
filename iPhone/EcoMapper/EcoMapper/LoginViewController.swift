@@ -24,7 +24,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     let authScript = "http://ecocollector.azurewebsites.net/get_login.php"
     
     // Create an object to store successful login info
-    var loginInfo = LoginInfo(guid: "")
+    var loginInfo = LoginInfo(uuid: "")
     
     // MARK: Initialization
     override func viewDidLoad() {
@@ -43,13 +43,17 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         // Deactivate the login button when username and password are blank
         loginButton.enabled = false
         
-        // TODO: Make this operational after adding a way to log out. If a guid is already available (user is already logged in) go directly to record table view.
-//        if let savedLogin = loadLogin() {
-//            loginInfo = savedLogin
-//            UserVars.guid = loginInfo!.guid
-//        }
-        if UserVars.guid != nil {
-            performSegueWithIdentifier("login", sender: nil)
+        // If a uuid is already available (user is already logged in) go directly to record table view.
+        if let savedLogin = loadLogin() {
+            loginInfo = savedLogin
+            UserVars.uuid = loginInfo!.uuid
+        }
+        dispatch_async(dispatch_get_main_queue()) {
+            if let uvuuid = UserVars.uuid {
+                if uvuuid != "" {
+                    self.performSegueWithIdentifier("Login", sender: "Saved Login")
+                }
+            }
         }
     }
     
@@ -75,6 +79,16 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Perform any actions necessary for segue
+        print("Logging in with \(sender!)")
+    }
+    
+    @IBAction func unwindToLogin(sender: UIStoryboardSegue) {
+        usernameView.text = ""
+        passwordView.text = ""
+        loginString = ""
+        UserVars.uuid = self.loginString?.lowercaseString
+        self.loginInfo!.uuid = UserVars.uuid
+        saveLogin()
     }
     
     // MARK: Actions
@@ -87,7 +101,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         self.attemptLogin()
     }
     
-    // MARK: Helper methods
+    // MARK: Login authentication
     
     func attemptLogin() {
         // Get user-entered info from text fields
@@ -137,12 +151,12 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                     // Stop the activity indicator
                     self.activityView.stopAnimating()
                     
-                    // If the login attempt was successful, set the structure variable guid for use by other classes and segue to the record table view controller. If the attempt was unsuccessful, present an alert with the login error.
+                    // If the login attempt was successful, set the structure variable uuid for use by other classes and segue to the record table view controller. If the attempt was unsuccessful, present an alert with the login error.
                     if loginSuccess {
-                        UserVars.guid = self.loginString?.lowercaseString
-                        self.loginInfo!.guid = UserVars.guid
+                        UserVars.uuid = self.loginString?.lowercaseString
+                        self.loginInfo!.uuid = UserVars.uuid
                         self.saveLogin()
-                        self.performSegueWithIdentifier("login", sender: nil)
+                        self.performSegueWithIdentifier("Login", sender: "New Login")
                     } else {
                         let errorString = self.loginString!.stringByReplacingOccurrencesOfString("Error: ",withString: "")
                         let alertVC = UIAlertView(title: "Login Error", message: "\(errorString)", delegate: self, cancelButtonTitle: "OK")
@@ -153,6 +167,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
             task.resume()
         }
     }
+    
+    // MARK: Helper methods
     
     func saveLogin() {
         let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo!, toFile: LoginInfo.ArchiveURL.path!)

@@ -12,23 +12,23 @@ class LoginInfo: NSObject, NSCoding {
     
     // MARK: Properties
     
-    var guid: String?
+    var uuid: String?
     
     // MARK: Types
     
     struct PropertyKey {
-        static let guidKey = "guid"
+        static let uuidKey = "uuid"
     }
     
     // MARK: Initialization
     
-    init?(guid: String?){
-        self.guid = guid
+    init?(uuid: String?){
+        self.uuid = uuid
         
         super.init()
         
         // Make initializer failable
-        if guid == nil {
+        if uuid == nil {
             return nil
         }
     }
@@ -36,14 +36,14 @@ class LoginInfo: NSObject, NSCoding {
     // MARK: NSCoding
     
     func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(guid, forKey: PropertyKey.guidKey)
+        aCoder.encodeObject(uuid, forKey: PropertyKey.uuidKey)
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
-        let guid = aDecoder.decodeObjectForKey(PropertyKey.guidKey) as! String
+        let uuid = aDecoder.decodeObjectForKey(PropertyKey.uuidKey) as! String
         
         // Must call designated initializer
-        self.init(guid: guid)
+        self.init(uuid: uuid)
     }
     
     // MARK: Archiving Paths

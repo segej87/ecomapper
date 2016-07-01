@@ -151,7 +151,7 @@ class RecordTableViewController: UITableViewController {
                 let oldMediaPath = records[indexPath.row].props["filepath"] as! String
                 
                 // Remove the root URL string to get the media name (media paths are formatted root URL/mediaName.
-                let oldMediaName = oldMediaPath.stringByReplacingOccurrencesOfString("\(blobRootURLString)\(UserVars.guid!)/", withString: "")
+                let oldMediaName = oldMediaPath.stringByReplacingOccurrencesOfString("\(blobRootURLString)\(UserVars.uuid!)/", withString: "")
                 
                 // Find the index in the media array corresponding to the media name.
                 let oldMediaIndex = indexOfMedia(oldMediaName)
@@ -195,6 +195,9 @@ class RecordTableViewController: UITableViewController {
     
     @IBAction func attemptSync(sender: UIBarButtonItem) {
         
+        // Initialize the class for uploading data
+        let ud = UploadData(tableView: self)!
+        
         // Check if the device is connected to a network
         if Reachability.isConnectedToNetwork() {
             
@@ -210,12 +213,12 @@ class RecordTableViewController: UITableViewController {
             
             // Add requred formatting for geojson, and start uploading procedure
             let biggerDict = ["type":"FeatureCollection", "features": features]
-            uploadRecords(biggerDict)
+            ud.uploadRecords(biggerDict)
             
             // Move to an asynchronous thread and upload the media from the media array
             let  priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
             dispatch_async(dispatch_get_global_queue(priority, 0)){
-                self.uploadMedia()
+                ud.uploadMedia()
             }
         } else {
             
@@ -244,163 +247,6 @@ class RecordTableViewController: UITableViewController {
             oldMediaIndex += 1
         }
         return -1
-    }
-    
-    func uploadRecords(biggerDict: NSDictionary) {
-        do {
-            // Try to encode the passed data as JSON
-            let biggestDict = try NSJSONSerialization.dataWithJSONObject(biggerDict, options: NSJSONWritingOptions())
-            
-            // Encode the JSON data as a string for use in POST
-            let dataString = NSString(data: biggestDict, encoding: NSUTF8StringEncoding)
-            
-            // Establish a request to the server-side PHP script, and define the method as POST
-            let request = NSMutableURLRequest(URL: NSURL(string: recordAddScript)!)
-            request.HTTPMethod = "POST"
-            
-            // Create the POST string with necessary variables, and put in HTTP body
-            let postString = "GUID=\(UserVars.guid!)&geojson=\(dataString!)"
-            request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
-            
-            // Create a session with the PHP script, and attempt to upload records
-            let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in
-                
-                // Make sure there are no errors creating the session and that some data is being passed
-                guard error == nil && data != nil else {
-                    print("error=\(error!)")
-                    return
-                }
-                
-                // Check if HTTP resposne code is 200 ("OK"). If not, print an error
-                if let httpStatus = response as? NSHTTPURLResponse where httpStatus.statusCode != 200 {
-                    print("Status code should be 200, but it's \(httpStatus.statusCode)")
-                    print("response = \(response!)")
-                }
-                
-                // Get the PHP script's response to the session
-                let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
-                
-                // Once background task finishes, if successful, delete all records using main thread
-                dispatch_async(dispatch_get_main_queue()) {
-                    
-                    // For reference, print the response string to the log
-                    print(responseString!)
-                    
-                    // Check if response string contains "Success!" If so, the records were uploaded successfully, and should be deleted form the phone
-                    if responseString!.stringByReplacingOccurrencesOfString("Success!", withString: "") != responseString! {
-                        
-                        // Create an array of UITableView index paths corresponding to records in phone storage
-                        var iPs = [NSIndexPath]()
-                        for i in 0..<self.records.count{
-                            let iP = NSIndexPath(forRow: i, inSection: 0)
-                            iPs.append(iP)
-                        }
-                        
-                        // Delete all records
-                        self.records.removeAll()
-                        
-                        // Delete UITableView rows from the index paths above
-                        self.tableView.deleteRowsAtIndexPaths(iPs, withRowAnimation: .Fade)
-                        
-                        // Save the new (empty) records list
-                        self.saveRecords()
-                    }
-                }
-            }
-            task.resume()
-        } catch let error as NSError {
-            print(error)
-        }
-    }
-    
-    func uploadMedia() {
-        
-        // Connect to Azure blob storage container for media
-        let connectionString = "DefaultEndpointsProtocol=https;AccountName=ecomapper;AccountKey=c0h6WIRF2ObRNWwAkp9arNRLb1KUa0/fZwnKohRwgZfrbVca5WXPxIqJKPeSVyK1oPdAgbIghCpPJNayrId1tw=="
-        let containerName = UserVars.guid!
-        
-        let storageAccount : AZSCloudStorageAccount;
-        try! storageAccount = AZSCloudStorageAccount(fromConnectionString: connectionString)
-        let blobClient = storageAccount.getBlobClient()
-        let container = blobClient.containerReferenceFromName(containerName)
-        
-        let condition = NSCondition()
-        var containerCreated = false
-        
-        container.createContainerIfNotExistsWithAccessType(AZSContainerPublicAccessType.Blob, requestOptions: nil, operationContext: nil) { (error:NSError?, created) -> Void in
-            condition.lock()
-            containerCreated = true
-            condition.signal()
-            condition.unlock()
-        }
-        
-        condition.lock()
-        while (!containerCreated) {
-            condition.wait()
-        }
-        condition.unlock()
-        
-        // Create a dictionary of media names and paths for upload loop
-        var mediaList = [String:NSURL]()
-        for i in medias.indices {
-            mediaList[medias[i].mediaName!] = medias[i].mediaPath
-        }
-        
-        // Loop through media dictionary
-        for m in mediaList.keys{
-            let mName = m
-            let mPath = mediaList[m]
-            
-            // PHAsset only works on iOS 8.0 or above
-            if #available(iOS 8.0, *) {
-                
-                // Fetch the image from phone storage using the image URL
-                let asset = PHAsset.fetchAssetsWithALAssetURLs([mPath!], options: nil)
-                guard let result = asset.firstObject where result is PHAsset else {
-                    print("No asset found")
-                    return
-                }
-                
-                // Create an image manager
-                let imageManager = PHImageManager.defaultManager()
-                
-                // Set options for retrieving image data
-                let options = PHImageRequestOptions()
-                options.deliveryMode = PHImageRequestOptionsDeliveryMode.Opportunistic
-                
-                // Retrieve image data, and, if retrieved, attempt to upload and delete
-                imageManager.requestImageDataForAsset(result as! PHAsset, options: options) { (imageData, dataUTI, orientation, info) -> Void in
-                    if let imageData = imageData {
-                        
-                        // Attempt to upload the image data to the correct blob container
-                        let blob = container.blockBlobReferenceFromName(mName)
-                        blob.uploadFromData(imageData, completionHandler: { (error: NSError?) -> Void in
-                            if error == nil {
-                                // Upload was successful
-                                print("Blob uploaded")
-                                
-                                //  Delete the entry from the media list and save list
-                                self.medias.removeAtIndex(self.indexOfMedia(mName))
-                                self.saveMedia()
-                                
-                                // Check to make sure the deletion occurred succesfully
-                                if self.indexOfMedia(mName) == -1 {
-                                    print("Media successfully removed")
-                                } else {
-                                    print("Media couldn't be removed")
-                                }
-                            } else {
-                                
-                                // Print any error that came up
-                                print("Error: \(error)")
-                            }
-                        })
-                    }
-                }
-            } else {
-                // TODO: Fallback on earlier versions
-            }
-        }
     }
     
     // MARK: Navigation
@@ -434,6 +280,8 @@ class RecordTableViewController: UITableViewController {
                 let selectedRecord = records[indexPath.row]
                 recordDetailViewController.record = selectedRecord
             }
+        } else if segue.identifier == "Logout" {
+            
         }
     }
     
@@ -457,13 +305,13 @@ class RecordTableViewController: UITableViewController {
 
                 // Before updating the photo, find its corresponding record in the media list.
                 let oldMediaPath = records[selectedIndexPath.row].props["filepath"] as! String
-                let oldMediaName = oldMediaPath.stringByReplacingOccurrencesOfString("\(blobRootURLString)\(UserVars.guid!)/", withString: "")
+                let oldMediaName = oldMediaPath.stringByReplacingOccurrencesOfString("\(blobRootURLString)\(UserVars.uuid!)/", withString: "")
                 let oldMediaIndex = indexOfMedia(oldMediaName)
                 if oldMediaIndex != -1 {
                     medias[oldMediaIndex] = media
                 }
                 
-                record.props["filepath"] = "\(blobRootURLString)\(UserVars.guid!)/\(media.mediaName!)"
+                record.props["filepath"] = "\(blobRootURLString)\(UserVars.uuid!)/\(media.mediaName!)"
                 
                 // Update the existing record.
                 records[selectedIndexPath.row] = record
@@ -472,7 +320,7 @@ class RecordTableViewController: UITableViewController {
             } else {
                 // Add a new record
                 let newIndexPath = NSIndexPath(forRow: records.count, inSection: 0)
-                record.props["filepath"] = "\(blobRootURLString)\(UserVars.guid!)/\(media.mediaName!)"
+                record.props["filepath"] = "\(blobRootURLString)\(UserVars.uuid!)/\(media.mediaName!)"
                 records.append(record)
                 tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Bottom)
                 
@@ -505,7 +353,8 @@ class RecordTableViewController: UITableViewController {
     // MARK: NSCoding
     
     func saveRecords() {
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(records, toFile: Record.ArchiveURL.path!)
+        
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(records, toFile: UserVars.RecordsURL!.path!)
         
         if !isSuccessfulSave {
             print("Failed to save records...")
@@ -513,7 +362,8 @@ class RecordTableViewController: UITableViewController {
     }
     
     func saveMedia() {
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(medias, toFile: Media.ArchiveURL.path!)
+        
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(medias, toFile: UserVars.MediasURL!.path!)
         
         if !isSuccessfulSave {
             print("Failed to save media...")
@@ -521,11 +371,17 @@ class RecordTableViewController: UITableViewController {
     }
     
     func loadRecords() -> [Record]? {
-        return NSKeyedUnarchiver.unarchiveObjectWithFile(Record.ArchiveURL.path!) as? [Record]
+        if let recURL = UserVars.RecordsURL?.path {
+            return NSKeyedUnarchiver.unarchiveObjectWithFile(recURL) as? [Record]
+        }
+        return nil
     }
     
     func loadMedia() -> [Media]? {
-        return NSKeyedUnarchiver.unarchiveObjectWithFile(Media.ArchiveURL.path!) as? [Media]
+        if let medURL = UserVars.MediasURL?.path {
+            return NSKeyedUnarchiver.unarchiveObjectWithFile(medURL) as? [Media]
+        }
+        return nil
     }
     
 }

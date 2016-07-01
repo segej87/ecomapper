@@ -70,10 +70,4 @@ class Record: NSObject, NSCoding {
         self.init(coords: coords, photo: photo, props: props)
     }
     
-    // MARK: Archiving Paths
-    
-    static let DocumentsDirectory = NSFileManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
-    //static let ArchiveURL = DocumentsDirectory.URLByAppendingPathComponent("ecoRecords")
-    static let ArchiveURL = DocumentsDirectory.URLByAppendingPathComponent("Records-\(UserVars.guid!)")
-    
 }

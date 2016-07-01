@@ -7,11 +7,11 @@
         <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
     </dependencies>
     <scenes>
-        <!--Records-->
+        <!--Notebook-->
         <scene sceneID="gQo-VO-UQm">
             <objects>
                 <tableViewController id="IBr-jA-5Zj" customClass="RecordTableViewController" customModule="EcoMapper" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="singleLineEtched" rowHeight="90" sectionHeaderHeight="28" sectionFooterHeight="28" id="tai-Vc-80W">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="90" sectionHeaderHeight="28" sectionFooterHeight="28" id="tai-Vc-80W">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -59,7 +59,7 @@
                             <outlet property="delegate" destination="IBr-jA-5Zj" id="Bky-of-rja"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Records" id="xNm-dn-QOM">
+                    <navigationItem key="navigationItem" title="Notebook" id="xNm-dn-QOM">
                         <rightBarButtonItems>
                             <barButtonItem systemItem="add" id="o33-9u-Gob">
                                 <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
@@ -67,10 +67,15 @@
                                     <segue destination="eMq-QN-4yf" kind="show" identifier="PushToNew" id="ADG-fg-zXP"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem title="Sync" id="hrT-ma-CpP">
+                            <barButtonItem title="S" id="hrT-ma-CpP">
                                 <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
                                     <action selector="attemptSync:" destination="IBr-jA-5Zj" id="Zu5-xr-KV3"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="L" id="LaH-Yb-tb0">
+                                <connections>
+                                    <segue destination="ph7-PJ-BS5" kind="unwind" unwindAction="unwindToLogin:" id="BcE-WT-TKk"/>
                                 </connections>
                             </barButtonItem>
                         </rightBarButtonItems>
@@ -82,6 +87,7 @@
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xst-qs-74R" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="ph7-PJ-BS5" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1337" y="356"/>
         </scene>
@@ -364,7 +370,7 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="2792" y="-620.5"/>
+            <point key="canvasLocation" x="2792" y="-605.5"/>
         </scene>
         <!--New Note-->
         <scene sceneID="Zs6-0s-yoE">
@@ -541,7 +547,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RfY-cS-n0I" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="9PC-af-giq" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="3604" y="193"/>
+            <point key="canvasLocation" x="3512" y="420"/>
         </scene>
         <!--New Photo-->
         <scene sceneID="RU6-ja-AV3">
@@ -748,7 +754,7 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="2792" y="1158"/>
+            <point key="canvasLocation" x="2803" y="1310.5"/>
         </scene>
         <!--EcoMapper-->
         <scene sceneID="qnm-3A-Wpa">
@@ -778,7 +784,7 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dIv-OI-46A">
-                                <rect key="frame" x="20" y="264" width="560" height="336"/>
+                                <rect key="frame" x="20" y="84" width="560" height="516"/>
                                 <subviews>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Username" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="mQV-8W-Foa">
                                         <rect key="frame" x="180" y="40" width="200" height="30"/>
@@ -803,8 +809,13 @@
                                             <constraint firstAttribute="width" constant="100" id="xcr-lq-oDm"/>
                                         </constraints>
                                         <state key="normal" title="Login">
-                                            <color key="titleColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
+                                            <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="5"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="tryLogin:" destination="t5W-ky-SW5" eventType="touchUpInside" id="RHL-Fi-hn6"/>
                                         </connections>
@@ -835,14 +846,16 @@
                             <constraint firstAttribute="trailingMargin" secondItem="T1z-Y5-ZWB" secondAttribute="trailing" id="i4T-EQ-dTG"/>
                             <constraint firstAttribute="leading" secondItem="T1z-Y5-ZWB" secondAttribute="leading" id="iDn-Oa-6Cv"/>
                             <constraint firstItem="T1z-Y5-ZWB" firstAttribute="width" secondItem="OiM-U7-wS4" secondAttribute="width" id="pkb-Mi-XXS"/>
-                            <constraint firstItem="dIv-OI-46A" firstAttribute="top" secondItem="T1z-Y5-ZWB" secondAttribute="bottom" id="tuQ-2x-brJ"/>
+                            <constraint firstItem="dIv-OI-46A" firstAttribute="top" secondItem="T1z-Y5-ZWB" secondAttribute="bottom" constant="-120" id="tuQ-2x-brJ"/>
                             <constraint firstItem="bEY-sY-MZO" firstAttribute="top" secondItem="dIv-OI-46A" secondAttribute="bottom" id="v6l-fq-1GJ"/>
+                            <constraint firstItem="dIv-OI-46A" firstAttribute="top" secondItem="To9-Cg-KGA" secondAttribute="bottom" constant="20" id="wvH-8P-Nmw"/>
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
-                                <exclude reference="WKw-u0-IOo"/>
                                 <exclude reference="hqz-ja-Aev"/>
                                 <exclude reference="i4T-EQ-dTG"/>
+                                <exclude reference="WKw-u0-IOo"/>
+                                <exclude reference="tuQ-2x-brJ"/>
                             </mask>
                         </variation>
                     </view>
@@ -852,7 +865,7 @@
                         <outlet property="loginButton" destination="ptF-Ia-W2W" id="iDg-e8-Lwi"/>
                         <outlet property="passwordView" destination="qaK-Em-vaq" id="CIK-d3-Ojl"/>
                         <outlet property="usernameView" destination="mQV-8W-Foa" id="5wL-w2-Smg"/>
-                        <segue destination="7ib-WF-ppe" kind="presentation" identifier="login" id="SK3-Hx-LxR"/>
+                        <segue destination="7ib-WF-ppe" kind="presentation" identifier="Login" id="SK3-Hx-LxR"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zCU-RQ-RZw" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -965,7 +978,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkR-qq-uTH" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1991" y="-542"/>
+            <point key="canvasLocation" x="2090" y="-605"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="3Bi-ze-LT4">
@@ -985,7 +998,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XzH-p5-r4U" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1991" y="1314"/>
+            <point key="canvasLocation" x="2090" y="1307"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="TNm-iO-4sg">
@@ -1030,7 +1043,7 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="wcK-Tt-d9F"/>
-        <segue reference="ojk-kG-aNs"/>
         <segue reference="z0a-hV-xsi"/>
+        <segue reference="ojk-kG-aNs"/>
     </inferredMetricsTieBreakers>
 </document>
