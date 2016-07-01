@@ -83,6 +83,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             tagTextField.text = record.props["tags"] as? String
             dateTime = record.props["datetime"] as? String
             userLoc = record.coords
+            gpsAccView.hidden = true
         } else {
             // Set a default index for the picker to prevent errors.
             //TODO: Set default access from another menu
