@@ -26,6 +26,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     @IBOutlet weak var noteLabel: UILabel!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var mainScrollView: UIScrollView!
+    @IBOutlet weak var gpsAccView: UILabel!
     
     let locationManager = CLLocationManager()
     
@@ -110,11 +111,8 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             } else {
                 // Do nothing
             }
-            if #available(iOS 9.0, *) {
-                locationManager.requestLocation()
-            } else {
-                locationManager.startUpdatingLocation()
-            }
+            
+            locationManager.startUpdatingLocation()
         }
         
         // Enable the Save button only if the required text fields have a valid name.
@@ -213,23 +211,15 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
-            // TODO: improve stability check before allowing reading
-            if location.horizontalAccuracy <= 30.0 {
+            // Current implementation of best accuracy algorithm
+            if location.horizontalAccuracy < gpsAcc || gpsAcc == nil {
+                gpsAcc = location.horizontalAccuracy
                 let lon = location.coordinate.longitude
                 let lat = location.coordinate.latitude
                 self.userLoc = [lon, lat]
-                print("Location found:  \(userLoc!)")
-                if #available(iOS 9.0, *) {
-                    // Do nothing
-                } else {
-                    manager.stopUpdatingLocation()
-                }
-            } else {
-                if #available(iOS 9.0, *) {
-                    manager.requestLocation()
-                } else {
-                    // Do nothing
-                }
+                print("New best accuracy: \(gpsAcc!) m")
+                
+                gpsAccView.text = "Current GPS Accuracy: \(gpsAcc!) m"
             }
         }
     }
@@ -256,6 +246,8 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     // MARK: Navigation
     
     @IBAction func cancel(sender: UIBarButtonItem) {
+        locationManager.stopUpdatingLocation()
+        
         // Depending on style of presentation (modal or push), dismiss the view controller differently
         let isPresentingInAddRecordMode = presentingViewController is UINavigationController
         if isPresentingInAddRecordMode {
@@ -267,10 +259,14 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     
     // This method lets you configure a view controller before it's presented.
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        locationManager.stopUpdatingLocation()
+        
         if saveButton === sender {
             let name = nameTextField.text ?? ""
             
-            let props = ["name": name, "tags": tagTextField.text, "datatype": "meas", "datetime": dateTime, "access": accessLevel, "text": notesTextField.text, "value": valTextField.text, "species": measTextField.text, "units": unitsTextField.text]
+            print("Using location \(userLoc!) with best accuracy \(gpsAcc!) m")
+            
+            let props = ["name": name, "tags": tagTextField.text!, "datatype": "meas", "datetime": dateTime!, "access": accessLevel!, "accuracy": gpsAcc!, "text": notesTextField.text, "value": valTextField.text!, "species": measTextField.text!, "units": unitsTextField.text!] as [String:AnyObject]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: self.userLoc!, photo: nil, props: props)

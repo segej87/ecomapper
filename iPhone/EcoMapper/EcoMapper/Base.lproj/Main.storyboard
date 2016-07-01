@@ -100,14 +100,14 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="719"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="750"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="950" translatesAutoresizingMaskIntoConstraints="NO" id="oHw-bp-Oga">
-                                <rect key="frame" x="20" y="64" width="560" height="655"/>
+                                <rect key="frame" x="20" y="64" width="560" height="686"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EaB-7M-rX1">
-                                        <rect key="frame" x="0.0" y="0.0" width="560" height="655"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="560" height="695"/>
                                         <subviews>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter a name for this measurement" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="l52-Hn-tHi">
                                                 <rect key="frame" x="0.0" y="14" width="560" height="30"/>
@@ -228,10 +228,17 @@
                                                     <constraint firstAttribute="height" constant="40" id="Iz8-3D-dGS"/>
                                                 </constraints>
                                             </pickerView>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Current GPS Accuracy" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="deK-sV-Qpo">
+                                                <rect key="frame" x="217" y="670" width="127" height="15"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
                                         </subviews>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
                                             <constraint firstItem="VpV-1u-byg" firstAttribute="leading" secondItem="EaB-7M-rX1" secondAttribute="leading" id="0su-yw-S6u"/>
+                                            <constraint firstAttribute="bottom" secondItem="deK-sV-Qpo" secondAttribute="bottom" constant="10" id="12Q-Z4-KIP"/>
                                             <constraint firstItem="VpV-1u-byg" firstAttribute="top" secondItem="GO6-Uv-SFC" secondAttribute="bottom" constant="5" id="2Th-mF-m3x"/>
                                             <constraint firstAttribute="trailing" secondItem="j5y-ac-amX" secondAttribute="trailing" constant="-40" id="3iY-Dg-ge2"/>
                                             <constraint firstItem="5oC-mv-YKX" firstAttribute="top" secondItem="xJP-FP-BkS" secondAttribute="bottom" constant="5" id="6TD-9o-Ijb"/>
@@ -257,6 +264,7 @@
                                             <constraint firstItem="xJP-FP-BkS" firstAttribute="leading" secondItem="EaB-7M-rX1" secondAttribute="leading" id="SUC-Vf-wFZ"/>
                                             <constraint firstAttribute="trailing" secondItem="l52-Hn-tHi" secondAttribute="trailing" constant="-40" id="T1n-3d-6Ag"/>
                                             <constraint firstItem="Gvs-Ek-xKt" firstAttribute="width" secondItem="EaB-7M-rX1" secondAttribute="width" id="Tbj-6E-JYO"/>
+                                            <constraint firstItem="deK-sV-Qpo" firstAttribute="top" secondItem="VpV-1u-byg" secondAttribute="bottom" constant="25" id="UFX-f4-fih"/>
                                             <constraint firstAttribute="trailing" secondItem="5oC-mv-YKX" secondAttribute="trailing" constant="-40" id="VQm-aq-zKa"/>
                                             <constraint firstAttribute="trailing" secondItem="6rB-D0-0X7" secondAttribute="trailing" constant="-40" id="XDm-EF-wcU"/>
                                             <constraint firstItem="wlZ-R3-4ZI" firstAttribute="width" secondItem="EaB-7M-rX1" secondAttribute="width" id="YQk-SZ-K1R"/>
@@ -307,17 +315,25 @@
                                                 <exclude reference="sq3-p1-Hxe"/>
                                                 <exclude reference="kdS-u4-qUz"/>
                                                 <exclude reference="KM4-hM-JCI"/>
+                                                <exclude reference="eyF-s0-Y2y"/>
                                             </mask>
                                         </variation>
                                     </view>
                                 </subviews>
                                 <constraints>
+                                    <constraint firstItem="deK-sV-Qpo" firstAttribute="centerX" secondItem="oHw-bp-Oga" secondAttribute="centerX" id="5MN-dN-RB0"/>
                                     <constraint firstItem="EaB-7M-rX1" firstAttribute="leading" secondItem="oHw-bp-Oga" secondAttribute="leading" id="Oai-o1-Tnh"/>
                                     <constraint firstItem="j5y-ac-amX" firstAttribute="centerX" secondItem="oHw-bp-Oga" secondAttribute="centerX" id="Q2D-5T-OrF"/>
+                                    <constraint firstItem="deK-sV-Qpo" firstAttribute="leading" secondItem="oHw-bp-Oga" secondAttribute="leading" constant="-20" id="hXo-Q2-jxO"/>
                                     <constraint firstItem="EaB-7M-rX1" firstAttribute="top" secondItem="oHw-bp-Oga" secondAttribute="top" id="mcM-Tc-NtT"/>
                                     <constraint firstAttribute="trailing" secondItem="EaB-7M-rX1" secondAttribute="trailing" id="oWE-wA-FWp"/>
                                     <constraint firstAttribute="bottom" secondItem="EaB-7M-rX1" secondAttribute="bottom" id="xUl-Sz-ail"/>
                                 </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="hXo-Q2-jxO"/>
+                                    </mask>
+                                </variation>
                             </scrollView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -348,9 +364,10 @@
                         </barButtonItem>
                     </navigationItem>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="600" height="719"/>
+                    <size key="freeformSize" width="600" height="750"/>
                     <connections>
                         <outlet property="accessPicker" destination="5oC-mv-YKX" id="FSX-gh-mfo"/>
+                        <outlet property="gpsAccView" destination="deK-sV-Qpo" id="rXy-Qy-M3r"/>
                         <outlet property="mainScrollView" destination="oHw-bp-Oga" id="JmP-Sh-Yb6"/>
                         <outlet property="measTextField" destination="R5s-eq-C6y" id="Cei-wO-Hap"/>
                         <outlet property="nameTextField" destination="l52-Hn-tHi" id="Yal-yd-lbw"/>
@@ -381,14 +398,14 @@
                         <viewControllerLayoutGuide type="bottom" id="X8l-eQ-SpI"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="lZn-nw-C4l">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="676"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="750"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="amm-6O-2YZ">
-                                <rect key="frame" x="20" y="64" width="560" height="612"/>
+                                <rect key="frame" x="20" y="64" width="560" height="686"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DWx-54-2nG">
-                                        <rect key="frame" x="0.0" y="0.0" width="560" height="612"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="560" height="652"/>
                                         <subviews>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter a name for this note" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="alN-T7-ABK">
                                                 <rect key="frame" x="0.0" y="14" width="560" height="30"/>
@@ -459,6 +476,12 @@
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Current GPS Accuracy" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="53e-RP-uS1">
+                                                <rect key="frame" x="217" y="627" width="127" height="15"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
                                         </subviews>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
@@ -471,8 +494,10 @@
                                             <constraint firstItem="2BC-gq-YgR" firstAttribute="width" secondItem="DWx-54-2nG" secondAttribute="width" id="Dcq-TF-tIU"/>
                                             <constraint firstItem="FwN-eA-lQ8" firstAttribute="leading" secondItem="DWx-54-2nG" secondAttribute="leading" id="J1a-Pr-kgZ"/>
                                             <constraint firstItem="5fQ-aQ-oiL" firstAttribute="leading" secondItem="DWx-54-2nG" secondAttribute="leading" id="Kez-ge-hc7"/>
+                                            <constraint firstAttribute="bottom" secondItem="53e-RP-uS1" secondAttribute="bottom" constant="10" id="O58-Ff-1VN"/>
                                             <constraint firstItem="alN-T7-ABK" firstAttribute="width" secondItem="DWx-54-2nG" secondAttribute="width" id="VPH-iD-Sat"/>
                                             <constraint firstItem="iqh-7v-E3d" firstAttribute="leading" secondItem="DWx-54-2nG" secondAttribute="leading" id="VTJ-ap-fcP"/>
+                                            <constraint firstItem="53e-RP-uS1" firstAttribute="top" secondItem="Mob-Xp-avc" secondAttribute="bottom" constant="25" id="WMC-lL-tAo"/>
                                             <constraint firstItem="iqh-7v-E3d" firstAttribute="width" secondItem="DWx-54-2nG" secondAttribute="width" id="WUm-1l-7Rx"/>
                                             <constraint firstItem="FwN-eA-lQ8" firstAttribute="top" secondItem="2BC-gq-YgR" secondAttribute="bottom" constant="25" id="bXb-wv-roE"/>
                                             <constraint firstItem="3by-J7-KAs" firstAttribute="top" secondItem="iqh-7v-E3d" secondAttribute="bottom" constant="25" id="cno-D0-mVG"/>
@@ -492,12 +517,14 @@
                                             <mask key="constraints">
                                                 <exclude reference="VTJ-ap-fcP"/>
                                                 <exclude reference="WUm-1l-7Rx"/>
+                                                <exclude reference="4lZ-hV-FHW"/>
                                             </mask>
                                         </variation>
                                     </view>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="DWx-54-2nG" firstAttribute="leading" secondItem="amm-6O-2YZ" secondAttribute="leading" id="Chb-7O-hC4"/>
+                                    <constraint firstItem="53e-RP-uS1" firstAttribute="centerX" secondItem="amm-6O-2YZ" secondAttribute="centerX" id="DFx-tp-NgN"/>
                                     <constraint firstAttribute="bottom" secondItem="DWx-54-2nG" secondAttribute="bottom" id="HTp-r7-e7c"/>
                                     <constraint firstAttribute="trailing" secondItem="DWx-54-2nG" secondAttribute="trailing" id="Wc5-dG-OMu"/>
                                     <constraint firstItem="iqh-7v-E3d" firstAttribute="centerX" secondItem="amm-6O-2YZ" secondAttribute="centerX" id="omx-al-6OE"/>
@@ -535,9 +562,10 @@
                         </barButtonItem>
                     </navigationItem>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="600" height="676"/>
+                    <size key="freeformSize" width="600" height="750"/>
                     <connections>
                         <outlet property="accessPicker" destination="2BC-gq-YgR" id="8fw-KJ-DLp"/>
+                        <outlet property="gpsAccView" destination="53e-RP-uS1" id="kg1-U4-CAb"/>
                         <outlet property="nameTextField" destination="alN-T7-ABK" id="0pv-8n-aMa"/>
                         <outlet property="notesTextField" destination="FXI-rc-991" id="Uwd-86-kMP"/>
                         <outlet property="saveButton" destination="wVk-9U-8OT" id="Efb-xi-yVg"/>
@@ -558,14 +586,14 @@
                         <viewControllerLayoutGuide type="bottom" id="mgo-bS-LhR"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Igx-id-xLf">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="757"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="800"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="efr-5K-xVe">
-                                <rect key="frame" x="20" y="64" width="560" height="693"/>
+                                <rect key="frame" x="20" y="64" width="560" height="736"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mOJ-7F-Y9Z">
-                                        <rect key="frame" x="0.0" y="0.0" width="560" height="693"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="560" height="733"/>
                                         <subviews>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter a name for this photo" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="DOq-Zi-vef">
                                                 <rect key="frame" x="0.0" y="14" width="560" height="30"/>
@@ -658,6 +686,12 @@
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Current GPS Accuracy" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="48m-uR-QIM">
+                                                <rect key="frame" x="216" y="708" width="127" height="15"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
                                         </subviews>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <constraints>
@@ -673,7 +707,9 @@
                                             <constraint firstItem="s3B-hq-IkI" firstAttribute="top" secondItem="dYF-8a-zgj" secondAttribute="bottom" constant="5" id="FZp-0v-K6D"/>
                                             <constraint firstAttribute="bottom" secondItem="QC1-9W-fyW" secondAttribute="bottom" constant="10" id="G9F-P1-0Dh"/>
                                             <constraint firstItem="QC1-9W-fyW" firstAttribute="leading" secondItem="mOJ-7F-Y9Z" secondAttribute="leading" id="HTx-Uz-M0J"/>
+                                            <constraint firstItem="s3B-hq-IkI" firstAttribute="top" secondItem="48m-uR-QIM" secondAttribute="bottom" constant="10" id="J6n-9q-T9E"/>
                                             <constraint firstItem="tte-bH-fit" firstAttribute="top" secondItem="3u0-k6-ehJ" secondAttribute="bottom" constant="5" id="MJE-x6-Kxb"/>
+                                            <constraint firstItem="48m-uR-QIM" firstAttribute="top" secondItem="QC1-9W-fyW" secondAttribute="bottom" constant="25" id="Nx5-y5-E1h"/>
                                             <constraint firstItem="BYH-7f-BU8" firstAttribute="width" secondItem="mOJ-7F-Y9Z" secondAttribute="width" id="Rs5-qQ-ECc"/>
                                             <constraint firstItem="dYF-8a-zgj" firstAttribute="leading" secondItem="mOJ-7F-Y9Z" secondAttribute="leading" id="UaV-b2-m5X"/>
                                             <constraint firstItem="DOq-Zi-vef" firstAttribute="width" secondItem="mOJ-7F-Y9Z" secondAttribute="width" id="UaX-5K-HUF"/>
@@ -685,6 +721,7 @@
                                             <constraint firstItem="3u0-k6-ehJ" firstAttribute="width" secondItem="mOJ-7F-Y9Z" secondAttribute="width" id="fOc-ao-BId"/>
                                             <constraint firstItem="q2s-ie-qB5" firstAttribute="leading" secondItem="mOJ-7F-Y9Z" secondAttribute="leading" id="feQ-p4-csA"/>
                                             <constraint firstItem="BYH-7f-BU8" firstAttribute="leading" secondItem="mOJ-7F-Y9Z" secondAttribute="leading" id="gbH-65-b8H"/>
+                                            <constraint firstAttribute="bottom" secondItem="48m-uR-QIM" secondAttribute="bottom" constant="10" id="mab-KH-xGO"/>
                                             <constraint firstItem="bG5-ZE-Bat" firstAttribute="leading" secondItem="mOJ-7F-Y9Z" secondAttribute="leading" id="nlp-me-M2q"/>
                                             <constraint firstItem="q2s-ie-qB5" firstAttribute="width" secondItem="mOJ-7F-Y9Z" secondAttribute="width" id="uFs-wJ-v8h"/>
                                             <constraint firstItem="DOq-Zi-vef" firstAttribute="top" secondItem="mOJ-7F-Y9Z" secondAttribute="top" constant="14" id="vPJ-TX-PXZ"/>
@@ -698,7 +735,9 @@
                                                 <exclude reference="nlp-me-M2q"/>
                                                 <exclude reference="UaV-b2-m5X"/>
                                                 <exclude reference="62g-12-14c"/>
+                                                <exclude reference="J6n-9q-T9E"/>
                                                 <exclude reference="xkg-b3-4yV"/>
+                                                <exclude reference="G9F-P1-0Dh"/>
                                             </mask>
                                         </variation>
                                     </view>
@@ -710,6 +749,7 @@
                                     <constraint firstItem="bG5-ZE-Bat" firstAttribute="centerX" secondItem="efr-5K-xVe" secondAttribute="centerX" id="PZS-He-yJM"/>
                                     <constraint firstItem="mOJ-7F-Y9Z" firstAttribute="top" secondItem="efr-5K-xVe" secondAttribute="top" id="cA8-6C-0kI"/>
                                     <constraint firstItem="mOJ-7F-Y9Z" firstAttribute="leading" secondItem="efr-5K-xVe" secondAttribute="leading" id="n9l-sK-zaY"/>
+                                    <constraint firstItem="48m-uR-QIM" firstAttribute="centerX" secondItem="efr-5K-xVe" secondAttribute="centerX" id="qTb-Qi-ebY"/>
                                     <constraint firstItem="s3B-hq-IkI" firstAttribute="centerX" secondItem="efr-5K-xVe" secondAttribute="centerX" id="ywO-DO-gyC"/>
                                 </constraints>
                             </scrollView>
@@ -736,9 +776,10 @@
                         </barButtonItem>
                     </navigationItem>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="600" height="757"/>
+                    <size key="freeformSize" width="600" height="800"/>
                     <connections>
                         <outlet property="accessPicker" destination="tte-bH-fit" id="qZS-ia-w3Q"/>
+                        <outlet property="gpsAccView" destination="48m-uR-QIM" id="dhZ-At-qi0"/>
                         <outlet property="nameTextField" destination="DOq-Zi-vef" id="HU1-Wi-bK8"/>
                         <outlet property="notesTextField" destination="RpT-PK-pX7" id="SHf-8g-1IC"/>
                         <outlet property="photoImageView" destination="dYF-8a-zgj" id="AyP-er-58r"/>
