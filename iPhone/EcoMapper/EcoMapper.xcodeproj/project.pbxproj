@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */; };
+		FC052F531D2EA1F5003DCD19 /* NewPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */; };
 		FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3349DB1D1B365F00D112EA /* Reachability.swift */; };
 		FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4E22221D21B93F00A57ED6 /* Media.swift */; };
 		FC546EAA1D26C95200E62B6C /* UploadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC546EA91D26C95200E62B6C /* UploadData.swift */; };
@@ -42,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
+		FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewPhoto.swift; sourceTree = "<group>"; };
 		FC3349DB1D1B365F00D112EA /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		FC4E22221D21B93F00A57ED6 /* Media.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		FC546EA91D26C95200E62B6C /* UploadData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadData.swift; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 				FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */,
 				FC84B3B11D18EFE800251003 /* Info.plist */,
 				FC5DFFDA1D22E6CE00C31A31 /* EcoMapper-Bridging-Header.h */,
+				FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */,
 			);
 			path = EcoMapper;
 			sourceTree = "<group>";
@@ -258,6 +261,7 @@
 				FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */,
 				FC546EAA1D26C95200E62B6C /* UploadData.swift in Sources */,
 				FC84B3C61D1919D400251003 /* Record.swift in Sources */,
+				FC052F531D2EA1F5003DCD19 /* NewPhoto.swift in Sources */,
 				FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */,
 				FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */,
 				FCEBA2581D24E6AE00AB6A9F /* LoginViewController.swift in Sources */,

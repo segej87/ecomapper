@@ -30,12 +30,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Style the navigation bar's background color and button colors
-        let nav = self.navigationController?.navigationBar
-        nav?.barStyle = UIBarStyle.Black
-        nav?.backgroundColor = UIColor(red: 0/255 as CGFloat, green: 0/255 as CGFloat, blue: 96/255 as CGFloat, alpha: 1)
-        self.navigationController?.navigationBar.tintColor = UIColor.lightGrayColor()
-        
         // Set the text field delegate to the class
         usernameView.delegate = self
         passwordView.delegate = self
@@ -146,7 +140,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                     self.loginString = responseString
                     
                     // Boolean to check whether the server's response was nil, or whether an error was returned
-                    let loginSuccess = self.loginString != nil && self.loginString!.stringByReplacingOccurrencesOfString("Error", withString: "") == self.loginString!
+//                    let loginSuccess = self.loginString != nil && self.loginString!.stringByReplacingOccurrencesOfString("Error", withString: "") == self.loginString!
+                    
+                    let loginSuccess = responseString != nil && responseString!.length == 36
                     
                     // Stop the activity indicator
                     self.activityView.stopAnimating()
@@ -156,15 +152,50 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                         UserVars.uuid = self.loginString?.lowercaseString
                         self.loginInfo!.uuid = UserVars.uuid
                         self.saveLogin()
+                        
+                        // Stop the activity indicator
+                        self.activityView.stopAnimating()
+                        
                         self.performSegueWithIdentifier("Login", sender: "New Login")
                     } else {
-                        let errorString = self.loginString!.stringByReplacingOccurrencesOfString("Error: ",withString: "")
-                        let alertVC = UIAlertView(title: "Login Error", message: "\(errorString)", delegate: self, cancelButtonTitle: "OK")
-                        alertVC.show()
+                        
+                        // Stop the activity indicator
+                        self.activityView.stopAnimating()
+                        
+                        var errorString: String?
+                        if self.loginString!.stringByReplacingOccurrencesOfString("Error", withString: "") != self.loginString! {
+                            errorString = self.loginString!.stringByReplacingOccurrencesOfString("Error: ",withString: "")
+                        } else {
+                            errorString = "Can't connect to the server - please check your internet connection"
+                        }
+
+                        if #available(iOS 9.0, *) {
+                            let alertVC = UIAlertController(title: "Login Error", message: "\(errorString!)", preferredStyle: .Alert)
+                            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+                            alertVC.addAction(okAction)
+                            self.presentViewController(alertVC, animated: true, completion: nil)
+                        } else {
+                            let alertVC = UIAlertView(title: "Login Error", message: "\(errorString!)", delegate: self, cancelButtonTitle: "OK")
+                            alertVC.show()
+                        }
                     }
                 }
             }
             task.resume()
+        } else {
+            
+            // Stop the activity indicator
+            self.activityView.stopAnimating()
+            
+            if #available(iOS 9.0, *) {
+                let alertVC = UIAlertController(title: "Login Error", message: "No internet - please check your connection", preferredStyle: .Alert)
+                let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+                alertVC.addAction(okAction)
+                self.presentViewController(alertVC, animated: true, completion: nil)
+            } else {
+                let alertVC = UIAlertView(title: "Login Error", message: "No internet - please check your connection", delegate: self, cancelButtonTitle: "OK")
+                alertVC.show()
+            }
         }
     }
     

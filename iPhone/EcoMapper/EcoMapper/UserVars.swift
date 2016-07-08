@@ -22,4 +22,6 @@ struct UserVars {
     static var RecordsURL: NSURL?
     
     static var MediasURL: NSURL?
+    
+    static let PhotosURL = DocumentsDirectory.URLByAppendingPathComponent("Photos", isDirectory: true)
 }

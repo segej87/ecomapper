@@ -13,6 +13,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     
     // MARK: Properties
     
+    // Outlets
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var accessPicker: UIPickerView!
     @IBOutlet weak var photoImageView: UIImageView!
@@ -21,18 +22,26 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var gpsAccView: UILabel!
     
+    // Location manager for GPS location
     let locationManager = CLLocationManager()
     
+    // The array for the institutions picker
     let pickerData = ["public", "institution", "private"]
     
+    // The access level selected by the user using pickerData
     var accessLevel: String?
+    
+    // A flag indicating whether a new photo is being taken
+    var newPhoto = false
+    
+    // The path to the photo on the device's drive
     var photoURL: NSURL?
     
     /*
      This value will be filled with the user's location by the CLLocationManager delegate
      */
     var userLoc: [Double]?
-    var gpsAcc: Double?
+    var gpsAcc = 0.0
     
     /*
      This value will be filled with the date and time recorded when the view was opened
@@ -44,6 +53,8 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
      */
     var record: Record?
     var media: Media?
+    
+    var medOutName: String?
     
     // MARK: Initialization
     
@@ -137,17 +148,51 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         // The info dictionary contains multiple representations of the image, and this uses the original.
         let selectedImage = info[UIImagePickerControllerOriginalImage] as! UIImage
         
-        // Get the URL of the image
-        let imageURL = info[UIImagePickerControllerReferenceURL] as! NSURL
+        // Save the image if it was taken from the camera.
+        if newPhoto {
+            
+            // Set the name of the photo
+            medOutName = "Photo_\(dateTime!.stringByReplacingOccurrencesOfString("-", withString: "").stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString(" ", withString: "_")).jpg"
+            
+            // Set path of photo to be saved
+            photoURL = UserVars.PhotosURL.URLByAppendingPathComponent(medOutName!)
+            
+            // Create an NSCoded photo object
+            let outPhoto = NewPhoto(photo: selectedImage)
+            
+            // Save the photo to the photos directory
+            savePhoto(outPhoto!)
+            
+        } else {
+            
+            // Get the url of the selected asset and set it to the instance variable
+            let imageURL = info[UIImagePickerControllerReferenceURL] as! NSURL
+            
+            photoURL = imageURL
+            
+            // Set the name of the photo
+            medOutName = "Photo_\(dateTime!.stringByReplacingOccurrencesOfString("-", withString: "").stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString(" ", withString: "_")).\(imageURL.absoluteString.substringFromIndex(imageURL.absoluteString.rangeOfString("ext=")!.endIndex))"
+        }
         
-        // Set the URL of the image on the phone's disk
-        photoURL = imageURL
+        // Set the aspect ratio of the image in the view
+        photoImageView.contentMode = .ScaleAspectFit
         
         // Set photoImageView to display the selected image.
         photoImageView.image = selectedImage
         
         // Dismiss the picker.
         dismissViewControllerAnimated(true, completion: nil)
+        
+        //TODO: Remove this when finished troubleshooting
+        if #available(iOS 8.0, *) {
+            let alertVC = UIAlertController(title: "Chosen image", message: info[UIImagePickerControllerOriginalImage] as? String, preferredStyle: .Alert)
+            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+            alertVC.addAction(okAction)
+            presentViewController(alertVC, animated: true, completion: nil)
+        } else {
+
+        }
+        
     }
 
     
@@ -220,14 +265,14 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             // Current implementation of best accuracy algorithm
-            if location.horizontalAccuracy < gpsAcc || gpsAcc == nil {
+            if location.horizontalAccuracy < gpsAcc || gpsAcc == 0.0 {
                 gpsAcc = location.horizontalAccuracy
                 let lon = location.coordinate.longitude
                 let lat = location.coordinate.latitude
                 self.userLoc = [lon, lat]
-                print("New best accuracy: \(gpsAcc!) m")
+                print("New best accuracy: \(gpsAcc) m")
                 
-                gpsAccView.text = "Current GPS Accuracy: \(gpsAcc!) m"
+                gpsAccView.text = "Current GPS Accuracy: \(gpsAcc) m"
             }
         }
     }
@@ -275,14 +320,14 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             let name = nameTextField.text ?? ""
             let urlOut = photoURL!.absoluteString
             
-            let props = ["name": name, "tags": tagTextField.text!, "datatype": "photo", "datetime": dateTime!, "access": accessLevel!, "accuracy": gpsAcc!, "text": notesTextField.text, "filepath": urlOut] as [String:AnyObject]
+            let props = ["name": name, "tags": tagTextField.text!, "datatype": "photo", "datetime": dateTime!, "access": accessLevel!, "accuracy": gpsAcc, "text": notesTextField.text, "filepath": urlOut] as [String:AnyObject]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: userLoc!, photo: photoImageView.image, props: props)
             
             // Set the media reference to be passed to RecordTableViewController after the unwind segue.
-            let medOutName = "Photo_\(dateTime!.stringByReplacingOccurrencesOfString("-", withString: "").stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString(" ", withString: "_")).\(urlOut.substringFromIndex(urlOut.rangeOfString("ext=")!.endIndex))"
-            media = Media(name: medOutName, path: photoURL)
+//            let medOutName = "Photo_\(dateTime!.stringByReplacingOccurrencesOfString("-", withString: "").stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString(" ", withString: "_")).\(urlOut.substringFromIndex(urlOut.rangeOfString("ext=")!.endIndex))"
+            media = Media(name: medOutName!, path: photoURL)
         }
     }
     
@@ -296,8 +341,11 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         // UIImagePickerController is a view controller that lets a user pick media from their photo library.
         let imagePickerController = UIImagePickerController()
         
-        //Allow photos to be picked from existing photos.
+        // Allow photos to be picked from existing photos.
         imagePickerController.sourceType = .PhotoLibrary
+        
+        // Indicate that a previously existing photo is being selected.
+        newPhoto = false
         
         // Make sure ViewController is notified when the user picks an image.
         imagePickerController.delegate = self
@@ -315,6 +363,12 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             imageTakerController.sourceType = .Camera
             imageTakerController.cameraCaptureMode = .Photo
             imageTakerController.modalPresentationStyle = .FullScreen
+            
+            // Indicate that a new photo is being selected.
+            newPhoto = true
+            
+            // Make sure ViewController is notified when the user takes an image.
+            imageTakerController.delegate = self
             presentViewController(imageTakerController, animated: true, completion: nil)
         } else {
             noCamera()
@@ -326,4 +380,21 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         nameTextField.text = "Photo" + " - " + dateTime!
     }
 
+    // MARK: NSCoding
+    
+    func savePhoto(photo: NewPhoto) {
+
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtPath(UserVars.PhotosURL.path!, withIntermediateDirectories: false, attributes: nil)
+        } catch let error as NSError {
+            print(error.localizedDescription);
+        }
+        
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(photo, toFile: photoURL!.path!)
+        
+        if !isSuccessfulSave {
+            print("Failed to save records...")
+        }
+    }
+    
 }

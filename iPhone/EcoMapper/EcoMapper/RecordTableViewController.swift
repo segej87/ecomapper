@@ -12,6 +12,7 @@ import Photos
 class RecordTableViewController: UITableViewController {
     
     // MARK: Properties
+    @IBOutlet weak var syncButton: UIBarButtonItem!
     
     // Array for holding saved records.
     var records = [Record]()
@@ -195,6 +196,9 @@ class RecordTableViewController: UITableViewController {
     
     @IBAction func attemptSync(sender: UIBarButtonItem) {
         
+        // Deactivate the sync button while uploading
+        syncButton.enabled = false
+        
         // Initialize the class for uploading data
         let ud = UploadData(tableView: self)!
         
@@ -232,6 +236,9 @@ class RecordTableViewController: UITableViewController {
                 let alertVC = UIAlertView(title: "No connection detected", message: "Can't sync without a data connection", delegate: self, cancelButtonTitle: "OK")
                 alertVC.show()
             }
+            
+            // Reactivate the sync button
+            syncButton.enabled = true
         }
     }
     

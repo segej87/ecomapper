@@ -69,6 +69,9 @@ public class UploadData {
             task.resume()
         } catch let error as NSError {
             print(error)
+            
+            // Reactivate the sync button
+            tableView!.syncButton.enabled = true
         }
     }
     
@@ -97,6 +100,9 @@ public class UploadData {
             // Save the new (empty) records list
             tableView!.saveRecords()
         }
+        
+        // Reactivate the sync button
+        tableView!.syncButton.enabled = true
     }
     
     // MARK: Upload media
@@ -117,31 +123,47 @@ public class UploadData {
             let mName = m
             let mPath = mediaList[m]
             
+            print(mPath)
+            
             // PHAsset only works on iOS 8.0 or above
             if #available(iOS 8.0, *) {
                 
                 // Fetch the image from phone storage using the image URL
                 let asset = PHAsset.fetchAssetsWithALAssetURLs([mPath!], options: nil)
-                guard let result = asset.firstObject where result is PHAsset else {
-                    print("No asset found")
-                    return
-                }
-                
-                // Create an image manager
-                let imageManager = PHImageManager.defaultManager()
-                
-                // Set options for retrieving image data
-                let options = PHImageRequestOptions()
-                options.deliveryMode = PHImageRequestOptionsDeliveryMode.Opportunistic
-                
-                // Retrieve image data, and, if retrieved, attempt to upload and delete
-                imageManager.requestImageDataForAsset(result as! PHAsset, options: options) { (imageData, dataUTI, orientation, info) -> Void in
-                    if let imageData = imageData {
-                        
-                        // Attempt to upload the blob to the server
-                        self.uploadBlob(mName, imageData: imageData, container: container)
+                if let result = asset.firstObject where result is PHAsset {
+                    
+                    // Create an image manager
+                    let imageManager = PHImageManager.defaultManager()
+                    
+                    // Set options for retrieving image data
+                    let options = PHImageRequestOptions()
+                    options.deliveryMode = PHImageRequestOptionsDeliveryMode.Opportunistic
+                    
+                    // Retrieve image data, and, if retrieved, attempt to upload and delete
+                    imageManager.requestImageDataForAsset(result as! PHAsset, options: options) { (imageData, dataUTI, orientation, info) -> Void in
+                        if let imageData = imageData {
+                            
+                            // Attempt to upload the blob to the server
+                            self.uploadBlob(mName, imageData: imageData, container: container)
+                        }
                     }
+                    
+                } else if let result = loadPhoto(mPath!) {
+                    print("No asset found, trying local folder")
+                    
+                    let imageData = UIImageJPEGRepresentation(result, 1.0)
+                    
+                    self.uploadBlob(mName, imageData: imageData!, container: container)
+                } else {
+                    print("Couldn't upload photo")
                 }
+
+//                guard let result = asset.firstObject where result is PHAsset else {
+//                    
+//                    return
+//                }
+                
+
             } else {
                 // TODO: Fallback on earlier versions
             }
@@ -203,6 +225,15 @@ public class UploadData {
                 print("Error: \(error)")
             }
         })
+    }
+    
+    func loadPhoto(photoURL: NSURL) -> UIImage? {
+        if let recURL = photoURL.path {
+            let np = NSKeyedUnarchiver.unarchiveObjectWithFile(recURL) as? NewPhoto
+            print(np?.photo)
+            return np?.photo
+        }
+        return nil
     }
     
 }

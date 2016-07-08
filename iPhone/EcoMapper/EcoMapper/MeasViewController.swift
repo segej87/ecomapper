@@ -38,7 +38,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
      This value will be filled with the user's location by the CLLocationManager delegate
      */
     var userLoc: [Double]?
-    var gpsAcc: Double?
+    var gpsAcc = 0.0
     
     /*
      This value will be filled with the date and time recorded when the view was opened
@@ -112,7 +112,6 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             } else {
                 // Do nothing
             }
-            
             locationManager.startUpdatingLocation()
         }
         
@@ -213,14 +212,14 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             // Current implementation of best accuracy algorithm
-            if location.horizontalAccuracy < gpsAcc || gpsAcc == nil {
+            if location.horizontalAccuracy < gpsAcc || gpsAcc == 0.0 {
                 gpsAcc = location.horizontalAccuracy
                 let lon = location.coordinate.longitude
                 let lat = location.coordinate.latitude
                 self.userLoc = [lon, lat]
-                print("New best accuracy: \(gpsAcc!) m")
+                print("New best accuracy: \(gpsAcc) m")
                 
-                gpsAccView.text = "Current GPS Accuracy: \(gpsAcc!) m"
+                gpsAccView.text = "Current GPS Accuracy: \(gpsAcc) m"
             }
         }
     }
@@ -265,9 +264,9 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         if saveButton === sender {
             let name = nameTextField.text ?? ""
             
-            print("Using location \(userLoc!) with best accuracy \(gpsAcc!) m")
+            print("Using location \(userLoc!) with best accuracy \(gpsAcc) m")
             
-            let props = ["name": name, "tags": tagTextField.text!, "datatype": "meas", "datetime": dateTime!, "access": accessLevel!, "accuracy": gpsAcc!, "text": notesTextField.text, "value": valTextField.text!, "species": measTextField.text!, "units": unitsTextField.text!] as [String:AnyObject]
+            let props = ["name": name, "tags": tagTextField.text!, "datatype": "meas", "datetime": dateTime!, "access": accessLevel!, "accuracy": gpsAcc, "text": notesTextField.text, "value": valTextField.text!, "species": measTextField.text!, "units": unitsTextField.text!] as [String:AnyObject]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: self.userLoc!, photo: nil, props: props)
