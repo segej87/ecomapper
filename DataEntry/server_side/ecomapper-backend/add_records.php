@@ -102,7 +102,6 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
                 } else {
                     $idTest = $newId . " not added";
                 }
-
             }
             
             // combine old and new features
