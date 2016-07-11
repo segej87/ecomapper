@@ -24,4 +24,6 @@ struct UserVars {
     static var MediasURL: NSURL?
     
     static let PhotosURL = DocumentsDirectory.URLByAppendingPathComponent("Photos", isDirectory: true)
+    
+    static var AccessLevels = ["public", "private"]
 }

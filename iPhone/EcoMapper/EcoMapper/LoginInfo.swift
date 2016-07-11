@@ -13,17 +13,20 @@ class LoginInfo: NSObject, NSCoding {
     // MARK: Properties
     
     var uuid: String?
+    var accessLevels: [String]?
     
     // MARK: Types
     
     struct PropertyKey {
         static let uuidKey = "uuid"
+        static let accessKey = "access"
     }
     
     // MARK: Initialization
     
-    init?(uuid: String?){
+    init?(uuid: String?, accessLevels: [String]?){
         self.uuid = uuid
+        self.accessLevels = accessLevels
         
         super.init()
         
@@ -37,13 +40,15 @@ class LoginInfo: NSObject, NSCoding {
     
     func encodeWithCoder(aCoder: NSCoder) {
         aCoder.encodeObject(uuid, forKey: PropertyKey.uuidKey)
+        aCoder.encodeObject(accessLevels, forKey: PropertyKey.accessKey)
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
         let uuid = aDecoder.decodeObjectForKey(PropertyKey.uuidKey) as! String
+        let accessLevels = aDecoder.decodeObjectForKey(PropertyKey.accessKey) as? [String]
         
         // Must call designated initializer
-        self.init(uuid: uuid)
+        self.init(uuid: uuid, accessLevels: accessLevels)
     }
     
     // MARK: Archiving Paths

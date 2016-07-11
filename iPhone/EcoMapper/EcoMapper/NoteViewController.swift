@@ -21,7 +21,7 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     
     let locationManager = CLLocationManager()
     
-    let pickerData = ["public", "institution", "private"]
+    let pickerData = UserVars.AccessLevels
     
     var accessLevel: String?
     

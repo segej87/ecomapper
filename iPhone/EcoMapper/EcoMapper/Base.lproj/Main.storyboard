@@ -108,7 +108,7 @@
                                 <rect key="frame" x="20" y="64" width="560" height="686"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EaB-7M-rX1">
-                                        <rect key="frame" x="0.0" y="0.0" width="560" height="695"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="560" height="705"/>
                                         <subviews>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter a name for this measurement" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="l52-Hn-tHi">
                                                 <rect key="frame" x="0.0" y="14" width="560" height="30"/>
@@ -138,7 +138,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Measured item" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dBu-i9-dt3">
-                                                <rect key="frame" x="0.0" y="195" width="560" height="21"/>
+                                                <rect key="frame" x="0.0" y="205" width="560" height="21"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="21" id="Fmf-Hb-Tsh"/>
                                                 </constraints>
@@ -147,7 +147,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter the name of the item being measured" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="R5s-eq-C6y">
-                                                <rect key="frame" x="0.0" y="221" width="560" height="30"/>
+                                                <rect key="frame" x="0.0" y="231" width="560" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="Ve2-mQ-zOz"/>
                                                 </constraints>
@@ -155,7 +155,7 @@
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Value" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wlZ-R3-4ZI">
-                                                <rect key="frame" x="0.0" y="276" width="560" height="21"/>
+                                                <rect key="frame" x="0.0" y="286" width="560" height="21"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="21" id="0id-Q1-Inl"/>
                                                 </constraints>
@@ -164,7 +164,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter the value of the measurement" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="djJ-rh-69J">
-                                                <rect key="frame" x="0.0" y="302" width="560" height="30"/>
+                                                <rect key="frame" x="0.0" y="312" width="560" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="gRi-7A-gjC"/>
                                                 </constraints>
@@ -172,7 +172,7 @@
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" keyboardType="numbersAndPunctuation" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Units" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Gvs-Ek-xKt">
-                                                <rect key="frame" x="0.0" y="357" width="560" height="21"/>
+                                                <rect key="frame" x="0.0" y="367" width="560" height="21"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="21" id="lRq-kX-wUb"/>
                                                 </constraints>
@@ -181,7 +181,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter the units of the measurement" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="6rB-D0-0X7">
-                                                <rect key="frame" x="0.0" y="383" width="560" height="30"/>
+                                                <rect key="frame" x="0.0" y="393" width="560" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="d5e-IQ-3X6"/>
                                                 </constraints>
@@ -189,7 +189,7 @@
                                                 <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="yes" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Note (optional)" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="whk-2W-rU7">
-                                                <rect key="frame" x="0.0" y="438" width="560" height="21"/>
+                                                <rect key="frame" x="0.0" y="448" width="560" height="21"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="21" id="6gk-fW-juh"/>
                                                 </constraints>
@@ -198,7 +198,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="200" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="pfN-jR-E8h">
-                                                <rect key="frame" x="0.0" y="464" width="560" height="100"/>
+                                                <rect key="frame" x="0.0" y="474" width="560" height="100"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="100" id="vyk-YY-kFy"/>
@@ -207,7 +207,7 @@
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                             </textView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tags" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GO6-Uv-SFC">
-                                                <rect key="frame" x="0.0" y="589" width="560" height="21"/>
+                                                <rect key="frame" x="0.0" y="599" width="560" height="21"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="21" id="fxD-gx-g3o"/>
                                                 </constraints>
@@ -216,7 +216,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter tags, separated by semicolons" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="VpV-1u-byg">
-                                                <rect key="frame" x="0.0" y="615" width="560" height="30"/>
+                                                <rect key="frame" x="0.0" y="625" width="560" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="JlS-VG-i2Z"/>
                                                 </constraints>
@@ -224,13 +224,13 @@
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
                                             <pickerView contentMode="scaleToFill" placeholderIntrinsicWidth="320" placeholderIntrinsicHeight="40" translatesAutoresizingMaskIntoConstraints="NO" id="5oC-mv-YKX">
-                                                <rect key="frame" x="0.0" y="130" width="560" height="40"/>
+                                                <rect key="frame" x="0.0" y="130" width="560" height="50"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" constant="40" id="Iz8-3D-dGS"/>
+                                                    <constraint firstAttribute="height" constant="50" id="Iz8-3D-dGS"/>
                                                 </constraints>
                                             </pickerView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Current GPS Accuracy" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="deK-sV-Qpo">
-                                                <rect key="frame" x="217" y="670" width="127" height="15"/>
+                                                <rect key="frame" x="217" y="680" width="127" height="15"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                 <nil key="highlightedColor"/>
@@ -304,10 +304,10 @@
                                                 <exclude reference="ayk-4n-nbD"/>
                                                 <exclude reference="VQm-aq-zKa"/>
                                                 <exclude reference="KCq-eF-F2r"/>
-                                                <exclude reference="oAS-j1-Imu"/>
                                                 <exclude reference="3iY-Dg-ge2"/>
                                                 <exclude reference="Bsu-5s-cCM"/>
                                                 <exclude reference="oGq-wf-qUm"/>
+                                                <exclude reference="oAS-j1-Imu"/>
                                                 <exclude reference="EPF-Os-D5X"/>
                                                 <exclude reference="fEO-zD-S8g"/>
                                                 <exclude reference="BOW-sG-pDC"/>
@@ -406,7 +406,7 @@
                                 <rect key="frame" x="20" y="64" width="560" height="686"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DWx-54-2nG">
-                                        <rect key="frame" x="0.0" y="0.0" width="560" height="652"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="560" height="662"/>
                                         <subviews>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter a name for this note" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="alN-T7-ABK">
                                                 <rect key="frame" x="0.0" y="14" width="560" height="30"/>
@@ -437,13 +437,13 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <pickerView contentMode="scaleToFill" placeholderIntrinsicWidth="320" placeholderIntrinsicHeight="40" translatesAutoresizingMaskIntoConstraints="NO" id="2BC-gq-YgR">
-                                                <rect key="frame" x="0.0" y="130" width="560" height="40"/>
+                                                <rect key="frame" x="0.0" y="130" width="560" height="50"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" constant="40" id="I9Q-oz-xFv"/>
+                                                    <constraint firstAttribute="height" constant="50" id="I9Q-oz-xFv"/>
                                                 </constraints>
                                             </pickerView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Note" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FwN-eA-lQ8">
-                                                <rect key="frame" x="0.0" y="195" width="560" height="21"/>
+                                                <rect key="frame" x="0.0" y="205" width="560" height="21"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="21" id="Xqk-ZW-PYx"/>
                                                 </constraints>
@@ -452,7 +452,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="300" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="FXI-rc-991">
-                                                <rect key="frame" x="0.0" y="221" width="560" height="300"/>
+                                                <rect key="frame" x="0.0" y="231" width="560" height="300"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="300" id="TCi-rH-e3v"/>
@@ -461,7 +461,7 @@
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                             </textView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tags" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5fQ-aQ-oiL">
-                                                <rect key="frame" x="0.0" y="546" width="560" height="21"/>
+                                                <rect key="frame" x="0.0" y="556" width="560" height="21"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="21" id="OLb-h5-wFi"/>
                                                 </constraints>
@@ -470,7 +470,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter tags, separated by semicolons" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Mob-Xp-avc">
-                                                <rect key="frame" x="0.0" y="572" width="560" height="30"/>
+                                                <rect key="frame" x="0.0" y="582" width="560" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="eL4-6q-fJ6"/>
                                                 </constraints>
@@ -478,7 +478,7 @@
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Current GPS Accuracy" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="53e-RP-uS1">
-                                                <rect key="frame" x="217" y="627" width="127" height="15"/>
+                                                <rect key="frame" x="217" y="637" width="127" height="15"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                 <nil key="highlightedColor"/>
@@ -594,7 +594,7 @@
                                 <rect key="frame" x="20" y="64" width="560" height="736"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mOJ-7F-Y9Z">
-                                        <rect key="frame" x="0.0" y="0.0" width="560" height="733"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="560" height="743"/>
                                         <subviews>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter a name for this photo" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="DOq-Zi-vef">
                                                 <rect key="frame" x="0.0" y="14" width="560" height="30"/>
@@ -625,13 +625,13 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <pickerView contentMode="scaleToFill" placeholderIntrinsicWidth="320" placeholderIntrinsicHeight="40" translatesAutoresizingMaskIntoConstraints="NO" id="tte-bH-fit">
-                                                <rect key="frame" x="0.0" y="130" width="560" height="40"/>
+                                                <rect key="frame" x="0.0" y="130" width="560" height="50"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" constant="40" id="SIa-cc-tda"/>
+                                                    <constraint firstAttribute="height" constant="50" id="SIa-cc-tda"/>
                                                 </constraints>
                                             </pickerView>
                                             <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="220" placeholderIntrinsicHeight="220" image="defaultPhoto" translatesAutoresizingMaskIntoConstraints="NO" id="dYF-8a-zgj">
-                                                <rect key="frame" x="180" y="196" width="200" height="200"/>
+                                                <rect key="frame" x="180" y="206" width="200" height="200"/>
                                                 <gestureRecognizers/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="200" id="066-q7-RUw"/>
@@ -642,7 +642,7 @@
                                                 </connections>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s3B-hq-IkI">
-                                                <rect key="frame" x="220" y="401" width="121" height="30"/>
+                                                <rect key="frame" x="220" y="411" width="121" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="mh1-CN-17J"/>
                                                 </constraints>
@@ -653,7 +653,7 @@
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Note (optional)" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="q2s-ie-qB5">
-                                                <rect key="frame" x="0.0" y="456" width="560" height="21"/>
+                                                <rect key="frame" x="0.0" y="466" width="560" height="21"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="21" id="8EP-k1-TD3"/>
                                                 </constraints>
@@ -662,7 +662,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="RpT-PK-pX7">
-                                                <rect key="frame" x="0.0" y="502" width="560" height="100"/>
+                                                <rect key="frame" x="0.0" y="512" width="560" height="100"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="100" id="goa-d9-8uR"/>
@@ -671,7 +671,7 @@
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                             </textView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tags" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BYH-7f-BU8">
-                                                <rect key="frame" x="0.0" y="627" width="560" height="21"/>
+                                                <rect key="frame" x="0.0" y="637" width="560" height="21"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="21" id="E1J-PW-XDa"/>
                                                 </constraints>
@@ -680,7 +680,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" placeholderIntrinsicWidth="560" placeholderIntrinsicHeight="30" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter tags, separated by semicolons" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="QC1-9W-fyW">
-                                                <rect key="frame" x="0.0" y="653" width="560" height="30"/>
+                                                <rect key="frame" x="0.0" y="663" width="560" height="30"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="30" id="N6N-0i-FDb"/>
                                                 </constraints>
@@ -688,7 +688,7 @@
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Current GPS Accuracy" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="48m-uR-QIM">
-                                                <rect key="frame" x="216" y="708" width="127" height="15"/>
+                                                <rect key="frame" x="216" y="718" width="127" height="15"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                                 <nil key="highlightedColor"/>

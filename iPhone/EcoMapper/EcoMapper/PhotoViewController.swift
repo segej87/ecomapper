@@ -26,7 +26,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     let locationManager = CLLocationManager()
     
     // The array for the institutions picker
-    let pickerData = ["public", "institution", "private"]
+    let pickerData = UserVars.AccessLevels
     
     // The access level selected by the user using pickerData
     var accessLevel: String?
@@ -182,17 +182,6 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         
         // Dismiss the picker.
         dismissViewControllerAnimated(true, completion: nil)
-        
-        //TODO: Remove this when finished troubleshooting
-        if #available(iOS 8.0, *) {
-            let alertVC = UIAlertController(title: "Chosen image", message: info[UIImagePickerControllerOriginalImage] as? String, preferredStyle: .Alert)
-            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
-            alertVC.addAction(okAction)
-            presentViewController(alertVC, animated: true, completion: nil)
-        } else {
-
-        }
-        
     }
 
     
