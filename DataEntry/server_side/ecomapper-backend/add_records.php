@@ -202,10 +202,11 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
                 
                 $add_cols = array_merge($cols_array, $props_out);
                 
-                // Remove tags and affiliations from the property array, they will be added as
+                // Remove tags, affiliations, and species, from the property array, they will be added as
                 // linktos in separate tables
                 unset($add_cols['property_tags']);
                 unset($add_cols['property_access']);
+                unset($add_cols['property_species']);
                 
                 // TODO: prevent SQL injection
                 $add_col_keys = '(' . implode(', ',array_keys($add_cols)) . ')';
@@ -223,7 +224,7 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
                     $newId = strtolower($result_fetch["FUID"]);
                     $idTest = $newId . " added";
                     $clean_feats[$i]['id'] = $newId;
-                    echo strtolower($result_fetch["FUID"]);
+                    //echo strtolower($result_fetch["FUID"]);
                 }
                 
                 // Get and explode the feature's tags
@@ -286,6 +287,39 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
                     $tsql_accessconnect = "INSERT INTO accessconnections (FUID, IUID, submitter_uuid) VALUES " . $access_connection_string;
                     $result_accessconnect = sqlsrv_query($conn, $tsql_accessconnect);
                 }
+                
+                // Connect species (if applicable) to the new feature
+                // Check whether the feature has a secies property
+                if (array_key_exists('species',$f['properties'])) {
+                    // Get the feature's species
+                    $species_string = $f['properties']['species'];
+                    
+                    echo $species_string;
+                    
+                    // Check if the species is already in the specieslist by querying
+                    // the species table, then store the result
+                    $tsql_speccheck = "SELECT SUID FROM species WHERE name = (?)";
+                    $params_speccheck = array($species_string);
+                    $result_speccheck = sqlsrv_query($conn, $tsql_speccheck, $params_speccheck);
+                    $result_specfetch = sqlsrv_fetch_array($result_speccheck);
+                    
+                    // If the species is not in the list, insert it
+                    if ($result_specfetch == '') {
+                        // Write the new species to the list, then get the new species ID
+                        $tsql_specadd = "INSERT INTO species (name) OUTPUT Inserted.SUID VALUES ((?))";
+                        $params_specadd = array($species_string);
+                        $result_specadd = sqlsrv_query($conn, $tsql_specadd, $params_specadd);
+                        $result_specid = strtolower(sqlsrv_fetch_array($result_specadd)[0]);
+                    } else {
+                        $result_specid = strtolower($result_specfetch[0]);
+                    }
+                    
+                    // Add connection between species and feature in speciesconnections table
+                    $spec_connection_array = array($newId, $result_specid, $guid);
+                    $spec_connection_string = "('" . implode("', '",$spec_connection_array) . "')";
+                    $tsql_specconnect = "INSERT INTO speciesconnections (FUID, SUID, submitter_uuid) VALUES " . $access_connection_string;
+                    $result_specconnect = sqlsrv_query($conn, $tsql_specconnect);
+                }
             }
             
             // combine old and new features
@@ -332,7 +366,7 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
             // json encode the new info to send
             $geojsonOut = json_encode($geojsonNew, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             
-            // TODO: Uncomment after writing record insert loop
+            // TODO: Uncomment after finishing record insert loop
 //             // write the new geojson file to the server
 //            $tsql2 = "UPDATE personal SET geojsonText = (?) WHERE UID = (?)";
 //            $params2 = array($geojsonOut, $guid);
