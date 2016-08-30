@@ -26,4 +26,17 @@ struct UserVars {
     static let PhotosURL = DocumentsDirectory.URLByAppendingPathComponent("Photos", isDirectory: true)
     
     static var AccessLevels = ["public", "private"]
+    
+    static var Tags = [String]()
+    
+    static var Species = [String]()
+    
+    // URL of the authorization script
+    static let authScript = "http://ecocollector.azurewebsites.net/get_login.php"
+    
+    // URL of the institution-getting script
+    static let institScript = "http://ecocollector.azurewebsites.net/get_institutions.php"
+    
+    //URL of the list-getting script
+    static let listScript = "http://ecocollector.azurewebsites.net/get_lists.php"
 }

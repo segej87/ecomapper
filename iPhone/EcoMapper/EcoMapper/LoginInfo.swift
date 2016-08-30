@@ -14,19 +14,25 @@ class LoginInfo: NSObject, NSCoding {
     
     var uuid: String?
     var accessLevels: [String]?
+    var tags: [String]?
+    var species: [String]?
     
     // MARK: Types
     
     struct PropertyKey {
         static let uuidKey = "uuid"
         static let accessKey = "access"
+        static let tagsKey = "tags"
+        static let speciesKey = "species"
     }
     
     // MARK: Initialization
     
-    init?(uuid: String?, accessLevels: [String]?){
+    init?(uuid: String?, accessLevels: [String]?, tags: [String]?, species: [String]?){
         self.uuid = uuid
         self.accessLevels = accessLevels
+        self.tags = tags
+        self.species = species
         
         super.init()
         
@@ -46,9 +52,11 @@ class LoginInfo: NSObject, NSCoding {
     required convenience init?(coder aDecoder: NSCoder) {
         let uuid = aDecoder.decodeObjectForKey(PropertyKey.uuidKey) as! String
         let accessLevels = aDecoder.decodeObjectForKey(PropertyKey.accessKey) as? [String]
+        let tags = aDecoder.decodeObjectForKey(PropertyKey.tagsKey) as? [String]
+        let species = aDecoder.decodeObjectForKey(PropertyKey.speciesKey) as? [String]
         
         // Must call designated initializer
-        self.init(uuid: uuid, accessLevels: accessLevels)
+        self.init(uuid: uuid, accessLevels: accessLevels, tags: tags, species: species)
     }
     
     // MARK: Archiving Paths

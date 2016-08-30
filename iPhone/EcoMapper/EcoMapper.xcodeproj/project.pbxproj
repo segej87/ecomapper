@@ -14,6 +14,7 @@
 		FC546EAA1D26C95200E62B6C /* UploadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC546EA91D26C95200E62B6C /* UploadData.swift */; };
 		FC5DFFE51D22EB2D00C31A31 /* AZSClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */; };
 		FC5DFFE71D22EBB100C31A31 /* libxml2.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */; };
+		FC6930151D74F2E6001407A0 /* ListPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */; };
 		FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */; };
 		FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */; };
 		FC8244E11D199D290048C3A7 /* RecordTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */; };
@@ -50,6 +51,7 @@
 		FC5DFFDA1D22E6CE00C31A31 /* EcoMapper-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EcoMapper-Bridging-Header.h"; sourceTree = "<group>"; };
 		FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AZSClient.framework; path = ../../../AZSClient.framework; sourceTree = "<group>"; };
 		FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.2.tbd; path = usr/lib/libxml2.2.tbd; sourceTree = SDKROOT; };
+		FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListPickerViewController.swift; sourceTree = "<group>"; };
 		FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
 		FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewController.swift; sourceTree = "<group>"; };
 		FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecordTableViewController.xib; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 			children = (
 				FC84B3A51D18EFE800251003 /* AppDelegate.swift */,
 				FC84B3A71D18EFE800251003 /* MeasViewController.swift */,
+				FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */,
 				FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */,
 				FC84B3C51D1919D400251003 /* Record.swift */,
 				FCEBA25B1D2597EE00AB6A9F /* LoginInfo.swift */,
@@ -256,6 +259,7 @@
 				FC84B3A81D18EFE800251003 /* MeasViewController.swift in Sources */,
 				FCEBA25A1D258F1700AB6A9F /* UserVars.swift in Sources */,
 				FCEBA25C1D2597EE00AB6A9F /* LoginInfo.swift in Sources */,
+				FC6930151D74F2E6001407A0 /* ListPickerViewController.swift in Sources */,
 				FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */,
 				FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */,
 				FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */,

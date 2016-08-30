@@ -23,14 +23,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     // Will store the institutions related to the user
     var accessLevels: [String]?
     
-    // URL of the authorization script
-    let authScript = "http://ecocollector.azurewebsites.net/get_login.php"
-    
-    // URL of the institution-getting script
-    let institScript = "http://ecocollector.azurewebsites.net/get_institutions.php"
-    
     // Create an object to store successful login info
-    var loginInfo = LoginInfo(uuid: "", accessLevels: nil)
+    var loginInfo = LoginInfo(uuid: "", accessLevels: nil, tags: nil, species: nil)
     
     // MARK: Initialization
     override func viewDidLoad() {
@@ -135,7 +129,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     
     func checkCredentialsAndGetUUID(uname: String, pword: String) {
         // Establish a request to the server-side PHP script, and define the method as POST
-        let request = NSMutableURLRequest(URL: NSURL(string: authScript)!)
+        let request = NSMutableURLRequest(URL: NSURL(string: UserVars.authScript)!)
         request.HTTPMethod = "POST"
         
         // Create the POST string with necessary variables, and put in HTTP body
@@ -209,7 +203,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     
     func getInstitutionsUsingUUID(uuid: String) {
         // Establish a request to the server-side PHP script, and define the method as POST
-        let request = NSMutableURLRequest(URL: NSURL(string: institScript)!)
+        let request = NSMutableURLRequest(URL: NSURL(string: UserVars.listScript)!)
         request.HTTPMethod = "POST"
         
         // Create the POST string with necessary variables, and put in HTTP body
@@ -254,13 +248,35 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                     do {
                         let responseData = responseString!.dataUsingEncoding(NSUTF8StringEncoding)
                         
-                        let institArray = try NSJSONSerialization.JSONObjectWithData(responseData!, options: NSJSONReadingOptions()) as! [String]
+                        let responseArray = try NSJSONSerialization.JSONObjectWithData(responseData!, options: NSJSONReadingOptions()) as! [String:AnyObject]
                         
-                        for i in institArray {
-                            UserVars.AccessLevels.append(i)
+                        let institArray = responseArray["institutions"] as! [String]
+                        
+                        if institArray.count == 1 && institArray[0].containsString("Error:") {
+                        } else {
+                            for i in institArray {
+                                UserVars.AccessLevels.append(i)
+                            }
                         }
                         
                         self.loginInfo?.accessLevels = UserVars.AccessLevels
+                        
+                        let tagsArray = responseArray["tags"] as! [String]
+                        
+                        for t in tagsArray {
+                            UserVars.Tags.append(t)
+                        }
+                        
+                        self.loginInfo?.tags = UserVars.Tags
+                        
+                        let speciesArray = responseArray["species"] as! [String]
+                        
+                        for s in speciesArray {
+                            UserVars.Species.append(s)
+                        }
+                        
+                        self.loginInfo?.species = UserVars.Species
+                        
                         self.saveLogin()
                         
                         self.performSegueWithIdentifier("Login", sender: "New Login")
