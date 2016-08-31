@@ -42,6 +42,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
             loginInfo = savedLogin
             UserVars.uuid = loginInfo!.uuid
             UserVars.AccessLevels = loginInfo!.accessLevels!
+            UserVars.Tags = loginInfo!.tags!
+            UserVars.Species = loginInfo!.species!
         }
         dispatch_async(dispatch_get_main_queue()) {
             if let uvuuid = UserVars.uuid {
@@ -84,8 +86,12 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         accessLevels = ["public", "private"]
         UserVars.uuid = self.loginString?.lowercaseString
         UserVars.AccessLevels = self.accessLevels!
+        UserVars.Tags = [String]()
+        UserVars.Species = [String]()
         self.loginInfo!.uuid = UserVars.uuid
         self.loginInfo!.accessLevels = UserVars.AccessLevels
+        self.loginInfo!.tags = [String]()
+        self.loginInfo!.species = [String]()
         saveLogin()
     }
     
@@ -252,6 +258,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                         
                         let institArray = responseArray["institutions"] as! [String]
                         
+                        print(institArray.joinWithSeparator(","))
+                        
                         if institArray.count == 1 && institArray[0].containsString("Error:") {
                         } else {
                             for i in institArray {
@@ -263,16 +271,24 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                         
                         let tagsArray = responseArray["tags"] as! [String]
                         
-                        for t in tagsArray {
-                            UserVars.Tags.append(t)
+                        if tagsArray.count == 1 && tagsArray[0].containsString("Error:") {
+                            
+                        } else {
+                            for t in tagsArray {
+                                UserVars.Tags.append(t)
+                            }
                         }
                         
                         self.loginInfo?.tags = UserVars.Tags
                         
                         let speciesArray = responseArray["species"] as! [String]
                         
-                        for s in speciesArray {
-                            UserVars.Species.append(s)
+                        if speciesArray.count == 1 && speciesArray[0].containsString("Error:") {
+                            
+                        } else {
+                            for s in speciesArray {
+                                UserVars.Species.append(s)
+                            }
                         }
                         
                         self.loginInfo?.species = UserVars.Species

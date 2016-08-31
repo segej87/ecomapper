@@ -47,6 +47,8 @@ class LoginInfo: NSObject, NSCoding {
     func encodeWithCoder(aCoder: NSCoder) {
         aCoder.encodeObject(uuid, forKey: PropertyKey.uuidKey)
         aCoder.encodeObject(accessLevels, forKey: PropertyKey.accessKey)
+        aCoder.encodeObject(tags, forKey: PropertyKey.tagsKey)
+        aCoder.encodeObject(species, forKey: PropertyKey.speciesKey)
     }
     
     required convenience init?(coder aDecoder: NSCoder) {

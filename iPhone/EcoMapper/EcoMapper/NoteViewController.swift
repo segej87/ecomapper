@@ -18,6 +18,7 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     @IBOutlet weak var tagTextField: UITextField!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var gpsAccView: UILabel!
+    @IBOutlet weak var tagButton: NSLayoutConstraint!
     
     let locationManager = CLLocationManager()
     
@@ -231,6 +232,17 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: userLoc!, photo: nil, props: props)
         }
+        
+        if tagButton === sender {
+            
+        }
+    }
+    
+    @IBAction func unwindFromTagController(segue: UIStoryboardSegue) {
+        let secondVC : ListPickerViewController = segue.sourceViewController as! ListPickerViewController
+        
+        tagTextField.text = secondVC.selectedItems.joinWithSeparator(";")
+        checkValidName()
     }
     
     // MARK: Actions

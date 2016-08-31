@@ -34,9 +34,12 @@ struct UserVars {
     // URL of the authorization script
     static let authScript = "http://ecocollector.azurewebsites.net/get_login.php"
     
-    // URL of the institution-getting script
-    static let institScript = "http://ecocollector.azurewebsites.net/get_institutions.php"
-    
     //URL of the list-getting script
     static let listScript = "http://ecocollector.azurewebsites.net/get_lists.php"
+    
+    // URL to PHP script for uploading new records via POST.
+    static let recordAddScript = "http://ecocollector.azurewebsites.net/add_records.php"
+    
+    // URL to blob storage Account.
+    static let blobRootURLString = "https://ecomapper.blob.core.windows.net/"
 }

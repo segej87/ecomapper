@@ -34,7 +34,7 @@ public class UploadData {
             let dataString = NSString(data: biggestDict, encoding: NSUTF8StringEncoding)
             
             // Establish a request to the server-side PHP script, and define the method as POST
-            let request = NSMutableURLRequest(URL: NSURL(string: tableView!.recordAddScript)!)
+            let request = NSMutableURLRequest(URL: NSURL(string: UserVars.recordAddScript)!)
             request.HTTPMethod = "POST"
             
             // Create the POST string with necessary variables, and put in HTTP body
@@ -50,7 +50,7 @@ public class UploadData {
                     return
                 }
                 
-                // Check if HTTP resposne code is 200 ("OK"). If not, print an error
+                // Check if HTTP response code is 200 ("OK"). If not, print an error
                 if let httpStatus = response as? NSHTTPURLResponse where httpStatus.statusCode != 200 {
                     print("Status code should be 200, but it's \(httpStatus.statusCode)")
                     print("response = \(response!)")
@@ -58,6 +58,8 @@ public class UploadData {
                 
                 // Get the PHP script's response to the session
                 let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
+                
+                print(responseString)
                 
                 // Once background task finishes, perform post-upload operations
                 dispatch_async(dispatch_get_main_queue()) {

@@ -12,6 +12,8 @@ import Photos
 class RecordTableViewController: UITableViewController {
     
     // MARK: Properties
+    
+    // Button to send data to server.
     @IBOutlet weak var syncButton: UIBarButtonItem!
     
     // Array for holding saved records.
@@ -19,12 +21,6 @@ class RecordTableViewController: UITableViewController {
     
     // Array for holding names and paths to media on device.
     var medias = [Media]()
-    
-    // URL to PHP script for uploading new records via POST.
-    let recordAddScript = "http://ecocollector.azurewebsites.net/add_records.php"
-    
-    // URL to blob storage Account.
-    let blobRootURLString = "https://ecomapper.blob.core.windows.net/"
     
     // MARK: Initialization
         
@@ -40,12 +36,12 @@ class RecordTableViewController: UITableViewController {
         // Use the edit button item provided by the table view controller.
         navigationItem.leftBarButtonItem = editButtonItem()
         
-        // Load any saved records, otherwise, load nothing.
+        // Load any saved records. If none, load nothing.
         if let savedRecords = loadRecords() {
             records += savedRecords
         }
         
-        // Load any saved media, otherwise, load nothing.
+        // Load any saved media. If none, load nothing.
         if let savedMedia = loadMedia() {
             medias += savedMedia
         }
@@ -152,7 +148,7 @@ class RecordTableViewController: UITableViewController {
                 let oldMediaPath = records[indexPath.row].props["filepath"] as! String
                 
                 // Remove the root URL string to get the media name (media paths are formatted root URL/mediaName.
-                let oldMediaName = oldMediaPath.stringByReplacingOccurrencesOfString("\(blobRootURLString)\(UserVars.uuid!)/", withString: "")
+                let oldMediaName = oldMediaPath.stringByReplacingOccurrencesOfString("\(UserVars.blobRootURLString)\(UserVars.uuid!)/", withString: "")
                 
                 // Find the index in the media array corresponding to the media name.
                 let oldMediaIndex = indexOfMedia(oldMediaName)
@@ -312,13 +308,13 @@ class RecordTableViewController: UITableViewController {
 
                 // Before updating the photo, find its corresponding record in the media list.
                 let oldMediaPath = records[selectedIndexPath.row].props["filepath"] as! String
-                let oldMediaName = oldMediaPath.stringByReplacingOccurrencesOfString("\(blobRootURLString)\(UserVars.uuid!)/", withString: "")
+                let oldMediaName = oldMediaPath.stringByReplacingOccurrencesOfString("\(UserVars.blobRootURLString)\(UserVars.uuid!)/", withString: "")
                 let oldMediaIndex = indexOfMedia(oldMediaName)
                 if oldMediaIndex != -1 {
                     medias[oldMediaIndex] = media
                 }
                 
-                record.props["filepath"] = "\(blobRootURLString)\(UserVars.uuid!)/\(media.mediaName!)"
+                record.props["filepath"] = "\(UserVars.blobRootURLString)\(UserVars.uuid!)/\(media.mediaName!)"
                 
                 // Update the existing record.
                 records[selectedIndexPath.row] = record
@@ -327,7 +323,7 @@ class RecordTableViewController: UITableViewController {
             } else {
                 // Add a new record
                 let newIndexPath = NSIndexPath(forRow: records.count, inSection: 0)
-                record.props["filepath"] = "\(blobRootURLString)\(UserVars.uuid!)/\(media.mediaName!)"
+                record.props["filepath"] = "\(UserVars.blobRootURLString)\(UserVars.uuid!)/\(media.mediaName!)"
                 records.append(record)
                 tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Bottom)
                 
