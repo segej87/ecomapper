@@ -178,7 +178,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                     self.loginInfo!.uuid = UserVars.uuid
                     //self.saveLogin()
                     
-                    self.getInstitutionsUsingUUID(UserVars.uuid!)
+                    self.getListsUsingUUID(UserVars.uuid!)
                     
                 } else {
                     
@@ -207,7 +207,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         task.resume()
     }
     
-    func getInstitutionsUsingUUID(uuid: String) {
+    func getListsUsingUUID(uuid: String) {
         // Establish a request to the server-side PHP script, and define the method as POST
         let request = NSMutableURLRequest(URL: NSURL(string: UserVars.listScript)!)
         request.HTTPMethod = "POST"
@@ -263,7 +263,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                         if institArray.count == 1 && institArray[0].containsString("Error:") {
                         } else {
                             for i in institArray {
-                                UserVars.AccessLevels.append(i)
+                                if !UserVars.AccessLevels.contains(i) {
+                                    UserVars.AccessLevels.append(i)
+                                }
                             }
                         }
                         
@@ -272,10 +274,12 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                         let tagsArray = responseArray["tags"] as! [String]
                         
                         if tagsArray.count == 1 && tagsArray[0].containsString("Error:") {
-                            
+                            print("Error getting tag array")
                         } else {
                             for t in tagsArray {
-                                UserVars.Tags.append(t)
+                                if !UserVars.Tags.contains(t) {
+                                    UserVars.Tags.append(t)
+                                }
                             }
                         }
                         
@@ -287,7 +291,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                             
                         } else {
                             for s in speciesArray {
-                                UserVars.Species.append(s)
+                                if !UserVars.Species.contains(s) {
+                                    UserVars.Species.append(s)
+                                }
                             }
                         }
                         
