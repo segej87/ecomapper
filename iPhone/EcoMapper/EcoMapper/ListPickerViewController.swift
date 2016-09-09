@@ -42,7 +42,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         
         // TODO: Set dynamically through segue
         // Load the initial full data source for the dable view
-        self.fullItems = UserVars.Tags
+        self.fullItems = Array(UserVars.Tags.keys)
         
         // Set the new item text field delegate
         self.newText.delegate = self

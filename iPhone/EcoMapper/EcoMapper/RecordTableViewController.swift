@@ -22,6 +22,9 @@ class RecordTableViewController: UITableViewController {
     // Array for holding names and paths to media on device.
     var medias = [Media]()
     
+    // Create an object to store successful login info
+    var loginInfo = LoginInfo(uuid: "", accessLevels: nil, tags: nil, species: nil)
+    
     // MARK: Initialization
         
     override func viewDidLoad() {
@@ -159,6 +162,20 @@ class RecordTableViewController: UITableViewController {
                 }
             }
             
+            // Modify the UserVar lists associated with the record
+            let prevArray = records[indexPath.row].props["tags"]?.componentsSeparatedByString(";")
+            for p in prevArray! {
+                var pTag = UserVars.Tags[p]
+                if pTag![0] as! String == "Local" {
+                    pTag![1] = pTag![1] as! Int - 1
+                    if pTag![1] as! Int == 0 {
+                        UserVars.Tags.removeValueForKey(p)
+                    } else {
+                        UserVars.Tags[p] = pTag!
+                    }
+                }
+            }
+            
             // Delete the record from the data source.
             records.removeAtIndex(indexPath.row)
             
@@ -235,6 +252,14 @@ class RecordTableViewController: UITableViewController {
             
             // Reactivate the sync button
             syncButton.enabled = true
+        }
+    }
+    
+    func saveLogin() {
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo!, toFile: LoginInfo.ArchiveURL.path!)
+        
+        if !isSuccessfulSave {
+            print("Failed to save login info...")
         }
     }
     
@@ -351,6 +376,12 @@ class RecordTableViewController: UITableViewController {
             // Save the records.
             saveRecords()
         }
+        
+        loginInfo!.uuid = UserVars.uuid
+        loginInfo!.accessLevels = UserVars.AccessLevels
+        loginInfo!.tags = UserVars.Tags
+        loginInfo!.species = UserVars.Species
+        saveLogin()
     }
     
     // MARK: NSCoding

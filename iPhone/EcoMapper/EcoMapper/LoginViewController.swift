@@ -86,11 +86,11 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         accessLevels = ["public", "private"]
         UserVars.uuid = self.loginString?.lowercaseString
         UserVars.AccessLevels = self.accessLevels!
-        UserVars.Tags = [String]()
+        UserVars.Tags = [String:[AnyObject]]()
         UserVars.Species = [String]()
         self.loginInfo!.uuid = UserVars.uuid
         self.loginInfo!.accessLevels = UserVars.AccessLevels
-        self.loginInfo!.tags = [String]()
+        self.loginInfo!.tags = [String:[AnyObject]]()
         self.loginInfo!.species = [String]()
         saveLogin()
     }
@@ -277,8 +277,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                             print("Error getting tag array")
                         } else {
                             for t in tagsArray {
-                                if !UserVars.Tags.contains(t) {
-                                    UserVars.Tags.append(t)
+                                if !UserVars.Tags.keys.contains(t) {
+                                    UserVars.Tags[t] = ["Server",0]
                                 }
                             }
                         }

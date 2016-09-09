@@ -14,7 +14,7 @@ class LoginInfo: NSObject, NSCoding {
     
     var uuid: String?
     var accessLevels: [String]?
-    var tags: [String]?
+    var tags: [String:[AnyObject]]?
     var species: [String]?
     
     // MARK: Types
@@ -28,7 +28,7 @@ class LoginInfo: NSObject, NSCoding {
     
     // MARK: Initialization
     
-    init?(uuid: String?, accessLevels: [String]?, tags: [String]?, species: [String]?){
+    init?(uuid: String?, accessLevels: [String]?, tags: [String:[AnyObject]]?, species: [String]?){
         self.uuid = uuid
         self.accessLevels = accessLevels
         self.tags = tags
@@ -54,7 +54,7 @@ class LoginInfo: NSObject, NSCoding {
     required convenience init?(coder aDecoder: NSCoder) {
         let uuid = aDecoder.decodeObjectForKey(PropertyKey.uuidKey) as! String
         let accessLevels = aDecoder.decodeObjectForKey(PropertyKey.accessKey) as? [String]
-        let tags = aDecoder.decodeObjectForKey(PropertyKey.tagsKey) as? [String]
+        let tags = aDecoder.decodeObjectForKey(PropertyKey.tagsKey) as? [String:[AnyObject]]
         let species = aDecoder.decodeObjectForKey(PropertyKey.speciesKey) as? [String]
         
         // Must call designated initializer

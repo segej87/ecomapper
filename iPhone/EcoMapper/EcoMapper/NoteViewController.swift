@@ -234,12 +234,40 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         }
         
         if tagButton === sender {
-            
+            // TODO: Send previous tags to ListPicker
         }
     }
     
     @IBAction func unwindFromTagController(segue: UIStoryboardSegue) {
         let secondVC : ListPickerViewController = segue.sourceViewController as! ListPickerViewController
+        
+        if tagTextField.text != "" {
+            let prevText = tagTextField.text
+            let prevArray = prevText!.componentsSeparatedByString(";")
+            for p in prevArray {
+                var pTag = UserVars.Tags[p]
+                if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
+                    pTag![1] = pTag![1] as! Int - 1
+                    if pTag![1] as! Int == 0 {
+                        UserVars.Tags.removeValueForKey(p)
+                    } else {
+                        UserVars.Tags[p] = pTag!
+                    }
+                }
+            }
+        }
+        
+        for t in secondVC.selectedItems {
+            if !UserVars.Tags.keys.contains(t) {
+                UserVars.Tags[t] = ["Local",1]
+            } else {
+                var tagInfo = UserVars.Tags[t]
+                if tagInfo![0] as! String == "Local" {
+                    tagInfo![1] = tagInfo![1] as! Int + 1
+                    UserVars.Tags[t] = tagInfo
+                }
+            }
+        }
         
         tagTextField.text = secondVC.selectedItems.joinWithSeparator(";")
         checkValidName()

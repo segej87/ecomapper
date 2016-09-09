@@ -27,7 +27,7 @@ struct UserVars {
     
     static var AccessLevels = ["public", "private"]
     
-    static var Tags = [String]()
+    static var Tags = [String:[AnyObject]]()
     
     static var Species = [String]()
     
