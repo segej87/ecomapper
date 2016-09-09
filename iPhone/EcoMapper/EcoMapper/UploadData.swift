@@ -33,6 +33,8 @@ public class UploadData {
             // Encode the JSON data as a string for use in POST
             let dataString = NSString(data: biggestDict, encoding: NSUTF8StringEncoding)
             
+            print(dataString)
+            
             // Establish a request to the server-side PHP script, and define the method as POST
             let request = NSMutableURLRequest(URL: NSURL(string: UserVars.recordAddScript)!)
             request.HTTPMethod = "POST"

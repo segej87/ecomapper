@@ -12,29 +12,32 @@ import CoreLocation
 class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
 
     // MARK: Properties
+    // IB properties
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var accessPicker: UIPickerView!
     @IBOutlet weak var notesTextField: UITextView!
     @IBOutlet weak var tagTextField: UITextField!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var gpsAccView: UILabel!
-    @IBOutlet weak var tagButton: NSLayoutConstraint!
+    @IBOutlet weak var tagButton: UIButton!
     
+    // Class variables
+    // The Core Location manager
     let locationManager = CLLocationManager()
     
+    // The access level data available to the UIPickerView
     let pickerData = UserVars.AccessLevels
     
+    // The selected access level
     var accessLevel: String?
     
-    /*
-     This value will be filled with the user's location by the CLLocationManager delegate
-     */
+    // For storing the user's location from the CLLocationManager delegate
     var userLoc: [Double]?
+    
+    // This will be filled by the CLLocationManager delegate
     var gpsAcc = 0.0
     
-    /*
-     This value will be filled with the date and time recorded when the view was opened
-     */
+    // For storing the date and time when the view was opened
     var dateTime: String?
     
     /*
@@ -233,8 +236,18 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             record = Record(coords: userLoc!, photo: nil, props: props)
         }
         
+        // If the add tags button was pressed, present the item picker
         if tagButton === sender {
+            let secondVC = segue.destinationViewController as! ListPickerViewController
+            secondVC.itemType = "tags"
+            
             // TODO: Send previous tags to ListPicker
+            if tagTextField.text != "" {
+                let tagArray = tagTextField.text?.componentsSeparatedByString(";")
+                for t in tagArray! {
+                    secondVC.selectedItems.append(t)
+                }
+            }
         }
     }
     

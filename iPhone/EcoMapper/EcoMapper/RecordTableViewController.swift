@@ -23,7 +23,7 @@ class RecordTableViewController: UITableViewController {
     var medias = [Media]()
     
     // Create an object to store successful login info
-    var loginInfo = LoginInfo(uuid: "", accessLevels: nil, tags: nil, species: nil)
+    var loginInfo = LoginInfo(uuid: "", accessLevels: nil, tags: nil, species: nil, units: nil)
     
     // MARK: Initialization
         
@@ -172,6 +172,21 @@ class RecordTableViewController: UITableViewController {
                         UserVars.Tags.removeValueForKey(p)
                     } else {
                         UserVars.Tags[p] = pTag!
+                    }
+                }
+            }
+            
+            if records[indexPath.row].props["datatype"] as! String == "meas" {
+                let prevArray = records[indexPath.row].props["species"]?.componentsSeparatedByString(";")
+                for p in prevArray! {
+                    var pTag = UserVars.Species[p]
+                    if pTag![0] as! String == "Local" {
+                        pTag![1] = pTag![1] as! Int - 1
+                        if pTag![1] as! Int == 0 {
+                            UserVars.Species.removeValueForKey(p)
+                        } else {
+                            UserVars.Species[p] = pTag!
+                        }
                     }
                 }
             }
@@ -381,6 +396,7 @@ class RecordTableViewController: UITableViewController {
         loginInfo!.accessLevels = UserVars.AccessLevels
         loginInfo!.tags = UserVars.Tags
         loginInfo!.species = UserVars.Species
+        loginInfo!.units = UserVars.Units
         saveLogin()
     }
     

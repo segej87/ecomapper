@@ -24,7 +24,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     var accessLevels: [String]?
     
     // Create an object to store successful login info
-    var loginInfo = LoginInfo(uuid: "", accessLevels: nil, tags: nil, species: nil)
+    var loginInfo = LoginInfo(uuid: "", accessLevels: nil, tags: nil, species: nil, units: nil)
     
     // MARK: Initialization
     override func viewDidLoad() {
@@ -44,6 +44,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
             UserVars.AccessLevels = loginInfo!.accessLevels!
             UserVars.Tags = loginInfo!.tags!
             UserVars.Species = loginInfo!.species!
+            UserVars.Units = loginInfo!.units!
         }
         dispatch_async(dispatch_get_main_queue()) {
             if let uvuuid = UserVars.uuid {
@@ -87,11 +88,13 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         UserVars.uuid = self.loginString?.lowercaseString
         UserVars.AccessLevels = self.accessLevels!
         UserVars.Tags = [String:[AnyObject]]()
-        UserVars.Species = [String]()
+        UserVars.Species = [String:[AnyObject]]()
+        UserVars.Units = [String:[AnyObject]]()
         self.loginInfo!.uuid = UserVars.uuid
         self.loginInfo!.accessLevels = UserVars.AccessLevels
         self.loginInfo!.tags = [String:[AnyObject]]()
-        self.loginInfo!.species = [String]()
+        self.loginInfo!.species = [String:[AnyObject]]()
+        self.loginInfo!.units = [String:[AnyObject]]()
         saveLogin()
     }
     
@@ -291,13 +294,27 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                             
                         } else {
                             for s in speciesArray {
-                                if !UserVars.Species.contains(s) {
-                                    UserVars.Species.append(s)
+                                if !UserVars.Species.keys.contains(s) {
+                                    UserVars.Species[s] = ["Server",0]
                                 }
                             }
                         }
                         
                         self.loginInfo?.species = UserVars.Species
+                        
+                        let unitsArray = responseArray["units"] as! [String]
+                        
+                        if unitsArray.count == 1 && unitsArray[0].containsString("Error:") {
+                            
+                        } else {
+                            for u in unitsArray {
+                                if !UserVars.Units.keys.contains(u) {
+                                    UserVars.Units[u] = ["Server",0]
+                                }
+                            }
+                        }
+                        
+                        self.loginInfo?.units = UserVars.Units
                         
                         self.saveLogin()
                         

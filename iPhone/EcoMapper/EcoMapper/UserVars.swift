@@ -29,7 +29,9 @@ struct UserVars {
     
     static var Tags = [String:[AnyObject]]()
     
-    static var Species = [String]()
+    static var Species = [String:[AnyObject]]()
+    
+    static var Units = [String:[AnyObject]]()
     
     // URL of the authorization script
     static let authScript = "http://ecocollector.azurewebsites.net/get_login.php"

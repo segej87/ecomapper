@@ -27,6 +27,9 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var mainScrollView: UIScrollView!
     @IBOutlet weak var gpsAccView: UILabel!
+    @IBOutlet weak var measPickerButton: UIButton!
+    @IBOutlet weak var tagPickerButton: UIButton!
+    @IBOutlet weak var unitsPickerButton: UIButton!
     
     let locationManager = CLLocationManager()
     
@@ -271,6 +274,140 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: self.userLoc!, photo: nil, props: props)
         }
+        
+        // If the add species button was pressed, present the item picker with a species item type
+        if measPickerButton === sender {
+            let secondVC = segue.destinationViewController as! ListPickerViewController
+            secondVC.itemType = "species"
+            
+            // TODO: Send previous species to ListPicker
+            if measTextField.text != "" {
+                let measArray = measTextField.text?.componentsSeparatedByString(";")
+                for m in measArray! {
+                    secondVC.selectedItems.append(m)
+                }
+            }
+        }
+        
+        // If the add units button was pressed, present the item picker with a units item type
+        if unitsPickerButton === sender {
+            let secondVC = segue.destinationViewController as! ListPickerViewController
+            secondVC.itemType = "units"
+            
+            // TODO: Send previous species to ListPicker
+            if unitsTextField.text != "" {
+                let unitsArray = unitsTextField.text?.componentsSeparatedByString(";")
+                for u in unitsArray! {
+                    secondVC.selectedItems.append(u)
+                }
+            }
+        }
+        
+        // If the add tags button was pressed, present the item picker with a tags item type
+        if tagPickerButton === sender {
+            let secondVC = segue.destinationViewController as! ListPickerViewController
+            secondVC.itemType = "tags"
+            
+            // TODO: Send previous tags to ListPicker
+            if tagTextField.text != "" {
+                let tagArray = tagTextField.text?.componentsSeparatedByString(";")
+                for t in tagArray! {
+                    secondVC.selectedItems.append(t)
+                }
+            }
+        }
+    }
+    
+    @IBAction func unwindFromTagController(segue: UIStoryboardSegue) {
+        let secondVC : ListPickerViewController = segue.sourceViewController as! ListPickerViewController
+        
+        let secondType = secondVC.itemType
+        
+        var targetField : UITextField?
+        
+        if secondType == "tags" {
+            targetField = tagTextField
+        } else if secondType == "species" {
+            targetField = measTextField
+        } else if secondType == "units" {
+            targetField = unitsTextField
+        }
+        
+        if targetField!.text != "" {
+            let prevText = targetField!.text
+            let prevArray = prevText!.componentsSeparatedByString(";")
+            for p in prevArray {
+                if secondType == "tags" {
+                    var pTag = UserVars.Tags[p]
+                    if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
+                        pTag![1] = pTag![1] as! Int - 1
+                        if pTag![1] as! Int == 0 {
+                            UserVars.Tags.removeValueForKey(p)
+                        } else {
+                            UserVars.Tags[p] = pTag!
+                        }
+                    }
+                } else if secondType == "species" {
+                    var pTag = UserVars.Species[p]
+                    if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
+                        pTag![1] = pTag![1] as! Int - 1
+                        if pTag![1] as! Int == 0 {
+                            UserVars.Species.removeValueForKey(p)
+                        } else {
+                            UserVars.Species[p] = pTag!
+                        }
+                    }
+                } else if secondType == "units" {
+                    var pTag = UserVars.Units[p]
+                    if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
+                        pTag![1] = pTag![1] as! Int - 1
+                        if pTag![1] as! Int == 0 {
+                            UserVars.Units.removeValueForKey(p)
+                        } else {
+                            UserVars.Units[p] = pTag!
+                        }
+                    }
+                }
+            }
+        }
+        
+        for t in secondVC.selectedItems {
+            if secondType == "tags" {
+                if !UserVars.Tags.keys.contains(t) {
+                    UserVars.Tags[t] = ["Local",1]
+                } else {
+                    var tagInfo = UserVars.Tags[t]
+                    if tagInfo![0] as! String == "Local" {
+                        tagInfo![1] = tagInfo![1] as! Int + 1
+                        UserVars.Tags[t] = tagInfo
+                    }
+                }
+            } else if secondType == "species" {
+                if !UserVars.Species.keys.contains(t) {
+                    UserVars.Species[t] = ["Local",1]
+                } else {
+                    var tagInfo = UserVars.Species[t]
+                    if tagInfo![0] as! String == "Local" {
+                        tagInfo![1] = tagInfo![1] as! Int + 1
+                        UserVars.Species[t] = tagInfo
+                    }
+                }
+            } else if secondType == "units" {
+                if !UserVars.Units.keys.contains(t) {
+                    UserVars.Units[t] = ["Local",1]
+                } else {
+                    var tagInfo = UserVars.Units[t]
+                    if tagInfo![0] as! String == "Local" {
+                        tagInfo![1] = tagInfo![1] as! Int + 1
+                        UserVars.Units[t] = tagInfo
+                    }
+                }
+            }
+        }
+        
+        targetField!.text = secondVC.selectedItems.joinWithSeparator(";")
+        
+        checkValidName()
     }
     
     // MARK: Actions

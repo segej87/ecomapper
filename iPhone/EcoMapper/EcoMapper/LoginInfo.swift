@@ -15,7 +15,8 @@ class LoginInfo: NSObject, NSCoding {
     var uuid: String?
     var accessLevels: [String]?
     var tags: [String:[AnyObject]]?
-    var species: [String]?
+    var species: [String:[AnyObject]]?
+    var units: [String:[AnyObject]]?
     
     // MARK: Types
     
@@ -24,15 +25,17 @@ class LoginInfo: NSObject, NSCoding {
         static let accessKey = "access"
         static let tagsKey = "tags"
         static let speciesKey = "species"
+        static let unitsKey = "units"
     }
     
     // MARK: Initialization
     
-    init?(uuid: String?, accessLevels: [String]?, tags: [String:[AnyObject]]?, species: [String]?){
+    init?(uuid: String?, accessLevels: [String]?, tags: [String:[AnyObject]]?, species: [String:[AnyObject]]?, units: [String:[AnyObject]]?){
         self.uuid = uuid
         self.accessLevels = accessLevels
         self.tags = tags
         self.species = species
+        self.units = units
         
         super.init()
         
@@ -49,16 +52,18 @@ class LoginInfo: NSObject, NSCoding {
         aCoder.encodeObject(accessLevels, forKey: PropertyKey.accessKey)
         aCoder.encodeObject(tags, forKey: PropertyKey.tagsKey)
         aCoder.encodeObject(species, forKey: PropertyKey.speciesKey)
+        aCoder.encodeObject(units, forKey: PropertyKey.unitsKey)
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
         let uuid = aDecoder.decodeObjectForKey(PropertyKey.uuidKey) as! String
         let accessLevels = aDecoder.decodeObjectForKey(PropertyKey.accessKey) as? [String]
         let tags = aDecoder.decodeObjectForKey(PropertyKey.tagsKey) as? [String:[AnyObject]]
-        let species = aDecoder.decodeObjectForKey(PropertyKey.speciesKey) as? [String]
+        let species = aDecoder.decodeObjectForKey(PropertyKey.speciesKey) as? [String:[AnyObject]]
+        let units = aDecoder.decodeObjectForKey(PropertyKey.unitsKey) as? [String:[AnyObject]]
         
         // Must call designated initializer
-        self.init(uuid: uuid, accessLevels: accessLevels, tags: tags, species: species)
+        self.init(uuid: uuid, accessLevels: accessLevels, tags: tags, species: species, units: units)
     }
     
     // MARK: Archiving Paths

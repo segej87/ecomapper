@@ -11,12 +11,15 @@ import UIKit
 class ListPickerViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UISearchBarDelegate {
     
     // MARK: Properties
-    
+    // IB Properties
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var newText: UITextField!
     
+    // Class variables
+    // A key indicating the type of list to use (sent via segue)
+    var itemType:String?
     
     // Full data source for table view
     var fullItems = [String]()
@@ -24,7 +27,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     // Items to list in table view (after search)
     var listItems = [String]()
     
-    // Members of the fullItems list that have been selected
+    // For storing items selected by the user
     var selectedItems = [String]()
     
     // The final joined string of selected list items
@@ -38,11 +41,27 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print(itemType!)
+        
         self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
         // TODO: Set dynamically through segue
-        // Load the initial full data source for the dable view
-        self.fullItems = Array(UserVars.Tags.keys)
+        // Load the initial full data source for the table view
+        if itemType == "tags" {
+            self.fullItems = Array(UserVars.Tags.keys)
+        } else if itemType == "species" {
+            self.fullItems = Array(UserVars.Species.keys)
+        } else if itemType == "units" {
+            self.fullItems = Array(UserVars.Units.keys)
+        }
+        
+        // Since previously selected items may have been loaded during the segue,
+        // check if anything should be removed from the full list
+        for f in self.fullItems {
+            if self.selectedItems.contains(f) {
+                self.fullItems.removeAtIndex(self.fullItems.indexOf(f)!)
+            }
+        }
         
         // Set the new item text field delegate
         self.newText.delegate = self
@@ -112,6 +131,11 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
             if (searchActive) {
                 if listItems[indexPath.row] != "No item found" {
                     selectedItems.append(listItems[indexPath.row])
+                    
+                    // Remove the item from the full list so you can't create duplicates
+                    fullItems.removeAtIndex(fullItems.indexOf(listItems[indexPath.row])!)
+                    
+                    // Remove the item from the searched list
                     listItems.removeAtIndex(indexPath.row)
                 }
             } else {
@@ -122,6 +146,10 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
             tableView.reloadData()
         } else if indexPath.section == 0 {
             if (searchActive) {
+                // Add the item to the full list
+                fullItems.append(selectedItems[indexPath.row])
+                
+                // Add the item to the searched list
                 listItems.append(selectedItems[indexPath.row])
                 selectedItems.removeAtIndex(indexPath.row)
             } else {
@@ -216,7 +244,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     
     @IBAction func save(sender: UIButton) {
         itemOut = selectedItems.joinWithSeparator(";")
-        print(itemOut)
+        print(itemOut!)
         
         // TODO: Add new items to the full list
         
