@@ -9,27 +9,22 @@
 import UIKit
 import CoreLocation
 
-class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
+class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate {
 
     // MARK: Properties
     // IB properties
     @IBOutlet weak var nameTextField: UITextField!
-    @IBOutlet weak var accessPicker: UIPickerView!
+    @IBOutlet weak var accessTextField: UITextField!
     @IBOutlet weak var notesTextField: UITextView!
     @IBOutlet weak var tagTextField: UITextField!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var gpsAccView: UILabel!
-    @IBOutlet weak var tagButton: UIButton!
-    
+    @IBOutlet weak var accessPickerButton: UIButton!
+    @IBOutlet weak var tagPickerButton: UIButton!
+
     // Class variables
     // The Core Location manager
     let locationManager = CLLocationManager()
-    
-    // The access level data available to the UIPickerView
-    let pickerData = UserVars.AccessLevels
-    
-    // The selected access level
-    var accessLevel: String?
     
     // For storing the user's location from the CLLocationManager delegate
     var userLoc: [Double]?
@@ -63,33 +58,23 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         
         // Handle text fields' user input through delegate callbacks.
         nameTextField.delegate = self
+        accessTextField.delegate = self
         tagTextField.delegate = self
         
         // Handle the notes field's user input through delegate callbacks.
         notesTextField.delegate = self
         
-        // Handle the access picker's user input
-        accessPicker.dataSource = self
-        accessPicker.delegate = self
-        
         // Set up views if editing an existing Record.
         if let record = record {
             navigationItem.title = "Editing Note"
             nameTextField.text = record.props["name"] as? String
-            accessPicker.selectRow(pickerData.indexOf(record.props["access"] as! String)!, inComponent: 0, animated: true)
-            accessLevel = pickerData[accessPicker.selectedRowInComponent(0)]
+            accessTextField.text = record.props["access"] as? String
             notesTextField.text = record.props["text"] as? String
             tagTextField.text = record.props["tags"] as? String
             dateTime = record.props["datetime"] as? String
             userLoc = record.coords
             gpsAccView.hidden = true
         } else {
-            // Set a default index for the picker to prevent errors.
-            //TODO: Set default access from another menu
-            let defaultRowForAccess = 1
-            accessPicker.selectRow(defaultRowForAccess, inComponent: 0, animated: false)
-            accessLevel = pickerData[accessPicker.selectedRowInComponent(0)]
-            
             // Get the current datetime
             getDateTime()
             
@@ -140,25 +125,6 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     
     func textViewDidChange(textView: UITextView) {
         checkValidName()
-    }
-    
-    // MARK: UIPicker delegate and data sources
-    // MARK: Data Sources
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return pickerData.count
-    }
-    
-    // Mark: Delegates
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return pickerData[row]
-    }
-    
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        self.accessLevel = pickerData[row]
     }
     
     // MARK: Location methods
@@ -230,14 +196,28 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         if saveButton === sender {
             let name = nameTextField.text ?? ""
             
-            let props = ["name": name, "tags": tagTextField.text!, "datatype": "note", "datetime": dateTime!, "access": accessLevel!, "accuracy": gpsAcc, "text": notesTextField.text] as [String:AnyObject]
+            let props = ["name": name, "tags": tagTextField.text!, "datatype": "note", "datetime": dateTime!, "access": accessTextField.text!, "accuracy": gpsAcc, "text": notesTextField.text] as [String:AnyObject]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: userLoc!, photo: nil, props: props)
         }
         
-        // If the add tags button was pressed, present the item picker
-        if tagButton === sender {
+        // If the add access button was pressed, present the item picker with an access item type
+        if accessPickerButton === sender {
+            let secondVC = segue.destinationViewController as! ListPickerViewController
+            secondVC.itemType = "access"
+            
+            // Send previous access levels to ListPicker
+            if accessTextField.text != "" {
+                let accessArray = accessTextField.text?.componentsSeparatedByString(";")
+                for a in accessArray! {
+                    secondVC.selectedItems.append(a)
+                }
+            }
+        }
+        
+        // If the add tags button was pressed, present the item picker with a tag item type
+        if tagPickerButton === sender {
             let secondVC = segue.destinationViewController as! ListPickerViewController
             secondVC.itemType = "tags"
             
@@ -254,35 +234,49 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     @IBAction func unwindFromTagController(segue: UIStoryboardSegue) {
         let secondVC : ListPickerViewController = segue.sourceViewController as! ListPickerViewController
         
-        if tagTextField.text != "" {
-            let prevText = tagTextField.text
-            let prevArray = prevText!.componentsSeparatedByString(";")
-            for p in prevArray {
-                var pTag = UserVars.Tags[p]
-                if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
-                    pTag![1] = pTag![1] as! Int - 1
-                    if pTag![1] as! Int == 0 {
-                        UserVars.Tags.removeValueForKey(p)
-                    } else {
-                        UserVars.Tags[p] = pTag!
+        let secondType = secondVC.itemType
+        
+        var targetField : UITextField?
+        
+        if secondType == "tags" {
+            targetField = tagTextField
+        } else if secondType == "access" {
+            targetField = accessTextField
+        }
+        
+        if secondType == "tags" {
+            if tagTextField.text != "" {
+                let prevText = tagTextField.text
+                let prevArray = prevText!.componentsSeparatedByString(";")
+                for p in prevArray {
+                    var pTag = UserVars.Tags[p]
+                    if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
+                        pTag![1] = pTag![1] as! Int - 1
+                        if pTag![1] as! Int == 0 {
+                            UserVars.Tags.removeValueForKey(p)
+                        } else {
+                            UserVars.Tags[p] = pTag!
+                        }
+                    }
+                }
+            }
+            
+            for t in secondVC.selectedItems {
+                if !UserVars.Tags.keys.contains(t) {
+                    UserVars.Tags[t] = ["Local",1]
+                } else {
+                    var tagInfo = UserVars.Tags[t]
+                    if tagInfo![0] as! String == "Local" {
+                        tagInfo![1] = tagInfo![1] as! Int + 1
+                        UserVars.Tags[t] = tagInfo
                     }
                 }
             }
         }
         
-        for t in secondVC.selectedItems {
-            if !UserVars.Tags.keys.contains(t) {
-                UserVars.Tags[t] = ["Local",1]
-            } else {
-                var tagInfo = UserVars.Tags[t]
-                if tagInfo![0] as! String == "Local" {
-                    tagInfo![1] = tagInfo![1] as! Int + 1
-                    UserVars.Tags[t] = tagInfo
-                }
-            }
-        }
         
-        tagTextField.text = secondVC.selectedItems.joinWithSeparator(";")
+        targetField!.text = secondVC.selectedItems.joinWithSeparator(";")
+        
         checkValidName()
     }
     

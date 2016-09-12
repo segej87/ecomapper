@@ -49,10 +49,17 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         // Load the initial full data source for the table view
         if itemType == "tags" {
             self.fullItems = Array(UserVars.Tags.keys)
+            newText.placeholder = "Add new tag"
         } else if itemType == "species" {
             self.fullItems = Array(UserVars.Species.keys)
+            newText.placeholder = "Add new measured item"
         } else if itemType == "units" {
             self.fullItems = Array(UserVars.Units.keys)
+            newText.placeholder = "Add new unit"
+        } else if itemType == "access" {
+            self.fullItems = UserVars.AccessLevels
+            newText.enabled = false
+            newText.placeholder = "Can't add new access level remotely"
         }
         
         // Since previously selected items may have been loaded during the segue,
@@ -112,7 +119,9 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
             cell.textLabel?.text = self.selectedItems[indexPath.row]
         } else if indexPath.section == 1 {
             if (searchActive) {
-                cell.textLabel?.text = self.listItems[indexPath.row]
+                if listItems.count > 0 {
+                    cell.textLabel?.text = self.listItems[indexPath.row]
+                }
             } else {
                 cell.textLabel?.text = self.fullItems[indexPath.row]
             }
@@ -141,6 +150,14 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
             } else {
                 selectedItems.append(fullItems[indexPath.row])
                 fullItems.removeAtIndex(indexPath.row)
+            }
+            
+            if (itemType == "species" || itemType == "units" && selectedItems.count > 1) {
+                for i in 0..<(selectedItems.count-1) {
+                    fullItems.append(selectedItems[i])
+                    listItems.append(selectedItems[i])
+                    selectedItems.removeAtIndex(i)
+                }
             }
             
             tableView.reloadData()
@@ -175,26 +192,31 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         
         if searchBar.text != "" {
             searchBar.text = ""
-            searchActive = false
+            // searchActive = false
         }
         
         // If the entered text is not already in the list, add as a
         // selected item and refresh the table.
         if !(textField.text?.isEmpty)! && !fullItems.contains(textField.text!) && !selectedItems.contains(textField.text!) {
             selectedItems.append(textField.text!)
-            tableView.reloadData()
             textField.text = ""
         } else if !(textField.text?.isEmpty)! && fullItems.contains(textField.text!) && !selectedItems.contains(textField.text!) {
-            // TODO: Finish this
             selectedItems.append(textField.text!)
             fullItems.removeAtIndex(fullItems.indexOf(textField.text!)!)
-            tableView.reloadData()
             textField.text = ""
         } else {
             textField.text = ""
         }
         
-        //checkValidName()
+        if ((itemType == "species" || itemType == "units") && selectedItems.count > 1) {
+            for i in 0..<(selectedItems.count-1) {
+                fullItems.append(selectedItems[i])
+                listItems.append(selectedItems[i])
+                selectedItems.removeAtIndex(i)
+            }
+        }
+        
+        tableView.reloadData()
     }
     
     // MARK: Search bar delegates

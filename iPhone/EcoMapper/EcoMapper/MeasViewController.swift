@@ -10,14 +10,13 @@ import UIKit
 import CoreLocation
 import QuartzCore
 
-class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
+class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate {
     
     // MARK: Properties
     
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var photoImageView: UIImageView!
-    @IBOutlet weak var accessPicker: UIPickerView!
+    @IBOutlet weak var accessTextField: UITextField!
     @IBOutlet weak var measTextField: UITextField!
     @IBOutlet weak var valTextField: UITextField!
     @IBOutlet weak var unitsTextField: UITextField!
@@ -30,6 +29,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     @IBOutlet weak var measPickerButton: UIButton!
     @IBOutlet weak var tagPickerButton: UIButton!
     @IBOutlet weak var unitsPickerButton: UIButton!
+    @IBOutlet weak var accessPickerButton: UIButton!
     
     let locationManager = CLLocationManager()
     
@@ -71,6 +71,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         
         // Handle text fields' user input through delegate callbacks.
         nameTextField.delegate = self
+        accessTextField.delegate = self
         measTextField.delegate = self
         valTextField.delegate = self
         unitsTextField.delegate = self
@@ -79,16 +80,11 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         // Handle the notes field's user input through delegate callbacks.
         notesTextField.delegate = self
         
-        // Handle the access picker's user input.
-        accessPicker.dataSource = self
-        accessPicker.delegate = self
-        
         // Set up views if editing an existing Record.
         if let record = record {
             navigationItem.title = "Editing Measurement"
             nameTextField.text = record.props["name"] as? String
-            accessPicker.selectRow(pickerData.indexOf(record.props["access"] as! String)!, inComponent: 0, animated: true)
-            accessLevel = pickerData[accessPicker.selectedRowInComponent(0)]
+            accessTextField.text = record.props["access"] as? String
             measTextField.text = record.props["species"] as? String
             valTextField.text = record.props["value"] as? String
             unitsTextField.text = record.props["units"] as? String
@@ -98,12 +94,6 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             userLoc = record.coords
             gpsAccView.hidden = true
         } else {
-            // Set a default index for the picker to prevent errors.
-            //TODO: Set default access from another menu
-            let defaultRowForAccess = 0
-            accessPicker.selectRow(defaultRowForAccess, inComponent: 0, animated: false)
-            accessLevel = pickerData[accessPicker.selectedRowInComponent(0)]
-            
             // Get the current datetime
             getDateTime()
             
@@ -152,9 +142,10 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         let text3 = valTextField.text ?? ""
         let text4 = unitsTextField.text ?? ""
         let text5 = tagTextField.text ?? ""
+        let text6 = accessTextField.text ?? ""
         let loc1 = userLoc ?? nil
         
-        saveButton.enabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty || text4.isEmpty || text5.isEmpty || loc1 == nil || !checkMeasFloatVal())
+        saveButton.enabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty || text4.isEmpty || text5.isEmpty || text6.isEmpty || loc1 == nil || !checkMeasFloatVal())
     }
     
     // TODO: Improve this check (if string starts with valid float it will pass, even if letter is in there)
@@ -177,25 +168,6 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         //Hide the keyboard.
         textView.resignFirstResponder()
         return true
-    }
-    
-    // MARK: UIPicker delegate and data sources
-        // MARK: Data Sources
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return pickerData.count
-    }
-    
-        // Mark: Delegates
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return pickerData[row]
-    }
-    
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        self.accessLevel = pickerData[row]
     }
     
     // MARK: Location methods
@@ -269,7 +241,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             
             print("Using location \(userLoc!) with best accuracy \(gpsAcc) m")
             
-            let props = ["name": name, "tags": tagTextField.text!, "datatype": "meas", "datetime": dateTime!, "access": accessLevel!, "accuracy": gpsAcc, "text": notesTextField.text, "value": valTextField.text!, "species": measTextField.text!, "units": unitsTextField.text!] as [String:AnyObject]
+            let props = ["name": name, "tags": tagTextField.text!, "datatype": "meas", "datetime": dateTime!, "access": accessTextField.text!, "accuracy": gpsAcc, "text": notesTextField.text, "value": valTextField.text!, "species": measTextField.text!, "units": unitsTextField.text!] as [String:AnyObject]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: self.userLoc!, photo: nil, props: props)
@@ -280,7 +252,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             let secondVC = segue.destinationViewController as! ListPickerViewController
             secondVC.itemType = "species"
             
-            // TODO: Send previous species to ListPicker
+            // Send previous species to ListPicker
             if measTextField.text != "" {
                 let measArray = measTextField.text?.componentsSeparatedByString(";")
                 for m in measArray! {
@@ -294,11 +266,25 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             let secondVC = segue.destinationViewController as! ListPickerViewController
             secondVC.itemType = "units"
             
-            // TODO: Send previous species to ListPicker
+            // Send previous species to ListPicker
             if unitsTextField.text != "" {
                 let unitsArray = unitsTextField.text?.componentsSeparatedByString(";")
                 for u in unitsArray! {
                     secondVC.selectedItems.append(u)
+                }
+            }
+        }
+        
+        // If the add access button was pressed, present the item picker with an access item type
+        if accessPickerButton === sender {
+            let secondVC = segue.destinationViewController as! ListPickerViewController
+            secondVC.itemType = "access"
+            
+            // Send previous access levels to ListPicker
+            if accessTextField.text != "" {
+                let accessArray = accessTextField.text?.componentsSeparatedByString(";")
+                for a in accessArray! {
+                    secondVC.selectedItems.append(a)
                 }
             }
         }
@@ -308,7 +294,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             let secondVC = segue.destinationViewController as! ListPickerViewController
             secondVC.itemType = "tags"
             
-            // TODO: Send previous tags to ListPicker
+            // Send previous tags to ListPicker
             if tagTextField.text != "" {
                 let tagArray = tagTextField.text?.componentsSeparatedByString(";")
                 for t in tagArray! {
@@ -331,6 +317,8 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             targetField = measTextField
         } else if secondType == "units" {
             targetField = unitsTextField
+        } else if secondType == "access" {
+            targetField = accessTextField
         }
         
         if targetField!.text != "" {
