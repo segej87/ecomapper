@@ -43,7 +43,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         
         print(itemType!)
         
-        self.tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
         // TODO: Set dynamically through segue
         // Load the initial full data source for the table view
@@ -58,7 +58,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
             newText.placeholder = "Add new unit"
         } else if itemType == "access" {
             self.fullItems = UserVars.AccessLevels
-            newText.enabled = false
+            newText.isEnabled = false
             newText.placeholder = "Can't add new access level remotely"
         }
         
@@ -66,7 +66,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         // check if anything should be removed from the full list
         for f in self.fullItems {
             if self.selectedItems.contains(f) {
-                self.fullItems.removeAtIndex(self.fullItems.indexOf(f)!)
+                self.fullItems.remove(at: self.fullItems.index(of: f)!)
             }
         }
         
@@ -79,11 +79,11 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     
     // MARK: Table protocols
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         var sectionName = "Selected"
         
         if section == 0 {
@@ -95,7 +95,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         return sectionName
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var rowCount = 0
         
         if section == 0 {
@@ -111,67 +111,67 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         return rowCount
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell:UITableViewCell = self.tableView.dequeueReusableCellWithIdentifier("cell")! as UITableViewCell
+        let cell:UITableViewCell = self.tableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
         
-        if indexPath.section == 0 {
-            cell.textLabel?.text = self.selectedItems[indexPath.row]
-        } else if indexPath.section == 1 {
+        if (indexPath as NSIndexPath).section == 0 {
+            cell.textLabel?.text = self.selectedItems[(indexPath as NSIndexPath).row]
+        } else if (indexPath as NSIndexPath).section == 1 {
             if (searchActive) {
                 if listItems.count > 0 {
-                    cell.textLabel?.text = self.listItems[indexPath.row]
+                    cell.textLabel?.text = self.listItems[(indexPath as NSIndexPath).row]
                 }
             } else {
-                cell.textLabel?.text = self.fullItems[indexPath.row]
+                cell.textLabel?.text = self.fullItems[(indexPath as NSIndexPath).row]
             }
         }
         
         return cell
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         // If the selected row is in the available section, move
         // the item from the available section to the selected section.
         // If the selected row is in the selected section, move to the
         // available section.
-        if indexPath.section == 1 {
+        if (indexPath as NSIndexPath).section == 1 {
             if (searchActive) {
-                if listItems[indexPath.row] != "No item found" {
-                    selectedItems.append(listItems[indexPath.row])
+                if listItems[(indexPath as NSIndexPath).row] != "No item found" {
+                    selectedItems.append(listItems[(indexPath as NSIndexPath).row])
                     
                     // Remove the item from the full list so you can't create duplicates
-                    fullItems.removeAtIndex(fullItems.indexOf(listItems[indexPath.row])!)
+                    fullItems.remove(at: fullItems.index(of: listItems[(indexPath as NSIndexPath).row])!)
                     
                     // Remove the item from the searched list
-                    listItems.removeAtIndex(indexPath.row)
+                    listItems.remove(at: (indexPath as NSIndexPath).row)
                 }
             } else {
-                selectedItems.append(fullItems[indexPath.row])
-                fullItems.removeAtIndex(indexPath.row)
+                selectedItems.append(fullItems[(indexPath as NSIndexPath).row])
+                fullItems.remove(at: (indexPath as NSIndexPath).row)
             }
             
             if (itemType == "species" || itemType == "units" && selectedItems.count > 1) {
                 for i in 0..<(selectedItems.count-1) {
                     fullItems.append(selectedItems[i])
                     listItems.append(selectedItems[i])
-                    selectedItems.removeAtIndex(i)
+                    selectedItems.remove(at: i)
                 }
             }
             
             tableView.reloadData()
-        } else if indexPath.section == 0 {
+        } else if (indexPath as NSIndexPath).section == 0 {
             if (searchActive) {
                 // Add the item to the full list
-                fullItems.append(selectedItems[indexPath.row])
+                fullItems.append(selectedItems[(indexPath as NSIndexPath).row])
                 
                 // Add the item to the searched list
-                listItems.append(selectedItems[indexPath.row])
-                selectedItems.removeAtIndex(indexPath.row)
+                listItems.append(selectedItems[(indexPath as NSIndexPath).row])
+                selectedItems.remove(at: (indexPath as NSIndexPath).row)
             } else {
-                fullItems.append(selectedItems[indexPath.row])
-                selectedItems.removeAtIndex(indexPath.row)
+                fullItems.append(selectedItems[(indexPath as NSIndexPath).row])
+                selectedItems.remove(at: (indexPath as NSIndexPath).row)
             }
             
             // Reload the table view after moving row.
@@ -181,14 +181,14 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     
     // MARK: UITextFieldDelegate
     
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         //Hide the keyboard.
         textField.resignFirstResponder()
         return true
     }
     
-    func textFieldDidEndEditing(textField: UITextField) {
+    func textFieldDidEndEditing(_ textField: UITextField) {
         
         if searchBar.text != "" {
             searchBar.text = ""
@@ -202,7 +202,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
             textField.text = ""
         } else if !(textField.text?.isEmpty)! && fullItems.contains(textField.text!) && !selectedItems.contains(textField.text!) {
             selectedItems.append(textField.text!)
-            fullItems.removeAtIndex(fullItems.indexOf(textField.text!)!)
+            fullItems.remove(at: fullItems.index(of: textField.text!)!)
             textField.text = ""
         } else {
             textField.text = ""
@@ -212,7 +212,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
             for i in 0..<(selectedItems.count-1) {
                 fullItems.append(selectedItems[i])
                 listItems.append(selectedItems[i])
-                selectedItems.removeAtIndex(i)
+                selectedItems.remove(at: i)
             }
         }
         
@@ -221,28 +221,28 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     
     // MARK: Search bar delegates
     
-    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         searchActive = true;
     }
     
-    func searchBarTextDidEndEditing(searchBar: UISearchBar) {
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         searchActive = false;
     }
     
-    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchActive = false;
     }
     
-    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchActive = false;
     }
     
-    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         
         // Get the items from fullItems that match the search text
         listItems = fullItems.filter({ (text) -> Bool in
-            let tmp: NSString = text
-            let range = tmp.rangeOfString(searchText, options: NSStringCompareOptions.CaseInsensitiveSearch)
+            let tmp: NSString = text as NSString
+            let range = tmp.range(of: searchText, options: NSString.CompareOptions.caseInsensitive)
             return range.location != NSNotFound
         })
         
@@ -259,16 +259,14 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
 
     // MARK: Actions
     
-    @IBAction func cancel(sender: UIButton) {
-        self.dismissViewControllerAnimated(false, completion: nil)
+    @IBAction func cancel(_ sender: UIButton) {
+        self.dismiss(animated: false, completion: nil)
         print("cancel")
     }
     
-    @IBAction func save(sender: UIButton) {
-        itemOut = selectedItems.joinWithSeparator(";")
+    @IBAction func save(_ sender: UIButton) {
+        itemOut = selectedItems.joined(separator: ";")
         print(itemOut!)
-        
-        // TODO: Add new items to the full list
         
     }
 }

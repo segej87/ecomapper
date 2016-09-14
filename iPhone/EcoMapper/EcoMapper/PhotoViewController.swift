@@ -31,7 +31,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     var newPhoto = false
     
     // The path to the photo on the device's drive
-    var photoURL: NSURL?
+    var photoURL: URL?
     
     /*
      This value will be filled with the user's location by the CLLocationManager delegate
@@ -59,14 +59,14 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         
         // Style the navigation bar's background color and button colors
         let nav = self.navigationController?.navigationBar
-        nav?.barStyle = UIBarStyle.Black
+        nav?.barStyle = UIBarStyle.black
         nav?.backgroundColor = UIColor(red: 0/255 as CGFloat, green: 0/255 as CGFloat, blue: 96/255 as CGFloat, alpha: 1)
-        self.navigationController?.navigationBar.tintColor = UIColor.lightGrayColor()
+        self.navigationController?.navigationBar.tintColor = UIColor.lightGray
         
         // Add border to text view
         self.notesTextField.layer.borderWidth = 0.5
         self.notesTextField.layer.cornerRadius = 10
-        self.notesTextField.layer.borderColor = UIColor.init(red: 200/255.0, green: 199/255.0, blue: 204/255.0, alpha: 1.0).CGColor
+        self.notesTextField.layer.borderColor = UIColor.init(red: 200/255.0, green: 199/255.0, blue: 204/255.0, alpha: 1.0).cgColor
         
         // Handle text fields' user input through delegate callbacks.
         nameTextField.delegate = self
@@ -86,7 +86,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             tagTextField.text = record.props["tags"] as? String
             dateTime = record.props["datetime"] as? String
             userLoc = record.coords
-            gpsAccView.hidden = true
+            gpsAccView.isHidden = true
         } else {
             // Get the current datetime
             getDateTime()
@@ -111,10 +111,10 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     
     func noCamera() {
         if #available(iOS 8.0, *) {
-            let alertVC = UIAlertController(title: "No Camera", message: "Sorry, this device doesn't have a camera", preferredStyle: .Alert)
-            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+            let alertVC = UIAlertController(title: "No Camera", message: "Sorry, this device doesn't have a camera", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
             alertVC.addAction(okAction)
-            presentViewController(alertVC, animated: true, completion: nil)
+            present(alertVC, animated: true, completion: nil)
         } else {
             let alertVC = UIAlertView(title: "No Camera", message: "Sorry, this device doesn't have a camera", delegate: self, cancelButtonTitle: "OK")
             alertVC.show()
@@ -123,13 +123,13 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     
     // MARK: UIImagePickerControllerDelegate
     
-    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         
         // Dismiss the picker if the user canceled.
-        dismissViewControllerAnimated(true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
         // The info dictionary contains multiple representations of the image, and this uses the original.
         let selectedImage = info[UIImagePickerControllerOriginalImage] as! UIImage
@@ -138,10 +138,10 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         if newPhoto {
             
             // Set the name of the photo
-            medOutName = "Photo_\(dateTime!.stringByReplacingOccurrencesOfString("-", withString: "").stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString(" ", withString: "_")).jpg"
+            medOutName = "Photo_\(dateTime!.replacingOccurrences(of: "-", with: "").replacingOccurrences(of: ":", with: "").replacingOccurrences(of: " ", with: "_")).jpg"
             
             // Set path of photo to be saved
-            photoURL = UserVars.PhotosURL.URLByAppendingPathComponent(medOutName!)
+            photoURL = UserVars.PhotosURL.appendingPathComponent(medOutName!)
             
             // Create an NSCoded photo object
             let outPhoto = NewPhoto(photo: selectedImage)
@@ -152,22 +152,22 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         } else {
             
             // Get the url of the selected asset and set it to the instance variable
-            let imageURL = info[UIImagePickerControllerReferenceURL] as! NSURL
+            let imageURL = info[UIImagePickerControllerReferenceURL] as! URL
             
             photoURL = imageURL
             
             // Set the name of the photo
-            medOutName = "Photo_\(dateTime!.stringByReplacingOccurrencesOfString("-", withString: "").stringByReplacingOccurrencesOfString(":", withString: "").stringByReplacingOccurrencesOfString(" ", withString: "_")).\(imageURL.absoluteString.substringFromIndex(imageURL.absoluteString.rangeOfString("ext=")!.endIndex))"
+            medOutName = "Photo_\(dateTime!.replacingOccurrences(of: "-", with: "").replacingOccurrences(of: ":", with: "").replacingOccurrences(of: " ", with: "_")).\(imageURL.absoluteString.substring(from: imageURL.absoluteString.range(of: "ext=")!.upperBound))"
         }
         
         // Set the aspect ratio of the image in the view
-        photoImageView.contentMode = .ScaleAspectFit
+        photoImageView.contentMode = .scaleAspectFit
         
         // Set photoImageView to display the selected image.
         photoImageView.image = selectedImage
         
         // Dismiss the picker.
-        dismissViewControllerAnimated(true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
 
     
@@ -184,23 +184,23 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         let text2 = tagTextField.text ?? ""
         let photo1 = photoImageView.image ?? nil
         let loc1 = userLoc ?? nil
-        saveButton.enabled = !(text1.isEmpty || text2.isEmpty || photo1 == nil || loc1 == nil)
+        saveButton.isEnabled = !(text1.isEmpty || text2.isEmpty || photo1 == nil || loc1 == nil)
     }
     
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         //Hide the keyboard.
         textField.resignFirstResponder()
         return true
     }
     
-    func textFieldDidEndEditing(textField: UITextField) {
+    func textFieldDidEndEditing(_ textField: UITextField) {
         checkValidName()
     }
     
     // MARK: UITextViewDelegate
     
-    func textViewDidChange(textView: UITextView) {
+    func textViewDidChange(_ textView: UITextView) {
         
     }
     
@@ -208,17 +208,17 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     
     func noGPS() {
         if #available(iOS 8.0, *) {
-            let alertVC = UIAlertController(title: "No GPS", message: "Can't pinpoint your location, using default", preferredStyle: .Alert)
-            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+            let alertVC = UIAlertController(title: "No GPS", message: "Can't pinpoint your location, using default", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
             alertVC.addAction(okAction)
-            presentViewController(alertVC, animated: true, completion: nil)
+            present(alertVC, animated: true, completion: nil)
         } else {
             let alertVC = UIAlertView(title: "No GPS", message: "Can't pinpoint your location, using default", delegate: self, cancelButtonTitle: "OK")
             alertVC.show()
         }
     }
     
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             // Current implementation of best accuracy algorithm
             if location.horizontalAccuracy < gpsAcc || gpsAcc == 0.0 {
@@ -233,7 +233,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         }
     }
     
-    func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Failed to find user's location: \(error.localizedDescription)")
         print("No location found, using default")
         noGPS()
@@ -246,37 +246,37 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     // MARK: Date methods
     
     func getDateTime(){
-        let currentDate = NSDate()
-        let dateFormatter = NSDateFormatter()
+        let currentDate = Date()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateTime = dateFormatter.stringFromDate(currentDate)
+        dateTime = dateFormatter.string(from: currentDate)
     }
     
     // MARK: Navigation
     
-    @IBAction func cancel(sender: UIBarButtonItem) {
+    @IBAction func cancel(_ sender: UIBarButtonItem) {
         locationManager.stopUpdatingLocation()
         
         // Depending on style of presentation (modal or push), dismiss the view controller differently
         let isPresentingInAddRecordMode = presentingViewController is UINavigationController
         if isPresentingInAddRecordMode {
-            dismissViewControllerAnimated(true, completion: nil)
+            dismiss(animated: true, completion: nil)
         } else {
-            navigationController!.popViewControllerAnimated(true)
+            navigationController!.popViewController(animated: true)
         }
     }
     
     // This method lets you configure a view controller before it's presented.
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         locationManager.stopUpdatingLocation()
         
-        if saveButton === sender {
+        if sender is UIBarButtonItem && saveButton === (sender as! UIBarButtonItem) {
             // TODO: Allow user to choose whether to use photo location or current location
             
             let name = nameTextField.text ?? ""
             let urlOut = photoURL!.absoluteString
             
-            let props = ["name": name, "tags": tagTextField.text!, "datatype": "photo", "datetime": dateTime!, "access": accessTextField.text!, "accuracy": gpsAcc, "text": notesTextField.text, "filepath": urlOut] as [String:AnyObject]
+            let props = ["name": name as AnyObject, "tags": tagTextField.text! as AnyObject, "datatype": "photo" as AnyObject, "datetime": dateTime! as AnyObject, "access": accessTextField.text! as AnyObject, "accuracy": gpsAcc as AnyObject, "text": notesTextField.text as AnyObject, "filepath": urlOut as AnyObject] as [String:AnyObject]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: userLoc!, photo: photoImageView.image, props: props)
@@ -286,13 +286,13 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         }
         
         // If the add access button was pressed, present the item picker with an access item type
-        if accessPickerButton === sender {
-            let secondVC = segue.destinationViewController as! ListPickerViewController
+        if sender is UIButton && accessPickerButton === (sender as! UIButton) {
+            let secondVC = segue.destination as! ListPickerViewController
             secondVC.itemType = "access"
             
             // Send previous access levels to ListPicker
             if accessTextField.text != "" {
-                let accessArray = accessTextField.text?.componentsSeparatedByString(";")
+                let accessArray = accessTextField.text?.components(separatedBy: ";")
                 for a in accessArray! {
                     secondVC.selectedItems.append(a)
                 }
@@ -300,13 +300,13 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         }
         
         // If the add tags button was pressed, present the item picker with a tags item type
-        if tagPickerButton === sender {
-            let secondVC = segue.destinationViewController as! ListPickerViewController
+        if sender is UIButton && tagPickerButton === (sender as! UIButton) {
+            let secondVC = segue.destination as! ListPickerViewController
             secondVC.itemType = "tags"
             
             // Send previous tags to ListPicker
             if tagTextField.text != "" {
-                let tagArray = tagTextField.text?.componentsSeparatedByString(";")
+                let tagArray = tagTextField.text?.components(separatedBy: ";")
                 for t in tagArray! {
                     secondVC.selectedItems.append(t)
                 }
@@ -314,8 +314,8 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         }
     }
     
-    @IBAction func unwindFromListPicker(segue: UIStoryboardSegue) {
-        let secondVC : ListPickerViewController = segue.sourceViewController as! ListPickerViewController
+    @IBAction func unwindFromListPicker(_ segue: UIStoryboardSegue) {
+        let secondVC : ListPickerViewController = segue.source as! ListPickerViewController
         
         let secondType = secondVC.itemType
         
@@ -330,13 +330,13 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         if secondType == "tags" {
             if tagTextField.text != "" {
                 let prevText = tagTextField.text
-                let prevArray = prevText!.componentsSeparatedByString(";")
+                let prevArray = prevText!.components(separatedBy: ";")
                 for p in prevArray {
                     var pTag = UserVars.Tags[p]
                     if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
-                        pTag![1] = pTag![1] as! Int - 1
+                        pTag![1] = ((pTag![1] as! Int - 1) as AnyObject)
                         if pTag![1] as! Int == 0 {
-                            UserVars.Tags.removeValueForKey(p)
+                            UserVars.Tags.removeValue(forKey: p)
                         } else {
                             UserVars.Tags[p] = pTag!
                         }
@@ -346,11 +346,11 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             
             for t in secondVC.selectedItems {
                 if !UserVars.Tags.keys.contains(t) {
-                    UserVars.Tags[t] = ["Local",1]
+                    UserVars.Tags[t] = ["Local" as AnyObject,1 as AnyObject]
                 } else {
                     var tagInfo = UserVars.Tags[t]
                     if tagInfo![0] as! String == "Local" {
-                        tagInfo![1] = tagInfo![1] as! Int + 1
+                        tagInfo![1] = ((tagInfo![1] as! Int + 1) as AnyObject)
                         UserVars.Tags[t] = tagInfo
                     }
                 }
@@ -358,14 +358,14 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         }
         
         
-        targetField!.text = secondVC.selectedItems.joinWithSeparator(";")
+        targetField!.text = secondVC.selectedItems.joined(separator: ";")
         
         checkValidName()
     }
     
     // MARK: Actions
     
-    @IBAction func selectImage(sender: UITapGestureRecognizer) {
+    @IBAction func selectImage(_ sender: UITapGestureRecognizer) {
         
         // Hide the keyboard.
         nameTextField.resignFirstResponder()
@@ -374,55 +374,55 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         let imagePickerController = UIImagePickerController()
         
         // Allow photos to be picked from existing photos.
-        imagePickerController.sourceType = .PhotoLibrary
+        imagePickerController.sourceType = .photoLibrary
         
         // Indicate that a previously existing photo is being selected.
         newPhoto = false
         
         // Make sure ViewController is notified when the user picks an image.
         imagePickerController.delegate = self
-        presentViewController(imagePickerController, animated: true, completion: nil)
+        present(imagePickerController, animated: true, completion: nil)
     }
     
-    @IBAction func takeImage(sender: UIButton) {
+    @IBAction func takeImage(_ sender: UIButton) {
         
-        if UIImagePickerController.availableCaptureModesForCameraDevice(.Rear) != nil {
+        if UIImagePickerController.availableCaptureModes(for: .rear) != nil {
             // Create a controller for handling the camera action
             let imageTakerController = UIImagePickerController()
             
             // Set camera options
             imageTakerController.allowsEditing = false
-            imageTakerController.sourceType = .Camera
-            imageTakerController.cameraCaptureMode = .Photo
-            imageTakerController.modalPresentationStyle = .FullScreen
+            imageTakerController.sourceType = .camera
+            imageTakerController.cameraCaptureMode = .photo
+            imageTakerController.modalPresentationStyle = .fullScreen
             
             // Indicate that a new photo is being selected.
             newPhoto = true
             
             // Make sure ViewController is notified when the user takes an image.
             imageTakerController.delegate = self
-            presentViewController(imageTakerController, animated: true, completion: nil)
+            present(imageTakerController, animated: true, completion: nil)
         } else {
             noCamera()
         }
         
     }
     
-    @IBAction func setDefaultNameText(sender: UIButton) {
+    @IBAction func setDefaultNameText(_ sender: UIButton) {
         nameTextField.text = "Photo" + " - " + dateTime!
     }
 
     // MARK: NSCoding
     
-    func savePhoto(photo: NewPhoto) {
+    func savePhoto(_ photo: NewPhoto) {
 
         do {
-            try NSFileManager.defaultManager().createDirectoryAtPath(UserVars.PhotosURL.path!, withIntermediateDirectories: false, attributes: nil)
+            try FileManager.default.createDirectory(atPath: UserVars.PhotosURL.path, withIntermediateDirectories: false, attributes: nil)
         } catch let error as NSError {
             print(error.localizedDescription);
         }
         
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(photo, toFile: photoURL!.path!)
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(photo, toFile: photoURL!.path)
         
         if !isSuccessfulSave {
             print("Failed to save records...")

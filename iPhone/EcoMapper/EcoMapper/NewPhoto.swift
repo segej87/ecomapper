@@ -35,12 +35,12 @@ class NewPhoto: NSObject, NSCoding {
     
     // MARK: NSCoding
     
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(photo, forKey: PropertyKey.photoKey)
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(photo, forKey: PropertyKey.photoKey)
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
-        let photo = aDecoder.decodeObjectForKey(PropertyKey.photoKey) as? UIImage
+        let photo = aDecoder.decodeObject(forKey: PropertyKey.photoKey) as? UIImage
         
         // Must call designated initializer
         self.init(photo: photo)

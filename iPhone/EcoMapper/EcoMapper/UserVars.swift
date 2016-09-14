@@ -12,20 +12,20 @@ import UIKit
 struct UserVars {
     static var uuid: String? {
         didSet {
-            RecordsURL = DocumentsDirectory.URLByAppendingPathComponent("Records-\(uuid)")
-            MediasURL = DocumentsDirectory.URLByAppendingPathComponent("Media-\(uuid)")
+            RecordsURL = DocumentsDirectory.appendingPathComponent("Records-\(uuid)")
+            MediasURL = DocumentsDirectory.appendingPathComponent("Media-\(uuid)")
         }
     }
     
-    static let DocumentsDirectory = NSFileManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
+    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
     
-    static var RecordsURL: NSURL?
+    static var RecordsURL: URL?
     
-    static var MediasURL: NSURL?
+    static var MediasURL: URL?
     
-    static let PhotosURL = DocumentsDirectory.URLByAppendingPathComponent("Photos", isDirectory: true)
+    static let PhotosURL = DocumentsDirectory.appendingPathComponent("Photos", isDirectory: true)
     
-    static var AccessLevels = ["public", "private"]
+    static var AccessLevels = ["Public", "Private"]
     
     static var Tags = [String:[AnyObject]]()
     

@@ -13,7 +13,7 @@ class Media: NSObject, NSCoding {
     // MARK: Properties
     
     var mediaName: String?
-    var mediaPath: NSURL?
+    var mediaPath: URL?
     
     // MARK: Types
     
@@ -24,7 +24,7 @@ class Media: NSObject, NSCoding {
     
     // MARK: Initialization
     
-    init?(name: String, path: NSURL?){
+    init?(name: String, path: URL?){
         self.mediaName = name
         self.mediaPath = path
         
@@ -38,14 +38,14 @@ class Media: NSObject, NSCoding {
     
     // MARK: NSCoding
     
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(mediaName, forKey: PropertyKey.nameKey)
-        aCoder.encodeObject(mediaPath, forKey: PropertyKey.pathKey)
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(mediaName, forKey: PropertyKey.nameKey)
+        aCoder.encode(mediaPath, forKey: PropertyKey.pathKey)
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
-        let name = aDecoder.decodeObjectForKey(PropertyKey.nameKey) as! String
-        let path = aDecoder.decodeObjectForKey(PropertyKey.pathKey) as? NSURL
+        let name = aDecoder.decodeObject(forKey: PropertyKey.nameKey) as! String
+        let path = aDecoder.decodeObject(forKey: PropertyKey.pathKey) as? URL
         
         // Must call designated initializer
         self.init(name: name, path: path)

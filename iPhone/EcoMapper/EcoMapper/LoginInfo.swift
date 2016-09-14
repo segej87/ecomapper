@@ -47,20 +47,20 @@ class LoginInfo: NSObject, NSCoding {
     
     // MARK: NSCoding
     
-    func encodeWithCoder(aCoder: NSCoder) {
-        aCoder.encodeObject(uuid, forKey: PropertyKey.uuidKey)
-        aCoder.encodeObject(accessLevels, forKey: PropertyKey.accessKey)
-        aCoder.encodeObject(tags, forKey: PropertyKey.tagsKey)
-        aCoder.encodeObject(species, forKey: PropertyKey.speciesKey)
-        aCoder.encodeObject(units, forKey: PropertyKey.unitsKey)
+    func encode(with aCoder: NSCoder) {
+        aCoder.encode(uuid, forKey: PropertyKey.uuidKey)
+        aCoder.encode(accessLevels, forKey: PropertyKey.accessKey)
+        aCoder.encode(tags, forKey: PropertyKey.tagsKey)
+        aCoder.encode(species, forKey: PropertyKey.speciesKey)
+        aCoder.encode(units, forKey: PropertyKey.unitsKey)
     }
     
     required convenience init?(coder aDecoder: NSCoder) {
-        let uuid = aDecoder.decodeObjectForKey(PropertyKey.uuidKey) as! String
-        let accessLevels = aDecoder.decodeObjectForKey(PropertyKey.accessKey) as? [String]
-        let tags = aDecoder.decodeObjectForKey(PropertyKey.tagsKey) as? [String:[AnyObject]]
-        let species = aDecoder.decodeObjectForKey(PropertyKey.speciesKey) as? [String:[AnyObject]]
-        let units = aDecoder.decodeObjectForKey(PropertyKey.unitsKey) as? [String:[AnyObject]]
+        let uuid = aDecoder.decodeObject(forKey: PropertyKey.uuidKey) as! String
+        let accessLevels = aDecoder.decodeObject(forKey: PropertyKey.accessKey) as? [String]
+        let tags = aDecoder.decodeObject(forKey: PropertyKey.tagsKey) as? [String:[AnyObject]]
+        let species = aDecoder.decodeObject(forKey: PropertyKey.speciesKey) as? [String:[AnyObject]]
+        let units = aDecoder.decodeObject(forKey: PropertyKey.unitsKey) as? [String:[AnyObject]]
         
         // Must call designated initializer
         self.init(uuid: uuid, accessLevels: accessLevels, tags: tags, species: species, units: units)
@@ -68,7 +68,7 @@ class LoginInfo: NSObject, NSCoding {
     
     // MARK: Archiving Paths
     
-    static let DocumentsDirectory = NSFileManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first!
-    static let ArchiveURL = DocumentsDirectory.URLByAppendingPathComponent("EcoLogin")
+    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
+    static let ArchiveURL = DocumentsDirectory.appendingPathComponent("EcoLogin")
     
 }

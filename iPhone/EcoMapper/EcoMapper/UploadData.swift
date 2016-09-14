@@ -9,7 +9,7 @@
 import Foundation
 import Photos
 
-public class UploadData {
+open class UploadData {
     
     // MARK: Properties
     
@@ -25,26 +25,26 @@ public class UploadData {
     
     // MARK: Upload geojson records
     
-    func uploadRecords(biggerDict: NSDictionary) {
+    func uploadRecords(_ biggerDict: NSDictionary) {
         do {
             // Try to encode the passed data as JSON
-            let biggestDict = try NSJSONSerialization.dataWithJSONObject(biggerDict, options: NSJSONWritingOptions())
+            let biggestDict = try JSONSerialization.data(withJSONObject: biggerDict, options: JSONSerialization.WritingOptions())
             
             // Encode the JSON data as a string for use in POST
-            let dataString = NSString(data: biggestDict, encoding: NSUTF8StringEncoding)
+            let dataString = NSString(data: biggestDict, encoding: String.Encoding.utf8.rawValue)
             
-            print(dataString)
+            print("New records to send: \(dataString)")
             
             // Establish a request to the server-side PHP script, and define the method as POST
-            let request = NSMutableURLRequest(URL: NSURL(string: UserVars.recordAddScript)!)
-            request.HTTPMethod = "POST"
+            let request = NSMutableURLRequest(url: URL(string: UserVars.recordAddScript)!)
+            request.httpMethod = "POST"
             
             // Create the POST string with necessary variables, and put in HTTP body
             let postString = "GUID=\(UserVars.uuid!)&geojson=\(dataString!)"
-            request.HTTPBody = postString.dataUsingEncoding(NSUTF8StringEncoding)
+            request.httpBody = postString.data(using: String.Encoding.utf8)
             
             // Create a session with the PHP script, and attempt to upload records
-            let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { data, response, error in
+            let task = URLSession.shared.dataTask(with: request as URLRequest, completionHandler: { data, response, error in
                 
                 // Make sure there are no errors creating the session and that some data is being passed
                 guard error == nil && data != nil else {
@@ -53,45 +53,45 @@ public class UploadData {
                 }
                 
                 // Check if HTTP response code is 200 ("OK"). If not, print an error
-                if let httpStatus = response as? NSHTTPURLResponse where httpStatus.statusCode != 200 {
+                if let httpStatus = response as? HTTPURLResponse , httpStatus.statusCode != 200 {
                     print("Status code should be 200, but it's \(httpStatus.statusCode)")
                     print("response = \(response!)")
                 }
                 
                 // Get the PHP script's response to the session
-                let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
+                let responseString = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)
                 
                 print(responseString)
                 
                 // Once background task finishes, perform post-upload operations
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     
                     // Perform post-upload tasks
                     self.postRecordUpload(responseString!)
                 }
-            }
+            }) 
             task.resume()
         } catch let error as NSError {
             print(error)
             
             // Reactivate the sync button
-            tableView!.syncButton.enabled = true
+            tableView!.syncButton.isEnabled = true
         }
     }
     
     // MARK: Record helper methods
     
-    func postRecordUpload (responseString: NSString) {
+    func postRecordUpload (_ responseString: NSString) {
         // For reference, print the response string to the log
         print(responseString)
         
         // Check if response string contains "Success!" If so, the records were uploaded successfully, and should be deleted form the phone
-        if responseString.stringByReplacingOccurrencesOfString("Success!", withString: "") != responseString {
+        if responseString.replacingOccurrences(of: "Success!", with: "") != responseString as String {
             
             // Create an array of UITableView index paths corresponding to records in phone storage
-            var iPs = [NSIndexPath]()
+            var iPs = [IndexPath]()
             for i in 0..<tableView!.records.count{
-                let iP = NSIndexPath(forRow: i, inSection: 0)
+                let iP = IndexPath(row: i, section: 0)
                 iPs.append(iP)
             }
             
@@ -99,14 +99,14 @@ public class UploadData {
             tableView!.records.removeAll()
             
             // Delete UITableView rows from the index paths above
-            tableView!.tableView.deleteRowsAtIndexPaths(iPs, withRowAnimation: .Fade)
+            tableView!.tableView.deleteRows(at: iPs, with: .fade)
             
             // Save the new (empty) records list
             tableView!.saveRecords()
         }
         
         // Reactivate the sync button
-        tableView!.syncButton.enabled = true
+        tableView!.syncButton.isEnabled = true
     }
     
     // MARK: Upload media
@@ -117,9 +117,9 @@ public class UploadData {
         let container = getContainer()
         
         // Create a dictionary of media names and paths for upload loop
-        var mediaList = [String:NSURL]()
+        var mediaList = [String:URL]()
         for i in tableView!.medias.indices {
-            mediaList[tableView!.medias[i].mediaName!] = tableView!.medias[i].mediaPath
+            mediaList[tableView!.medias[i].mediaName!] = tableView!.medias[i].mediaPath as URL?
         }
         
         // Loop through media dictionary and attempt to upload
@@ -133,18 +133,18 @@ public class UploadData {
             if #available(iOS 8.0, *) {
                 
                 // Fetch the image from phone storage using the image URL
-                let asset = PHAsset.fetchAssetsWithALAssetURLs([mPath!], options: nil)
-                if let result = asset.firstObject where result is PHAsset {
+                let asset = PHAsset.fetchAssets(withALAssetURLs: [mPath!], options: nil)
+                if let result = asset.firstObject {
                     
                     // Create an image manager
-                    let imageManager = PHImageManager.defaultManager()
+                    let imageManager = PHImageManager.default()
                     
                     // Set options for retrieving image data
                     let options = PHImageRequestOptions()
-                    options.deliveryMode = PHImageRequestOptionsDeliveryMode.Opportunistic
+                    options.deliveryMode = PHImageRequestOptionsDeliveryMode.opportunistic
                     
                     // Retrieve image data, and, if retrieved, attempt to upload and delete
-                    imageManager.requestImageDataForAsset(result as! PHAsset, options: options) { (imageData, dataUTI, orientation, info) -> Void in
+                    imageManager.requestImageData(for: result , options: options) { (imageData, dataUTI, orientation, info) -> Void in
                         if let imageData = imageData {
                             
                             // Attempt to upload the blob to the server
@@ -184,12 +184,12 @@ public class UploadData {
         let storageAccount : AZSCloudStorageAccount;
         try! storageAccount = AZSCloudStorageAccount(fromConnectionString: connectionString)
         let blobClient = storageAccount.getBlobClient()
-        let container = blobClient.containerReferenceFromName(containerName)
+        let container = blobClient?.containerReference(fromName: containerName)
         
         let condition = NSCondition()
         var containerCreated = false
         
-        container.createContainerIfNotExistsWithAccessType(AZSContainerPublicAccessType.Blob, requestOptions: nil, operationContext: nil) { (error:NSError?, created) -> Void in
+        container?.createContainerIfNotExists(with: AZSContainerPublicAccessType.blob, requestOptions: nil, operationContext: nil) { (error:Error?, created) -> Void in
             condition.lock()
             containerCreated = true
             condition.signal()
@@ -202,19 +202,19 @@ public class UploadData {
         }
         condition.unlock()
         
-        return container
+        return container!
     }
     
-    func uploadBlob(mName: String, imageData: NSData, container: AZSCloudBlobContainer) {
+    func uploadBlob(_ mName: String, imageData: Data, container: AZSCloudBlobContainer) {
         // Attempt to upload the image data to the correct blob container
-        let blob = container.blockBlobReferenceFromName(mName)
-        blob.uploadFromData(imageData, completionHandler: { (error: NSError?) -> Void in
+        let blob = container.blockBlobReference(fromName: mName)
+        blob.upload(from: imageData, completionHandler: { (error: Error?) -> Void in
             if error == nil {
                 // Upload was successful
                 print("Blob uploaded")
                 
                 //  Delete the entry from the media list and save list
-                self.tableView!.medias.removeAtIndex(self.tableView!.indexOfMedia(mName))
+                self.tableView!.medias.remove(at: self.tableView!.indexOfMedia(mName))
                 self.tableView!.saveMedia()
                 
                 // Check to make sure the deletion occurred succesfully
@@ -231,9 +231,10 @@ public class UploadData {
         })
     }
     
-    func loadPhoto(photoURL: NSURL) -> UIImage? {
-        if let recURL = photoURL.path {
-            let np = NSKeyedUnarchiver.unarchiveObjectWithFile(recURL) as? NewPhoto
+    func loadPhoto(_ photoURL: URL) -> UIImage? {
+        let recURL = photoURL.path
+        if !recURL.isEmpty {
+            let np = NSKeyedUnarchiver.unarchiveObject(withFile: recURL) as? NewPhoto
             print(np?.photo)
             return np?.photo
         }
