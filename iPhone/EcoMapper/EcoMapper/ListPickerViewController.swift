@@ -27,11 +27,8 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     // Items to list in table view (after search)
     var listItems = [String]()
     
-    // For storing items selected by the user
+    // Items selected by the user
     var selectedItems = [String]()
-    
-    // The final joined string of selected list items
-    var itemOut : String?
     
     // Boolean indicating whether a search is active
     var searchActive : Bool = false
@@ -47,20 +44,26 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         
         // TODO: Set dynamically through segue
         // Load the initial full data source for the table view
-        if itemType == "tags" {
+        switch itemType! {
+        case "tags":
             self.fullItems = Array(UserVars.Tags.keys)
             newText.placeholder = "Add new tag"
-        } else if itemType == "species" {
+        case "species":
             self.fullItems = Array(UserVars.Species.keys)
             newText.placeholder = "Add new measured item"
-        } else if itemType == "units" {
+        case "units":
             self.fullItems = Array(UserVars.Units.keys)
             newText.placeholder = "Add new unit"
-        } else if itemType == "access" {
+        case "access":
             self.fullItems = UserVars.AccessLevels
             newText.isEnabled = false
-            newText.placeholder = "Can't add new access level remotely"
+            newText.placeholder = "New access levels can't be added remotely"
+        default:
+            self.fullItems = [String]()
         }
+        
+        // Sort the lists
+        sortLists()
         
         // Since previously selected items may have been loaded during the segue,
         // check if anything should be removed from the full list
@@ -78,11 +81,12 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     // MARK: Table protocols
-    
+    // Define two sections in the table view
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2
     }
     
+    // Set the titles for the table sections
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         var sectionName = "Selected"
         
@@ -95,6 +99,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         return sectionName
     }
     
+    // Get the number of rows in the table section
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var rowCount = 0
         
@@ -111,6 +116,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         return rowCount
     }
     
+    // Method for populating data in the table view
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell:UITableViewCell = self.tableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
@@ -130,6 +136,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         return cell
     }
     
+    // Method for allowing the user to select rows in the table view
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         // If the selected row is in the available section, move
@@ -160,6 +167,8 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
                 }
             }
             
+            // Sort and reload the table view after moving row.
+            self.sortLists()
             tableView.reloadData()
         } else if (indexPath as NSIndexPath).section == 0 {
             if (searchActive) {
@@ -174,13 +183,13 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
                 selectedItems.remove(at: (indexPath as NSIndexPath).row)
             }
             
-            // Reload the table view after moving row.
+            // Sort and reload the table view after moving row.
+            self.sortLists()
             tableView.reloadData()
         }
     }
     
     // MARK: UITextFieldDelegate
-    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         //Hide the keyboard.
@@ -192,11 +201,10 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         
         if searchBar.text != "" {
             searchBar.text = ""
-            // searchActive = false
         }
         
         // If the entered text is not already in the list, add as a
-        // selected item and refresh the table.
+        // selected item
         if !(textField.text?.isEmpty)! && !fullItems.contains(textField.text!) && !selectedItems.contains(textField.text!) {
             selectedItems.append(textField.text!)
             textField.text = ""
@@ -216,6 +224,8 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
             }
         }
         
+        // Sort and reload the table view after adding a new item.
+        self.sortLists()
         tableView.reloadData()
     }
     
@@ -254,9 +264,33 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
             listItems = fullItems
         }
         
+        // Reload the table view after search text is entered
         self.tableView.reloadData()
     }
-
+    
+    // MARK: Helper methods
+    
+    func sortLists () {
+        // Sort the lists
+        self.selectedItems = self.selectedItems.sorted(by: <)
+        self.listItems = self.listItems.sorted(by: <)
+        self.fullItems = self.fullItems.sorted(by: <)
+        
+        // If the list picker is showing access levels, put Public and Private back on top
+        if itemType == "access" {
+            for i in ["Private","Public"] {
+                if listItems.contains(i) {
+                    listItems.remove(at: listItems.index(of: i)!)
+                    listItems.insert(i, at: 0)
+                }
+                if fullItems.contains(i) {
+                    fullItems.remove(at: fullItems.index(of: i)!)
+                    fullItems.insert(i, at: 0)
+                }
+            }
+        }
+    }
+    
     // MARK: Actions
     
     @IBAction func cancel(_ sender: UIButton) {
@@ -265,8 +299,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     }
     
     @IBAction func save(_ sender: UIButton) {
-        itemOut = selectedItems.joined(separator: ";")
-        print(itemOut!)
+        print("List picker selected: \(selectedItems.joined(separator: ", "))")
         
     }
 }

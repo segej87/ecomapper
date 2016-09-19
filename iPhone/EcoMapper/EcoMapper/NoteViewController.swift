@@ -26,6 +26,10 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     // The Core Location manager
     let locationManager = CLLocationManager()
     
+    // Array to hold selected multi-pick items (tags and access levels)
+    var tagArray = [String]()
+    var accessArray = [String]()
+    
     // For storing the user's location from the CLLocationManager delegate
     var userLoc: [Double]?
     
@@ -68,9 +72,11 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         if let record = record {
             navigationItem.title = "Editing Note"
             nameTextField.text = record.props["name"] as? String
-            accessTextField.text = record.props["access"] as? String
+            accessTextField.text = (record.props["access"] as! [String]).joined(separator: ", ")
+            accessArray = record.props["access"] as! [String]
             notesTextField.text = record.props["text"] as? String
-            tagTextField.text = record.props["tags"] as? String
+            tagTextField.text = (record.props["tags"] as! [String]).joined(separator: ", ")
+            tagArray = record.props["tags"] as! [String]
             dateTime = record.props["datetime"] as? String
             userLoc = record.coords
             gpsAccView.isHidden = true
@@ -119,8 +125,9 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         let text1 = nameTextField.text ?? ""
         let text2 = notesTextField.text ?? ""
         let text3 = tagTextField.text ?? ""
+        let text4 = accessTextField.text ?? ""
         let loc1 = userLoc ?? nil
-        saveButton.isEnabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty || loc1 == nil)
+        saveButton.isEnabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty || text4.isEmpty || loc1 == nil)
     }
     
     func textViewDidChange(_ textView: UITextView) {
@@ -193,10 +200,10 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         locationManager.stopUpdatingLocation()
         
-        if sender is UIBarButtonItem && (sender as! UIBarButtonItem).tag == 1 {
+        if sender is UIBarButtonItem && saveButton === (sender as! UIBarButtonItem) {
             let name = nameTextField.text ?? ""
             
-            let props = ["name": name as AnyObject, "tags": tagTextField.text! as AnyObject, "datatype": "note" as AnyObject, "datetime": dateTime! as AnyObject, "access": accessTextField.text! as AnyObject, "accuracy": gpsAcc as AnyObject, "text": notesTextField.text as AnyObject] as [String:AnyObject]
+            let props = ["name": name as AnyObject, "tags": tagArray as AnyObject, "datatype": "note" as AnyObject, "datetime": dateTime! as AnyObject, "access": accessArray as AnyObject, "accuracy": gpsAcc as AnyObject, "text": notesTextField.text as AnyObject] as [String:AnyObject]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: userLoc!, photo: nil, props: props)
@@ -209,8 +216,7 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             
             // Send previous access levels to ListPicker
             if accessTextField.text != "" {
-                let accessArray = accessTextField.text?.components(separatedBy: ";")
-                for a in accessArray! {
+                for a in accessArray {
                     secondVC.selectedItems.append(a)
                 }
             }
@@ -223,8 +229,7 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             
             // TODO: Send previous tags to ListPicker
             if tagTextField.text != "" {
-                let tagArray = tagTextField.text?.components(separatedBy: ";")
-                for t in tagArray! {
+                for t in tagArray {
                     secondVC.selectedItems.append(t)
                 }
             }
@@ -246,8 +251,7 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         
         if secondType == "tags" {
             if tagTextField.text != "" {
-                let prevText = tagTextField.text
-                let prevArray = prevText!.components(separatedBy: ";")
+                let prevArray = tagArray
                 for p in prevArray {
                     var pTag = UserVars.Tags[p]
                     if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
@@ -274,8 +278,13 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             }
         }
         
+        if secondType == "tags" {
+            tagArray = secondVC.selectedItems
+        } else if secondType == "access" {
+            accessArray = secondVC.selectedItems
+        }
         
-        targetField!.text = secondVC.selectedItems.joined(separator: ";")
+        targetField!.text = secondVC.selectedItems.joined(separator: ", ")
         
         checkValidName()
     }

@@ -12,12 +12,10 @@ import Photos
 class RecordTableViewController: UITableViewController {
     
     // MARK: Properties
-    
     // Button to send and receive data from server.
     @IBOutlet weak var syncButton: UIBarButtonItem!
-    
-    // Create an object to store user info after sync
-    var loginInfo = LoginInfo(uuid: "", accessLevels: nil, tags: nil, species: nil, units: nil)
+    @IBOutlet weak var logoutButton: UIBarButtonItem!
+    @IBOutlet weak var newButton: UIBarButtonItem!
     
     // Create an object to store lists retrieved from server
     var listString : NSString?
@@ -34,12 +32,9 @@ class RecordTableViewController: UITableViewController {
         super.viewDidLoad()
         
         // Style the navigation bar's background color and button colors.
-        let nav = self.navigationController?.navigationBar
-        nav?.barStyle = UIBarStyle.black
-        nav?.backgroundColor = UIColor(red: 0/255 as CGFloat, green: 0/255 as CGFloat, blue: 96/255 as CGFloat, alpha: 1)
-        self.navigationController?.navigationBar.tintColor = UIColor.lightGray
+        styleNavigationBar()
         
-        // Add an edit button item provided by the table view controller.
+        // Add an edit button item to the navigation bar
         navigationItem.leftBarButtonItem = editButtonItem
         
         // Load any saved records. If none, load nothing.
@@ -59,7 +54,6 @@ class RecordTableViewController: UITableViewController {
     }
 
     // MARK: Table view data source
-
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -102,9 +96,8 @@ class RecordTableViewController: UITableViewController {
         // Get the tags associated with the record.
         let recTags = record.props["tags"] as? [String]
         
-        // Replace semi-colons with commas for display
+        // Join the tags array with commas
         let dispTags = recTags!.joined(separator: ", ")
-            // recTags.replacingOccurrences(of: ";", with: ", ", options: NSString.CompareOptions.literal, range: nil)
         
         // If the record is a measurement, show the measured item, value, and units.
         // Otherwise show the record tags.
@@ -145,6 +138,7 @@ class RecordTableViewController: UITableViewController {
 
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        
         if editingStyle == .delete {
             
             // Before deleting a photo, the corresponding item in the media list needs to be found and deleted.
@@ -180,15 +174,28 @@ class RecordTableViewController: UITableViewController {
             }
             
             if records[(indexPath as NSIndexPath).row].props["datatype"] as! String == "meas" {
-                let prevArray = records[(indexPath as NSIndexPath).row].props["species"]?.components(separatedBy: ";")
-                for p in prevArray! {
-                    var pTag = UserVars.Species[p]
-                    if pTag![0] as! String == "Local" {
-                        pTag![1] = ((pTag![1] as! Int - 1) as AnyObject)
-                        if pTag![1] as! Int == 0 {
-                            UserVars.Species.removeValue(forKey: p)
+                let specArray = records[(indexPath as NSIndexPath).row].props["species"]?.components(separatedBy: ", ")
+                for s in specArray! {
+                    var sTag = UserVars.Species[s]
+                    if sTag![0] as! String == "Local" {
+                        sTag![1] = ((sTag![1] as! Int - 1) as AnyObject)
+                        if sTag![1] as! Int == 0 {
+                            UserVars.Species.removeValue(forKey: s)
                         } else {
-                            UserVars.Species[p] = pTag!
+                            UserVars.Species[s] = sTag!
+                        }
+                    }
+                }
+                
+                let unitArray = records[(indexPath as NSIndexPath).row].props["units"]?.components(separatedBy: ", ")
+                for u in unitArray! {
+                    var uTag = UserVars.Units[u]
+                    if uTag![0] as! String == "Local" {
+                        uTag![1] = ((uTag![1] as! Int - 1) as AnyObject)
+                        if uTag![1] as! Int == 0 {
+                            UserVars.Units.removeValue(forKey: u)
+                        } else {
+                            UserVars.Units[u] = uTag!
                         }
                     }
                 }
@@ -200,6 +207,9 @@ class RecordTableViewController: UITableViewController {
             // Save the modified data.
             saveRecords()
             saveMedia()
+            
+            // Save the lists for logins.
+            saveLogin()
             
             // Delete the row from the table.
             tableView.deleteRows(at: [indexPath], with: .fade)
@@ -227,12 +237,8 @@ class RecordTableViewController: UITableViewController {
     
     @IBAction func attemptSync(_ sender: UIBarButtonItem) {
         
-        
-        // Temporary
-        print(UserVars.Species)
-        
-        // Deactivate the sync button while uploading
-        syncButton.isEnabled = false
+        // Deactivate the buttons while uploading
+        deactivateButtons()
         
         // Initialize the class for uploading data
         let ud = UploadData(tableView: self)!
@@ -254,9 +260,6 @@ class RecordTableViewController: UITableViewController {
             let biggerDict = ["type":"FeatureCollection", "features": features] as [String : Any]
             ud.uploadRecords(biggerDict as NSDictionary)
             
-            // TODO: make sure this executes so "Local" items are changed to "Server"
-            getListsUsingUUID(UserVars.uuid!)
-            
             // Move to an asynchronous thread and upload the media from the media array
             let  priority = DispatchQueue.GlobalQueuePriority.default
             DispatchQueue.global(priority: priority).async{
@@ -275,131 +278,8 @@ class RecordTableViewController: UITableViewController {
                 alertVC.show()
             }
             
-            // Reactivate the sync button
-            syncButton.isEnabled = true
-        }
-    }
-    
-    func getListsUsingUUID(_ uuid: String) {
-        // Establish a request to the server-side PHP script, and define the method as POST
-        let request = NSMutableURLRequest(url: URL(string: UserVars.listScript)!)
-        request.httpMethod = "POST"
-        
-        // Create the POST string with necessary variables, and put in HTTP body
-        let postString = "GUID=\(uuid)"
-        request.httpBody = postString.data(using: String.Encoding.utf8)
-        
-        // Create a session with the PHP script, and attempt to login
-        let task = URLSession.shared.dataTask(with: request as URLRequest, completionHandler: { data, response, error in
-            
-            // Make sure there are no errors creating the session and that some data is being passed
-            guard error == nil && data != nil else {
-                print("error=\(error!)")
-                return
-            }
-            
-            // Check if HTTP response code is 200 ("OK"). If not, print an error
-            if let httpStatus = response as? HTTPURLResponse , httpStatus.statusCode != 200 {
-                print("Unexpected http status code: \(httpStatus.statusCode)")
-                print("response = \(response!)")
-            }
-            
-            // Get the PHP script's response to the session
-            let responseString = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)
-            self.listString = responseString!
-            
-            // Perform rest of login procedure after background server session finishes
-            DispatchQueue.main.async {
-                
-                // For reference, print the response string to the log
-                print("Response: \(responseString!)")
-                
-                // Boolean to check whether the server's response was nil, or whether an error was returned
-                let listSuccess = responseString! != ""
-                
-                // If the login attempt was successful, set the structure variable uuid for use by other classes and segue to the record table view controller. If the attempt was unsuccessful, present an alert with the login error.
-                if listSuccess {
-                    do {
-                        // Encode the response string as data, then parse JSON
-                        let responseData = responseString!.data(using: String.Encoding.utf8.rawValue)
-                        let responseArray = try JSONSerialization.jsonObject(with: responseData!, options: JSONSerialization.ReadingOptions()) as! [String:AnyObject]
-                        
-                        // Initialize an array of all keys to read from the server response
-                        let keys = ["institutions","tags","species","units"]
-                        
-                        // Read the arrays corresponding to the keys, and write to user variables
-                        for k in keys {
-                            let kArray = responseArray[k] as! [String]
-                            
-                            if kArray.count == 1 && kArray[0].contains("Error:") {
-                                
-                            } else {
-                                for i in kArray {
-                                    switch k {
-                                    case "institutions":
-                                        if !UserVars.AccessLevels.contains(i) {
-                                            UserVars.AccessLevels.append(i)
-                                        }
-                                    case "tags":
-                                        if !UserVars.Tags.keys.contains(i) || (UserVars.Tags.keys.contains(i) && UserVars.Tags[i]![0] as! String == "Local") {
-                                            UserVars.Tags[i] = ["Server" as AnyObject,0 as AnyObject]
-                                        }
-                                    case "species":
-                                        if !UserVars.Species.keys.contains(i) || (UserVars.Species.keys.contains(i) && UserVars.Species[i]![0] as! String == "Local") {
-                                            UserVars.Species[i] = ["Server" as AnyObject,0 as AnyObject]
-                                        }
-                                    case "units":
-                                        if !UserVars.Units.keys.contains(i) || (UserVars.Units.keys.contains(i) && UserVars.Units[i]![0] as! String == "Local") {
-                                            UserVars.Units[i] = ["Server" as AnyObject,0 as AnyObject]
-                                        }
-                                    default:
-                                        print("Unexpected key")
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // Write the user variables to the login object and save
-                        self.loginInfo?.uuid = UserVars.uuid
-                        self.loginInfo?.accessLevels = UserVars.AccessLevels
-                        self.loginInfo?.tags = UserVars.Tags
-                        self.loginInfo?.species = UserVars.Species
-                        self.loginInfo?.units = UserVars.Units
-                        
-                        self.saveLogin()
-                    } catch let error as NSError {
-                        print(error.localizedDescription)
-                    }
-                } else {
-                    // Show the error to the user as an alert controller
-                    var errorString: String?
-                    if self.listString!.replacingOccurrences(of: "Error", with: "") != self.listString! as String {
-                        errorString = self.listString!.replacingOccurrences(of: "Error: ",with: "")
-                    } else {
-                        errorString = "Can't connect to the server - please check your internet connection"
-                    }
-                    
-                    // Present an alert to the user
-                    if #available(iOS 9.0, *) {
-                        let alertVC = UIAlertController(title: "Login Error", message: "\(errorString!)", preferredStyle: .alert)
-                        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-                        alertVC.addAction(okAction)
-                        self.present(alertVC, animated: true, completion: nil)
-                    } else {
-                        let alertVC = UIAlertView(title: "Login Error", message: "\(errorString!)", delegate: self, cancelButtonTitle: "OK")
-                        alertVC.show()
-                    }
-                }
-            }
-        }) 
-        task.resume()
-    }
-    
-    func saveLogin() {
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo!, toFile: LoginInfo.ArchiveURL.path)
-        
-        if !isSuccessfulSave {
-            print("Failed to save login info...")
+            // Reactivate the buttons
+            deactivateButtons()
         }
     }
     
@@ -415,6 +295,21 @@ class RecordTableViewController: UITableViewController {
             oldMediaIndex += 1
         }
         return -1
+    }
+    
+    func styleNavigationBar() {
+        let nav = self.navigationController?.navigationBar
+        nav?.barStyle = UIBarStyle.black
+        nav?.backgroundColor = UIColor(red: 0/255 as CGFloat, green: 0/255 as CGFloat, blue: 96/255 as CGFloat, alpha: 1)
+        self.navigationController?.navigationBar.tintColor = UIColor.lightGray
+    }
+    
+    func deactivateButtons () {
+        for b in [syncButton, logoutButton, newButton, editButtonItem] {
+            b!.isEnabled = false
+        }
+
+        tableView.allowsSelection = false
     }
     
     // MARK: Navigation
@@ -516,12 +411,7 @@ class RecordTableViewController: UITableViewController {
             // Save the records.
             saveRecords()
         }
-        
-        loginInfo!.uuid = UserVars.uuid
-        loginInfo!.accessLevels = UserVars.AccessLevels
-        loginInfo!.tags = UserVars.Tags
-        loginInfo!.species = UserVars.Species
-        loginInfo!.units = UserVars.Units
+
         saveLogin()
     }
     
@@ -559,4 +449,15 @@ class RecordTableViewController: UITableViewController {
         return nil
     }
     
+    func saveLogin() {
+        // Create a login object with the user variables
+        let loginInfo = LoginInfo(uuid: UserVars.uuid, accessLevels: UserVars.AccessLevels, tags: UserVars.Tags, species: UserVars.Species, units: UserVars.Units)
+        
+        // Save the login object
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo!, toFile: LoginInfo.ArchiveURL.path)
+        
+        if !isSuccessfulSave {
+            print("Failed to save login info...")
+        }
+    }
 }

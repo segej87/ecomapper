@@ -11,17 +11,15 @@ import UIKit
 class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationControllerDelegate {
     
     // MARK: Properties
-    
+    // IB properties
     @IBOutlet weak var usernameView: UITextField!
     @IBOutlet weak var passwordView: UITextField!
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var activityView: UIActivityIndicatorView!
     
+    // Class variables
     // Will store the UUID to pass in to the record table view
-    var loginString: NSString?
-    
-    // Create an object to store successful login info
-    var loginInfo = LoginInfo(uuid: "", accessLevels: nil, tags: nil, species: nil, units: nil)
+    var serverString: NSString?
     
     // MARK: Initialization
     override func viewDidLoad() {
@@ -36,18 +34,16 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
             t?.addTarget(self, action: #selector(LoginViewController.textFieldDidChange(_:)), for: UIControlEvents.editingChanged)
         }
         
-        
         // Deactivate the login button when username and password are blank
         loginButton.isEnabled = false
         
         // If a uuid is already available (user is already logged in) go directly to record table view.
         if let savedLogin = loadLogin() {
-            loginInfo = savedLogin
-            UserVars.uuid = loginInfo!.uuid
-            UserVars.AccessLevels = loginInfo!.accessLevels!
-            UserVars.Tags = loginInfo!.tags!
-            UserVars.Species = loginInfo!.species!
-            UserVars.Units = loginInfo!.units!
+            UserVars.uuid = savedLogin.uuid
+            UserVars.AccessLevels = savedLogin.accessLevels!
+            UserVars.Tags = savedLogin.tags!
+            UserVars.Species = savedLogin.species!
+            UserVars.Units = savedLogin.units!
         }
         DispatchQueue.main.async {
             if let uvuuid = UserVars.uuid {
@@ -59,7 +55,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     }
     
     // MARK: UITextFieldDelegate
-    
+    // Method to allow activation of the login button as the text fields change
     func textFieldDidChange(_ textField: UITextField) {
         // If a username and password have been provided, enable the login button
         if usernameView.text != "" && passwordView.text != "" {
@@ -74,30 +70,27 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     }
     
     // MARK: Navigation
-    
+    // Actions to perform before segue away from login view controller
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Perform any actions necessary for segue
+        // Print login status to log.
         print("Logging in with \(sender!)")
     }
     
+    // When the app returns to the login page, clear key variables
     @IBAction func unwindToLogin(_ sender: UIStoryboardSegue) {
         // Make sure the text fields and login result are blank
         usernameView.text = ""
         passwordView.text = ""
-        loginString = ""
+        serverString = ""
         
         // Clear all of the user variables
-        UserVars.uuid = self.loginString?.lowercased
-        self.loginInfo!.uuid = UserVars.uuid
+        UserVars.uuid = self.serverString?.lowercased
         UserVars.AccessLevels = ["Public", "Private"]
-        self.loginInfo!.accessLevels = UserVars.AccessLevels
         UserVars.Tags = [String:[AnyObject]]()
-        self.loginInfo!.tags = [String:[AnyObject]]()
         UserVars.Species = [String:[AnyObject]]()
-        self.loginInfo!.species = [String:[AnyObject]]()
         UserVars.Units = [String:[AnyObject]]()
-        self.loginInfo!.units = [String:[AnyObject]]()
-        saveLogin()
+        
+        saveLogin(loginInfo: LoginInfo(uuid: UserVars.uuid, accessLevels: UserVars.AccessLevels, tags: UserVars.Tags, species: UserVars.Species, units: UserVars.Units)!)
     }
     
     // MARK: Actions
@@ -137,7 +130,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         }
     }
     
-    // MARK: Helper methods
+    // MARK: Server communication helper methods
     
     func checkCredentialsAndGetUUID(_ uname: String, pword: String) {
         // Initialize a request to the server-side PHP script, and define the method as POST
@@ -153,14 +146,14 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
             
             // Make sure there are no errors creating the session and that some data is being passed
             guard error == nil && data != nil else {
-                print("error=\(error!)")
+                print("Login error: \(error!)")
                 return
             }
             
             // Check if HTTP response code is 200 ("OK"). If not, print an error
             if let httpStatus = response as? HTTPURLResponse , httpStatus.statusCode != 200 {
                 print("Unexpected http status code: \(httpStatus.statusCode)")
-                print("response = \(response!)")
+                print("Login server response: \(response!)")
             }
             
             // Get the PHP script's response to the session
@@ -169,10 +162,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
             // Perform rest of login procedure after background server session finishes
             DispatchQueue.main.async {
                 // For reference, print the response string to the log
-                print("Response: \(responseString!)")
+                print("Login server response: \(responseString!)")
                 
                 // Set the instance property loginString to the server's response
-                self.loginString = responseString
+                self.serverString = responseString
                 
                 // Boolean to check whether the server's response was nil, or whether an error was returned
                 let loginSuccess = responseString != nil && responseString!.length == 36
@@ -180,8 +173,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                 /* If the login attempt was successful, set the structure variable uuid and segue to the record table view controller. If the attempt was unsuccessful, present an alert with the login error.
                  */
                 if loginSuccess {
-                    UserVars.uuid = self.loginString?.lowercased
-                    self.loginInfo!.uuid = UserVars.uuid
+                    UserVars.uuid = self.serverString?.lowercased
                     
                     self.getListsUsingUUID(UserVars.uuid!)
                 } else {
@@ -192,8 +184,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                      as configured on the PHP server
                      */
                     var errorString: String?
-                    if self.loginString!.replacingOccurrences(of: "Error", with: "") != self.loginString! as String {
-                        errorString = self.loginString!.replacingOccurrences(of: "Error: ",with: "")
+                    if self.serverString!.replacingOccurrences(of: "Error", with: "") != self.serverString! as String {
+                        errorString = self.serverString!.replacingOccurrences(of: "Error: ",with: "")
                     } else {
                         errorString = "Can't connect to the server - please check your internet connection"
                     }
@@ -228,14 +220,14 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
             
             // Make sure there are no errors creating the session and that some data is being passed
             guard error == nil && data != nil else {
-                print("error=\(error!)")
+                print("Login list retrieve error: \(error!)")
                 return
             }
             
             // Check if HTTP response code is 200 ("OK"). If not, print an error
             if let httpStatus = response as? HTTPURLResponse , httpStatus.statusCode != 200 {
                 print("Unexpected http status code: \(httpStatus.statusCode)")
-                print("response = \(response!)")
+                print("Login list response: \(response!)")
             }
             
             // Get the PHP script's response to the session
@@ -245,7 +237,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
             DispatchQueue.main.async {
                 
                 // For reference, print the response string to the log
-                print("Response: \(responseString!)")
+                print("Login list response: \(responseString!)")
                 
                 // Boolean to check whether the server's response was nil, or whether an error was returned
                 let listSuccess = responseString! != ""
@@ -286,27 +278,23 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                                             UserVars.Units[i] = ["Server" as AnyObject,0 as AnyObject]
                                         }
                                     default:
-                                        print("Unexpected key")
+                                        print("Login list retrieval error: unexpected key")
                                     }
                                 }
                             }
                         }
                         
                         // Write the user variables to the login object and save
-                        self.loginInfo?.accessLevels = UserVars.AccessLevels
-                        self.loginInfo?.tags = UserVars.Tags
-                        self.loginInfo?.species = UserVars.Species
-                        self.loginInfo?.units = UserVars.Units
+                        self.saveLogin(loginInfo: LoginInfo(uuid: UserVars.uuid, accessLevels: UserVars.AccessLevels, tags: UserVars.Tags, species: UserVars.Species, units: UserVars.Units)!)
                         
-                        self.saveLogin()
-                        
+                        // Stop the activity indicator
                         self.activityView.stopAnimating()
                         
                         // Perform a segue to the record table view controller
                         self.performSegue(withIdentifier: "Login", sender: "New Login")
                         
                     } catch let error as NSError {
-                        print(error.localizedDescription)
+                        print("Login list retrieve parse error: \(error.localizedDescription)")
                     }
                 } else {
                     // Stop the activity indicator
@@ -314,8 +302,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                     
                     // Show the error to the user as an alert controller
                     var errorString: String?
-                    if self.loginString!.replacingOccurrences(of: "Error", with: "") != self.loginString! as String {
-                        errorString = self.loginString!.replacingOccurrences(of: "Error: ",with: "")
+                    if self.serverString!.replacingOccurrences(of: "Error", with: "") != self.serverString! as String {
+                        errorString = self.serverString!.replacingOccurrences(of: "Error: ",with: "")
                     } else {
                         errorString = "Can't connect to the server - please check your internet connection"
                     }
@@ -336,8 +324,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         task.resume()
     }
     
-    func saveLogin() {
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo!, toFile: LoginInfo.ArchiveURL.path)
+    // MARK: NSCoding
+    
+    func saveLogin(loginInfo: LoginInfo) {
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo, toFile: LoginInfo.ArchiveURL.path)
         
         if !isSuccessfulSave {
             print("Failed to save login info...")
@@ -347,5 +337,4 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     func loadLogin() -> LoginInfo? {
         return NSKeyedUnarchiver.unarchiveObject(withFile: LoginInfo.ArchiveURL.path) as? LoginInfo
     }
-    
 }

@@ -13,7 +13,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     
     // MARK: Properties
     
-    // Outlets
+    // IB Properties
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var photoImageView: UIImageView!
     @IBOutlet weak var accessTextField: UITextField!
@@ -24,8 +24,13 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     @IBOutlet weak var accessPickerButton: UIButton!
     @IBOutlet weak var tagPickerButton: UIButton!
     
-    // Location manager for GPS location
+    // Class Variables
+    // The Core Location manager
     let locationManager = CLLocationManager()
+    
+    // Array to hold selected multi-pick items (tags and access levels)
+    var tagArray = [String]()
+    var accessArray = [String]()
     
     // A flag indicating whether a new photo is being taken
     var newPhoto = false
@@ -58,15 +63,10 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         super.viewDidLoad()
         
         // Style the navigation bar's background color and button colors
-        let nav = self.navigationController?.navigationBar
-        nav?.barStyle = UIBarStyle.black
-        nav?.backgroundColor = UIColor(red: 0/255 as CGFloat, green: 0/255 as CGFloat, blue: 96/255 as CGFloat, alpha: 1)
-        self.navigationController?.navigationBar.tintColor = UIColor.lightGray
+        styleNavigationBar()
         
         // Add border to text view
-        self.notesTextField.layer.borderWidth = 0.5
-        self.notesTextField.layer.cornerRadius = 10
-        self.notesTextField.layer.borderColor = UIColor.init(red: 200/255.0, green: 199/255.0, blue: 204/255.0, alpha: 1.0).cgColor
+        styleTextView()
         
         // Handle text fields' user input through delegate callbacks.
         nameTextField.delegate = self
@@ -77,16 +77,8 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         notesTextField.delegate = self
         
         // Set up views if editing an existing Record.
-        if let record = record {
-            navigationItem.title = "Editing Photo"
-            nameTextField.text = record.props["name"] as? String
-            accessTextField.text = record.props["access"] as? String
-            photoImageView.image = record.photo
-            notesTextField.text = record.props["text"] as? String
-            tagTextField.text = record.props["tags"] as? String
-            dateTime = record.props["datetime"] as? String
-            userLoc = record.coords
-            gpsAccView.isHidden = true
+        if let savedRecord = record {
+            setupEditingMode(record: savedRecord)
         } else {
             // Get the current datetime
             getDateTime()
@@ -124,13 +116,11 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
     // MARK: UIImagePickerControllerDelegate
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        
         // Dismiss the picker if the user canceled.
         dismiss(animated: true, completion: nil)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        
         // The info dictionary contains multiple representations of the image, and this uses the original.
         let selectedImage = info[UIImagePickerControllerOriginalImage] as! UIImage
         
@@ -182,13 +172,13 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         // Disable the Save button if the required text fields are empty.
         let text1 = nameTextField.text ?? ""
         let text2 = tagTextField.text ?? ""
+        let text3 = accessTextField.text ?? ""
         let photo1 = photoImageView.image ?? nil
         let loc1 = userLoc ?? nil
-        saveButton.isEnabled = !(text1.isEmpty || text2.isEmpty || photo1 == nil || loc1 == nil)
+        saveButton.isEnabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty || photo1 == nil || loc1 == nil)
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        
         //Hide the keyboard.
         textField.resignFirstResponder()
         return true
@@ -276,7 +266,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             let name = nameTextField.text ?? ""
             let urlOut = photoURL!.absoluteString
             
-            let props = ["name": name as AnyObject, "tags": tagTextField.text! as AnyObject, "datatype": "photo" as AnyObject, "datetime": dateTime! as AnyObject, "access": accessTextField.text! as AnyObject, "accuracy": gpsAcc as AnyObject, "text": notesTextField.text as AnyObject, "filepath": urlOut as AnyObject] as [String:AnyObject]
+            let props = ["name": name as AnyObject, "tags": tagArray as AnyObject, "datatype": "photo" as AnyObject, "datetime": dateTime! as AnyObject, "access": accessArray as AnyObject, "accuracy": gpsAcc as AnyObject, "text": notesTextField.text as AnyObject, "filepath": urlOut as AnyObject] as [String:AnyObject]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: userLoc!, photo: photoImageView.image, props: props)
@@ -292,8 +282,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             
             // Send previous access levels to ListPicker
             if accessTextField.text != "" {
-                let accessArray = accessTextField.text?.components(separatedBy: ";")
-                for a in accessArray! {
+                for a in accessArray {
                     secondVC.selectedItems.append(a)
                 }
             }
@@ -306,8 +295,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             
             // Send previous tags to ListPicker
             if tagTextField.text != "" {
-                let tagArray = tagTextField.text?.components(separatedBy: ";")
-                for t in tagArray! {
+                for t in tagArray {
                     secondVC.selectedItems.append(t)
                 }
             }
@@ -329,8 +317,7 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         
         if secondType == "tags" {
             if tagTextField.text != "" {
-                let prevText = tagTextField.text
-                let prevArray = prevText!.components(separatedBy: ";")
+                let prevArray = tagArray
                 for p in prevArray {
                     var pTag = UserVars.Tags[p]
                     if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
@@ -357,8 +344,13 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
             }
         }
         
+        if secondType == "tags" {
+            tagArray = secondVC.selectedItems
+        } else if secondType == "access" {
+            accessArray = secondVC.selectedItems
+        }
         
-        targetField!.text = secondVC.selectedItems.joined(separator: ";")
+        targetField!.text = secondVC.selectedItems.joined(separator: ", ")
         
         checkValidName()
     }
@@ -429,4 +421,31 @@ class PhotoViewController: UIViewController, UITextFieldDelegate, UITextViewDele
         }
     }
     
+    // MARK: Helper methods
+    func styleNavigationBar() {
+        let nav = self.navigationController?.navigationBar
+        nav?.barStyle = UIBarStyle.black
+        nav?.backgroundColor = UIColor(red: 0/255 as CGFloat, green: 0/255 as CGFloat, blue: 96/255 as CGFloat, alpha: 1)
+        self.navigationController?.navigationBar.tintColor = UIColor.lightGray
+    }
+    
+    func styleTextView() {
+        self.notesTextField.layer.borderWidth = 0.5
+        self.notesTextField.layer.cornerRadius = 10
+        self.notesTextField.layer.borderColor = UIColor.init(red: 200/255.0, green: 199/255.0, blue: 204/255.0, alpha: 1.0).cgColor
+    }
+    
+    func setupEditingMode(record: Record) {
+        navigationItem.title = "Editing Photo"
+        nameTextField.text = record.props["name"] as? String
+        accessTextField.text = (record.props["access"] as? [String])?.joined(separator: ", ")
+        accessArray = record.props["access"] as! [String]
+        photoImageView.image = record.photo
+        notesTextField.text = record.props["text"] as? String
+        tagTextField.text = (record.props["tags"] as? [String])?.joined(separator: ", ")
+        tagArray = record.props["tags"] as! [String]
+        dateTime = record.props["datetime"] as? String
+        userLoc = record.coords
+        gpsAccView.isHidden = true
+    }
 }

@@ -12,7 +12,7 @@ import Photos
 open class UploadData {
     
     // MARK: Properties
-    
+    // The calling table view
     var tableView: RecordTableViewController?
     
     init?(tableView: RecordTableViewController?) {
@@ -24,7 +24,6 @@ open class UploadData {
     }
     
     // MARK: Upload geojson records
-    
     func uploadRecords(_ biggerDict: NSDictionary) {
         do {
             // Try to encode the passed data as JSON
@@ -61,7 +60,8 @@ open class UploadData {
                 // Get the PHP script's response to the session
                 let responseString = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)
                 
-                print(responseString)
+                // TODO: make sure this executes so "Local" items are changed to "Server"
+                self.getListsUsingUUID(UserVars.uuid!)
                 
                 // Once background task finishes, perform post-upload operations
                 DispatchQueue.main.async {
@@ -74,8 +74,8 @@ open class UploadData {
         } catch let error as NSError {
             print(error)
             
-            // Reactivate the sync button
-            tableView!.syncButton.isEnabled = true
+            // Reactivate the buttons and table
+            enableButtons()
         }
     }
     
@@ -104,9 +104,6 @@ open class UploadData {
             // Save the new (empty) records list
             tableView!.saveRecords()
         }
-        
-        // Reactivate the sync button
-        tableView!.syncButton.isEnabled = true
     }
     
     // MARK: Upload media
@@ -161,11 +158,6 @@ open class UploadData {
                 } else {
                     print("Couldn't upload photo")
                 }
-
-//                guard let result = asset.firstObject where result is PHAsset else {
-//                    
-//                    return
-//                }
                 
 
             } else {
@@ -214,8 +206,10 @@ open class UploadData {
                 print("Blob uploaded")
                 
                 //  Delete the entry from the media list and save list
-                self.tableView!.medias.remove(at: self.tableView!.indexOfMedia(mName))
-                self.tableView!.saveMedia()
+                if self.tableView!.indexOfMedia(mName) != -1 {
+                    self.tableView!.medias.remove(at: self.tableView!.indexOfMedia(mName))
+                    self.tableView!.saveMedia()
+                }
                 
                 // Check to make sure the deletion occurred succesfully
                 if self.tableView!.indexOfMedia(mName) == -1 {
@@ -241,4 +235,125 @@ open class UploadData {
         return nil
     }
     
+    // MARK: Get lists from server
+    func getListsUsingUUID(_ uuid: String) {
+        // Establish a request to the server-side PHP script, and define the method as POST
+        let request = NSMutableURLRequest(url: URL(string: UserVars.listScript)!)
+        request.httpMethod = "POST"
+        
+        // Create the POST string with necessary variables, and put in HTTP body
+        let postString = "GUID=\(uuid)"
+        request.httpBody = postString.data(using: String.Encoding.utf8)
+        
+        // Create a session with the PHP script, and attempt to login
+        let task = URLSession.shared.dataTask(with: request as URLRequest, completionHandler: { data, response, error in
+            
+            // Make sure there are no errors creating the session and that some data is being passed
+            guard error == nil && data != nil else {
+                print("error=\(error!)")
+                return
+            }
+            
+            // Check if HTTP response code is 200 ("OK"). If not, print an error
+            if let httpStatus = response as? HTTPURLResponse , httpStatus.statusCode != 200 {
+                print("Unexpected http status code: \(httpStatus.statusCode)")
+                print("response = \(response!)")
+            }
+            
+            // Get the PHP script's response to the session
+            let responseString = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)
+            self.tableView!.listString = responseString!
+            
+            // Perform rest of login procedure after background server session finishes
+            DispatchQueue.main.async {
+                
+                // For reference, print the response string to the log
+                print("Response: \(responseString!)")
+                
+                // Boolean to check whether the server's response was nil, or whether an error was returned
+                let listSuccess = responseString! != ""
+                
+                // If the login attempt was successful, set the structure variable uuid for use by other classes and segue to the record table view controller. If the attempt was unsuccessful, present an alert with the login error.
+                if listSuccess {
+                    do {
+                        // Encode the response string as data, then parse JSON
+                        let responseData = responseString!.data(using: String.Encoding.utf8.rawValue)
+                        let responseArray = try JSONSerialization.jsonObject(with: responseData!, options: JSONSerialization.ReadingOptions()) as! [String:AnyObject]
+                        
+                        // Initialize an array of all keys to read from the server response
+                        let keys = ["institutions","tags","species","units"]
+                        
+                        // Read the arrays corresponding to the keys, and write to user variables
+                        for k in keys {
+                            let kArray = responseArray[k] as! [String]
+                            
+                            if kArray.count == 1 && kArray[0].contains("Error:") {
+                                
+                            } else {
+                                for i in kArray {
+                                    switch k {
+                                    case "institutions":
+                                        if !UserVars.AccessLevels.contains(i) {
+                                            UserVars.AccessLevels.append(i)
+                                        }
+                                    case "tags":
+                                        if !UserVars.Tags.keys.contains(i) || (UserVars.Tags.keys.contains(i) && UserVars.Tags[i]![0] as! String == "Local") {
+                                            UserVars.Tags[i] = ["Server" as AnyObject,0 as AnyObject]
+                                        }
+                                    case "species":
+                                        if !UserVars.Species.keys.contains(i) || (UserVars.Species.keys.contains(i) && UserVars.Species[i]![0] as! String == "Local") {
+                                            UserVars.Species[i] = ["Server" as AnyObject,0 as AnyObject]
+                                        }
+                                    case "units":
+                                        if !UserVars.Units.keys.contains(i) || (UserVars.Units.keys.contains(i) && UserVars.Units[i]![0] as! String == "Local") {
+                                            UserVars.Units[i] = ["Server" as AnyObject,0 as AnyObject]
+                                        }
+                                    default:
+                                        print("Unexpected key")
+                                    }
+                                }
+                            }
+                        }
+                        
+                        self.tableView!.saveLogin()
+                        
+                        // Reactivate the buttons and table
+                        self.enableButtons()
+                    } catch let error as NSError {
+                        print(error.localizedDescription)
+                    }
+                } else {
+                    // Show the error to the user as an alert controller
+                    var errorString: String?
+                    if self.tableView!.listString!.replacingOccurrences(of: "Error", with: "") != self.tableView!.listString! as String {
+                        errorString = self.tableView!.listString!.replacingOccurrences(of: "Error: ",with: "")
+                    } else {
+                        errorString = "Can't connect to the server - please check your internet connection"
+                    }
+                    
+                    // Present an alert to the user
+                    if #available(iOS 9.0, *) {
+                        let alertVC = UIAlertController(title: "Login Error", message: "\(errorString!)", preferredStyle: .alert)
+                        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                        alertVC.addAction(okAction)
+                        self.tableView!.present(alertVC, animated: true, completion: nil)
+                    } else {
+                        let alertVC = UIAlertView(title: "Login Error", message: "\(errorString!)", delegate: self, cancelButtonTitle: "OK")
+                        alertVC.show()
+                    }
+                }
+            }
+        })
+        task.resume()
+    }
+    
+    //MARK: General helper methods
+    
+    func enableButtons () {
+        for b in [self.tableView!.syncButton, self.tableView!.logoutButton, self.tableView!.newButton,self.tableView!.editButtonItem] {
+            b!.isEnabled = true
+        }
+        
+        self.tableView!.tableView.allowsSelection = true
+    }
 }
