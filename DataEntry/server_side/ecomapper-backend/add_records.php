@@ -6,101 +6,6 @@
  * and open the template in the editor.
  */
 
-// temp for troubleshooting
-$_POST['GUID'] = '178a7a0d-ca41-4abf-b256-bcc465cb4d67';
-$_POST['geojson'] = '{
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "properties": {
-                "tags": "Ugh",
-                "datatype": "photo",
-                "text": "",
-                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20160708_122605.jpg",
-                "access": "UC Berkeley",
-                "datetime": "2016-07-08 12:26:05",
-                "accuracy": 5,
-                "name": "Hopefully last time I do this"
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -71.441674120791,
-                    42.376331496092,
-                    100
-                ]
-            },
-            "type": "Feature",
-            "id": 6002624
-        },
-        {
-            "properties": {
-                "tags": "Test;Ugh",
-                "datatype": "meas",
-                "value": 1.23,
-                "text": "",
-                "access": "Kumpi Mayu",
-                "datetime": "2016-07-11 09:36:24",
-                "species": "Test",
-                "units": "test",
-                "accuracy": 10,
-                "name": "Meas - 2016-07-11 09:36:24"
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -122.1944589169,
-                    37.445017760654
-                ]
-            },
-            "type": "Feature",
-            "id": 8676147
-        },
-        {
-            "properties": {
-                "tags": "Chris;Test",
-                "datatype": "photo",
-                "text": "",
-                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20160711_125628.jpg",
-                "access": "Private",
-                "datetime": "2016-07-11 12:56:28",
-                "accuracy": 5,
-                "name": "Photo - 2016-07-11 12:56:28"
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -122.20214210462,
-                    37.432153928128
-                ]
-            },
-            "type": "Feature",
-            "id": 8426757
-        },
-        {
-            "properties": {
-                "tags": "Grass;Chris;Ugh",
-                "datatype": "photo",
-                "text": "",
-                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20160713_122331.jpg",
-                "access": "Public",
-                "datetime": "2016-07-13 12:23:31",
-                "accuracy": 5,
-                "name": "Side"
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -122.73167118442,
-                    37.974405018648
-                ]
-            },
-            "type": "Feature",
-            "id": 4018768
-        }
-    ]
-}';
-
 // array for JSON response
 $response = array();
 
@@ -202,11 +107,12 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
                 
                 $add_cols = array_merge($cols_array, $props_out);
                 
-                // Remove tags, affiliations, and species, from the property array, they will be added as
+                // Remove tags, affiliations, species, and units from the property array, they will be added as
                 // linktos in separate tables
                 unset($add_cols['property_tags']);
                 unset($add_cols['property_access']);
                 unset($add_cols['property_species']);
+                unset($add_cols['property_units']);
                 
                 // TODO: prevent SQL injection
                 $add_col_keys = '(' . implode(', ',array_keys($add_cols)) . ')';
@@ -227,11 +133,8 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
                     //echo strtolower($result_fetch["FUID"]);
                 }
                 
-                // Get and explode the feature's tags
-                // TODO: send and receive the tags as an array, then remove the
-                // exploding step
-                $tags_string = $f['properties']['tags'];
-                $tags_array = explode(';',$tags_string);
+                // Get the feature's tags
+                $tags_array = $f['properties']['tags'];
                 
                 // Loop through tags to add to list (if necessary), and connect to the new feature
                 for ($t = 0; $t < count($tags_array); $t++) {
@@ -263,11 +166,8 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
                 }
                 
                 // Loop through access levels to connect to the new feature
-                // Get and explode the feature's access levels
-                // TODO: send and receive the access levels as an array, then remove the
-                // exploding step
-                $access_string = $f['properties']['access'];
-                $access_array = explode(';',$access_string);
+                // Get and the feature's access levels
+                $access_array = $f['properties']['access'];
                 
                 // Loop through access to add to list (if necessary), and connect to the new feature
                 for ($a = 0; $a < count($access_array); $a++) {
@@ -294,8 +194,6 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
                     // Get the feature's species
                     $species_string = $f['properties']['species'];
                     
-                    echo $species_string;
-                    
                     // Check if the species is already in the specieslist by querying
                     // the species table, then store the result
                     $tsql_speccheck = "SELECT SUID FROM species WHERE name = (?)";
@@ -317,8 +215,39 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
                     // Add connection between species and feature in speciesconnections table
                     $spec_connection_array = array($newId, $result_specid, $guid);
                     $spec_connection_string = "('" . implode("', '",$spec_connection_array) . "')";
-                    $tsql_specconnect = "INSERT INTO speciesconnections (FUID, SUID, submitter_uuid) VALUES " . $access_connection_string;
+                    $tsql_specconnect = "INSERT INTO speciesconnections (FUID, SUID, submitter_uuid) VALUES " . $spec_connection_string;
                     $result_specconnect = sqlsrv_query($conn, $tsql_specconnect);
+                }
+                
+                // Connect units (if applicable) to the new feature
+                // Check whether the feature has a units property
+                if (array_key_exists('units',$f['properties'])) {
+                    // Get the feature's units
+                    $units_string = $f['properties']['units'];
+
+                    // Check if the unit is already in the unitlist by querying
+                    // the units table, then store the result
+                    $tsql_unitcheck = "SELECT NUID FROM units WHERE text = (?)";
+                    $params_unitcheck = array($units_string);
+                    $result_unitcheck = sqlsrv_query($conn, $tsql_unitcheck, $params_unitcheck);
+                    $result_unitfetch = sqlsrv_fetch_array($result_unitcheck);
+
+                    // If the unit is not in the list, insert it
+                    if ($result_unitfetch == '') {
+                        // Write the new unit to the list, then get the new unit ID
+                        $tsql_unitadd = "INSERT INTO units (text) OUTPUT Inserted.NUID VALUES ((?))";
+                        $params_unitadd = array($units_string);
+                        $result_unitadd = sqlsrv_query($conn, $tsql_unitadd, $params_unitadd);
+                        $result_unitid = strtolower(sqlsrv_fetch_array($result_unitadd)[0]);
+                    } else {
+                        $result_unitid = strtolower($result_unitfetch[0]);
+                    }
+
+                    // Add connection between units and feature in unitconnections table
+                    $unit_connection_array = array($newId, $result_unitid, $guid);
+                    $unit_connection_string = "('" . implode("', '",$unit_connection_array) . "')";
+                    $tsql_unitconnect = "INSERT INTO unitconnections (FUID, NUID, submitter_uuid) VALUES " . $unit_connection_string;
+                    $result_unitconnect = sqlsrv_query($conn, $tsql_unitconnect);
                 }
             }
             
@@ -366,18 +295,18 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
             // json encode the new info to send
             $geojsonOut = json_encode($geojsonNew, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             
-            // TODO: Uncomment after finishing record insert loop
-//             // write the new geojson file to the server
-//            $tsql2 = "UPDATE personal SET geojsonText = (?) WHERE UID = (?)";
-//            $params2 = array($geojsonOut, $guid);
-//            $stmt = sqlsrv_query($conn, $tsql2, $params2);
-//            if ($stmt === false ) {
-//                die( print_r (sqlsrv_errors(), true));
-//            } else {
-//                echo "Success! Features before sync: " . $num_old_feats . 
-//                        ". Total new features: " . $num_new_feats . 
-//                        ". New features added: " . $num_new_clean_feats;
-//            }
+             //TODO: Uncomment after finishing record insert loop
+             // write the new geojson file to the server
+            $tsql2 = "UPDATE personal SET geojsonText = (?) WHERE UID = (?)";
+            $params2 = array($geojsonOut, $guid);
+            $stmt = sqlsrv_query($conn, $tsql2, $params2);
+            if ($stmt === false ) {
+                die( print_r (sqlsrv_errors(), true));
+            } else {
+                echo "Success! Features before sync: " . $num_old_feats . 
+                        ". Total new features: " . $num_new_feats . 
+                        ". New features added: " . $num_new_clean_feats;
+            }
         }
         else
         {

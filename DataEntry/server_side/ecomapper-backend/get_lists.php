@@ -6,12 +6,9 @@
  * and open the template in the editor.
  */
 
-// Delete after dev
-$_POST['GUID'] = '178a7a0d-ca41-4abf-b256-bcc465cb4d67';
-
 // array for JSON response
 $response = array();
-        
+
 // Connect to mysql database
 try
 {
@@ -96,28 +93,28 @@ if (isset($_POST['GUID']))
         else
         {
             // Username not found
-            $response["tags"] = "Error: tags not found";	
+            $response["tags"] = ["Error: tags not found"];	
         }
     }
     else
     {
         // Username not found
-        $response["tags"] = "Error: tags not found";	
+        $response["tags"] = ["Error: tags not found"];	
     }
     
     // get the species that the user is connected to
     $tsql = "SELECT name FROM species "
             . "ORDER BY name ASC";
-    $params = array($guid);
-    $result = sqlsrv_query($conn, $tsql, $params, array("Scrollable"=>"buffered"));
+    $params_spec = array($guid);
+    $result_spec = sqlsrv_query($conn, $tsql, $params_spec, array("Scrollable"=>"buffered"));
         
     // check for empty result
-    if (!empty($result))
+    if (!empty($result_spec))
     {
-        if (sqlsrv_num_rows($result) > 0)
+        if (sqlsrv_num_rows($result_spec) > 0)
         {
             $specs = array();
-            while ($row = sqlsrv_fetch_array($result)) {
+            while ($row = sqlsrv_fetch_array($result_spec)) {
                 $name = $row["name"];
                 array_push($specs, $name);
             }
@@ -127,13 +124,44 @@ if (isset($_POST['GUID']))
         else
         {
             // Username not found
-            $response["institutions"] = "Error: institutions not found";	
+            $response["species"] = ["Error: species not found"];	
         }
     }
     else
     {
         // Username not found
-        $response["institutions"] = "Error: institutions not found";	
+        $response["species"] = ["Error: species not found"];	
+    }
+    
+    // get the species that the user is connected to
+    $tsql = "SELECT text FROM units "
+            . "ORDER BY text ASC";
+    $params_unit = array($guid);
+    $result_unit = sqlsrv_query($conn, $tsql, $params_unit, array("Scrollable"=>"buffered"));
+        
+    // check for empty result
+    if (!empty($result_unit))
+    {
+        if (sqlsrv_num_rows($result_unit) > 0)
+        {
+            $units = array();
+            while ($row = sqlsrv_fetch_array($result_unit)) {
+                $name = $row["text"];
+                array_push($units, $name);
+            }
+            
+            $response["units"] = $units;
+        }
+        else
+        {
+            // Username not found
+            $response["units"] = ["Error: units not found"];	
+        }
+    }
+    else
+    {
+        // Username not found
+        $response["units"] = ["Error: units not found"];	
     }
     
     print_r(json_encode($response,JSON_PRETTY_PRINT));
