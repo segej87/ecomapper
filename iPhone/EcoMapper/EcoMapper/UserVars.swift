@@ -12,8 +12,8 @@ import UIKit
 struct UserVars {
     static var uuid: String? {
         didSet {
-            RecordsURL = DocumentsDirectory.appendingPathComponent("Records-\(uuid)")
-            MediasURL = DocumentsDirectory.appendingPathComponent("Media-\(uuid)")
+            RecordsURL = DocumentsDirectory.appendingPathComponent("Records-\(uuid!)")
+            MediasURL = DocumentsDirectory.appendingPathComponent("Media-\(uuid!)")
         }
     }
     

@@ -73,6 +73,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     // Actions to perform before segue away from login view controller
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Print login status to log.
+        print("Writing records to \(UserVars.RecordsURL!)")
+        print("Writing media list to \(UserVars.MediasURL!)")
+        print("Saving photos to \(UserVars.PhotosURL)")
         print("Logging in with \(sender!)")
     }
     

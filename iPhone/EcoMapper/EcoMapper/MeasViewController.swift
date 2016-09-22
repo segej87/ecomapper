@@ -186,7 +186,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         if sender is UIBarButtonItem && saveButton === (sender as! UIBarButtonItem) {
             print("Saving record using location \(userLoc!) with best accuracy \(gpsAcc) m")
             
-            let props = ["name": nameTextField.text as AnyObject, "tags": tagArray as AnyObject, "datatype": "meas" as AnyObject, "datetime": dateTime! as AnyObject, "access": accessArray as AnyObject, "accuracy": gpsAcc as AnyObject, "text": notesTextField.text as AnyObject, "value": valTextField.text! as AnyObject, "species": measTextField.text! as AnyObject, "units": unitsTextField.text! as AnyObject] as [String:AnyObject]
+            let props = ["name": nameTextField.text! as AnyObject, "tags": tagArray as AnyObject, "datatype": "meas" as AnyObject, "datetime": dateTime! as AnyObject, "access": accessArray as AnyObject, "accuracy": gpsAcc as AnyObject, "text": notesTextField.text as AnyObject, "value": valTextField.text! as AnyObject, "species": measTextField.text! as AnyObject, "units": unitsTextField.text! as AnyObject] as [String:AnyObject]
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
             record = Record(coords: self.userLoc!, photo: nil, props: props)
