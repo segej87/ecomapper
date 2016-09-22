@@ -25,7 +25,7 @@ public class SQLReader {
 		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 		
 		Connection m_Connection = DriverManager.getConnection(
-				"jdbc:sqlserver://map-it.database.windows.net:1433;database=geojson;user=segej87@map-it;password={J0nathan5!};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;");
+				"jdbc:sqlserver://map-it.database.windows.net:1433;database=geojson;user=ecoCollector@map-it;password={173394aBzZqR!};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;");
 		
 		Statement m_Statement = m_Connection.createStatement();
 		

@@ -47,8 +47,14 @@ Temporary Items
 .apdisk
 
 # =========================
-#Eclipse folders and files
+# Eclipse folders and files
 # =========================
 #Eclipse config folders
 /.metadata/*
 /.recommenders/*
+
+# =========================
+# PyCharm folders and files
+# =========================
+#PyCharm config folders
+*/.idea/*
