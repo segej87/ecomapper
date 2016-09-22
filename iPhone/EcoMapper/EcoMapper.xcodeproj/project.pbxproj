@@ -8,7 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */; };
+		FC052F531D2EA1F5003DCD19 /* NewPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */; };
+		FC0824FC1D87798E00286707 /* DataRetriever.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0824FB1D87798E00286707 /* DataRetriever.swift */; };
 		FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3349DB1D1B365F00D112EA /* Reachability.swift */; };
+		FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4E22221D21B93F00A57ED6 /* Media.swift */; };
+		FC546EAA1D26C95200E62B6C /* UploadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC546EA91D26C95200E62B6C /* UploadData.swift */; };
+		FC5DFFE51D22EB2D00C31A31 /* AZSClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */; };
+		FC5DFFE71D22EBB100C31A31 /* libxml2.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */; };
+		FC6930151D74F2E6001407A0 /* ListPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */; };
 		FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */; };
 		FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */; };
 		FC8244E11D199D290048C3A7 /* RecordTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */; };
@@ -19,7 +26,11 @@
 		FC84B3B01D18EFE800251003 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */; };
 		FC84B3BB1D18EFE800251003 /* EcoMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3BA1D18EFE800251003 /* EcoMapperTests.swift */; };
 		FC84B3C61D1919D400251003 /* Record.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3C51D1919D400251003 /* Record.swift */; };
+		FCA943431D23123F00C5C24D /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FCA943421D23123F00C5C24D /* AssetsLibrary.framework */; };
 		FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCCE99311D1A23C300A675BE /* NoteViewController.swift */; };
+		FCEBA2581D24E6AE00AB6A9F /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */; };
+		FCEBA25A1D258F1700AB6A9F /* UserVars.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEBA2591D258F1700AB6A9F /* UserVars.swift */; };
+		FCEBA25C1D2597EE00AB6A9F /* LoginInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEBA25B1D2597EE00AB6A9F /* LoginInfo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,7 +45,15 @@
 
 /* Begin PBXFileReference section */
 		FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
+		FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewPhoto.swift; sourceTree = "<group>"; };
+		FC0824FB1D87798E00286707 /* DataRetriever.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataRetriever.swift; sourceTree = "<group>"; };
 		FC3349DB1D1B365F00D112EA /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
+		FC4E22221D21B93F00A57ED6 /* Media.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
+		FC546EA91D26C95200E62B6C /* UploadData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadData.swift; sourceTree = "<group>"; };
+		FC5DFFDA1D22E6CE00C31A31 /* EcoMapper-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EcoMapper-Bridging-Header.h"; sourceTree = "<group>"; };
+		FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AZSClient.framework; path = ../../../AZSClient.framework; sourceTree = "<group>"; };
+		FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.2.tbd; path = usr/lib/libxml2.2.tbd; sourceTree = SDKROOT; };
+		FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListPickerViewController.swift; sourceTree = "<group>"; };
 		FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
 		FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewController.swift; sourceTree = "<group>"; };
 		FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecordTableViewController.xib; sourceTree = "<group>"; };
@@ -49,7 +68,11 @@
 		FC84B3BA1D18EFE800251003 /* EcoMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EcoMapperTests.swift; sourceTree = "<group>"; };
 		FC84B3BC1D18EFE800251003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FC84B3C51D1919D400251003 /* Record.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Record.swift; sourceTree = "<group>"; };
+		FCA943421D23123F00C5C24D /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		FCCE99311D1A23C300A675BE /* NoteViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
+		FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		FCEBA2591D258F1700AB6A9F /* UserVars.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserVars.swift; sourceTree = "<group>"; };
+		FCEBA25B1D2597EE00AB6A9F /* LoginInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginInfo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +80,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FCA943431D23123F00C5C24D /* AssetsLibrary.framework in Frameworks */,
+				FC5DFFE71D22EBB100C31A31 /* libxml2.2.tbd in Frameworks */,
+				FC5DFFE51D22EB2D00C31A31 /* AZSClient.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,6 +99,9 @@
 		FC84B3991D18EFE800251003 = {
 			isa = PBXGroup;
 			children = (
+				FCA943421D23123F00C5C24D /* AssetsLibrary.framework */,
+				FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */,
+				FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */,
 				FC84B3A41D18EFE800251003 /* EcoMapper */,
 				FC84B3B91D18EFE800251003 /* EcoMapperTests */,
 				FC84B3A31D18EFE800251003 /* Products */,
@@ -93,17 +122,26 @@
 			children = (
 				FC84B3A51D18EFE800251003 /* AppDelegate.swift */,
 				FC84B3A71D18EFE800251003 /* MeasViewController.swift */,
+				FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */,
 				FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */,
 				FC84B3C51D1919D400251003 /* Record.swift */,
+				FCEBA25B1D2597EE00AB6A9F /* LoginInfo.swift */,
+				FCEBA2591D258F1700AB6A9F /* UserVars.swift */,
 				FC84B3A91D18EFE800251003 /* Main.storyboard */,
+				FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */,
 				FC3349DB1D1B365F00D112EA /* Reachability.swift */,
 				FCCE99311D1A23C300A675BE /* NoteViewController.swift */,
 				FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */,
+				FC546EA91D26C95200E62B6C /* UploadData.swift */,
+				FC4E22221D21B93F00A57ED6 /* Media.swift */,
 				FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */,
 				FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */,
 				FC84B3AC1D18EFE800251003 /* Assets.xcassets */,
 				FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */,
 				FC84B3B11D18EFE800251003 /* Info.plist */,
+				FC5DFFDA1D22E6CE00C31A31 /* EcoMapper-Bridging-Header.h */,
+				FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */,
+				FC0824FB1D87798E00286707 /* DataRetriever.swift */,
 			);
 			path = EcoMapper;
 			sourceTree = "<group>";
@@ -162,15 +200,17 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Sege Industries";
 				TargetAttributes = {
 					FC84B3A11D18EFE800251003 = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = N6RMATL4MH;
+						LastSwiftMigration = 0800;
 					};
 					FC84B3B51D18EFE800251003 = {
 						CreatedOnToolsVersion = 7.3.1;
+						LastSwiftMigration = 0800;
 						TestTargetID = FC84B3A11D18EFE800251003;
 					};
 				};
@@ -220,13 +260,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC0824FC1D87798E00286707 /* DataRetriever.swift in Sources */,
 				FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */,
 				FC84B3A81D18EFE800251003 /* MeasViewController.swift in Sources */,
+				FCEBA25A1D258F1700AB6A9F /* UserVars.swift in Sources */,
+				FCEBA25C1D2597EE00AB6A9F /* LoginInfo.swift in Sources */,
+				FC6930151D74F2E6001407A0 /* ListPickerViewController.swift in Sources */,
 				FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */,
 				FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */,
+				FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */,
+				FC546EAA1D26C95200E62B6C /* UploadData.swift in Sources */,
 				FC84B3C61D1919D400251003 /* Record.swift in Sources */,
+				FC052F531D2EA1F5003DCD19 /* NewPhoto.swift in Sources */,
 				FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */,
 				FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */,
+				FCEBA2581D24E6AE00AB6A9F /* LoginViewController.swift in Sources */,
 				FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -283,8 +331,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -329,8 +379,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -349,6 +401,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -358,14 +411,21 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = /Users/jon/Desktop;
 				INFOPLIST_FILE = EcoMapper/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gmail.jonsege.EcoMapper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "EcoMapper/EcoMapper-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -373,14 +433,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = /Users/jon/Desktop;
 				INFOPLIST_FILE = EcoMapper/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gmail.jonsege.EcoMapper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "EcoMapper/EcoMapper-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -392,6 +458,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gmail.jonsege.EcoMapperTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EcoMapper.app/EcoMapper";
 			};
 			name = Debug;
@@ -404,6 +471,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gmail.jonsege.EcoMapperTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/EcoMapper.app/EcoMapper";
 			};
 			name = Release;

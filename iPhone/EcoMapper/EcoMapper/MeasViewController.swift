@@ -10,34 +10,37 @@ import UIKit
 import CoreLocation
 import QuartzCore
 
-//@available(iOS 9.0, *)
-class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate, UIPickerViewDataSource, UIPickerViewDelegate {
+class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate {
     
     // MARK: Properties
-    
+    // IB Properties
     @IBOutlet weak var nameTextField: UITextField!
-    @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var photoImageView: UIImageView!
-    @IBOutlet weak var accessPicker: UIPickerView!
+    @IBOutlet weak var accessTextField: UITextField!
     @IBOutlet weak var measTextField: UITextField!
     @IBOutlet weak var valTextField: UITextField!
     @IBOutlet weak var unitsTextField: UITextField!
     @IBOutlet weak var notesTextField: UITextView!
     @IBOutlet weak var tagTextField: UITextField!
-    @IBOutlet weak var noteLabel: UILabel!
     @IBOutlet weak var saveButton: UIBarButtonItem!
+    @IBOutlet weak var gpsAccView: UILabel!
+    @IBOutlet weak var measPickerButton: UIButton!
+    @IBOutlet weak var tagPickerButton: UIButton!
+    @IBOutlet weak var unitsPickerButton: UIButton!
+    @IBOutlet weak var accessPickerButton: UIButton!
     
+    // Class variables
+    // The Core Location manager
     let locationManager = CLLocationManager()
     
-    let pickerData = ["public", "institution", "private"]
-    
-    var accessLevel: String?
+    // Array to hold selected multi-pick items (tags and access levels)
+    var tagArray = [String]()
+    var accessArray = [String]()
     
     /*
      This value will be filled with the user's location by the CLLocationManager delegate
      */
     var userLoc: [Double]?
-    var gpsAcc: Double?
+    var gpsAcc = 0.0
     
     /*
      This value will be filled with the date and time recorded when the view was opened
@@ -50,55 +53,26 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     var record: Record?
     
     // MARK: Initialization
-
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Style the navigation bar's background color and button colors
-        let nav = self.navigationController?.navigationBar
-        nav?.barStyle = UIBarStyle.Black
-        nav?.backgroundColor = UIColor(red: 0/255 as CGFloat, green: 0/255 as CGFloat, blue: 96/255 as CGFloat, alpha: 1)
-        self.navigationController?.navigationBar.tintColor = UIColor.lightGrayColor()
+        styleNavigationBar()
         
         // Add border to text view
-        self.notesTextField.layer.borderWidth = 0.5
-        self.notesTextField.layer.cornerRadius = 10
-        self.notesTextField.layer.borderColor = UIColor.init(red: 200/255.0, green: 199/255.0, blue: 204/255.0, alpha: 1.0).CGColor
+        styleTextView()
         
         // Handle text fields' user input through delegate callbacks.
         nameTextField.delegate = self
-        measTextField.delegate = self
         valTextField.delegate = self
-        unitsTextField.delegate = self
-        tagTextField.delegate = self
         
         // Handle the notes field's user input through delegate callbacks.
         notesTextField.delegate = self
         
-        // Handle the access picker's user input.
-        accessPicker.dataSource = self
-        accessPicker.delegate = self
-        
         // Set up views if editing an existing Record.
-        if let record = record {
-            navigationItem.title = "Editing Measurement"
-            nameTextField.text = record.props["name"] as? String
-            accessPicker.selectRow(pickerData.indexOf(record.props["access"] as! String)!, inComponent: 0, animated: true)
-            accessLevel = pickerData[accessPicker.selectedRowInComponent(0)]
-            measTextField.text = record.props["species"] as? String
-            valTextField.text = record.props["value"] as? String
-            unitsTextField.text = record.props["units"] as? String
-            notesTextField.text = record.props["text"] as? String
-            tagTextField.text = record.props["tags"] as? String
-            dateTime = record.props["datetime"] as? String
-            userLoc = record.coords
+        if let savedRecord = record {
+            setupEditingMode(record: savedRecord)
         } else {
-            // Set a default index for the picker to prevent errors.
-            //TODO: Set default access from another menu
-            let defaultRowForAccess = 0
-            accessPicker.selectRow(defaultRowForAccess, inComponent: 0, animated: false)
-            accessLevel = pickerData[accessPicker.selectedRowInComponent(0)]
-            
             // Get the current datetime
             getDateTime()
             
@@ -108,29 +82,332 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             if #available(iOS 8.0, *) {
                 locationManager.requestWhenInUseAuthorization()
             } else {
-                // Fallback on earlier versions
+                // Do nothing
             }
-            if #available(iOS 9.0, *) {
-                locationManager.requestLocation()
-            } else {
-                // Fallback on earlier versions
-            }
+            locationManager.startUpdatingLocation()
         }
         
         // Enable the Save button only if the required text fields have a valid name.
         checkValidName()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
     // MARK: UITextFieldDelegate
-    
-    func textFieldDidBeginEditing(textField: UITextField) {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
         // Disable the Save button while editing.
-        saveButton.enabled = false
+        saveButton.isEnabled = false
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        //Hide the keyboard.
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        checkValidName()
+    }
+    
+    // MARK: UITextViewDelegate
+    func textViewShouldReturn(_ textView: UITextView) -> Bool {
+        //Hide the keyboard.
+        textView.resignFirstResponder()
+        return true
+    }
+    
+    // MARK: Location methods
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last {
+            // Current implementation of best accuracy algorithm
+            if location.horizontalAccuracy < gpsAcc || gpsAcc == 0.0 {
+                gpsAcc = location.horizontalAccuracy
+                let lon = location.coordinate.longitude
+                let lat = location.coordinate.latitude
+                self.userLoc = [lon, lat]
+                print("New best accuracy: \(gpsAcc) m")
+                
+                gpsAccView.text = "Current GPS Accuracy: \(gpsAcc) m"
+            }
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("Failed to find user's location: \(error.localizedDescription)")
+        print("No location found, using null island")
+        noGPS()
+        let lon = 0.0
+        let lat = 0.0
+        self.userLoc = [lon, lat]
+        checkValidName()
+    }
+    
+    func noGPS() {
+        if #available(iOS 8.0, *) {
+            let alertVC = UIAlertController(title: "No GPS", message: "Can't pinpoint your location, using default", preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+            alertVC.addAction(okAction)
+            present(alertVC, animated: true, completion: nil)
+        } else {
+            let alertVC = UIAlertView(title: "No GPS", message: "Can't pinpoint your location, using default", delegate: self, cancelButtonTitle: "OK")
+            alertVC.show()
+        }
+    }
+    
+    // MARK: Date methods
+    func getDateTime(){
+        let currentDate = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        dateTime = dateFormatter.string(from: currentDate)
+    }
+    
+    // MARK: Navigation
+    @IBAction func cancel(_ sender: UIBarButtonItem) {
+        locationManager.stopUpdatingLocation()
+        
+        // Depending on style of presentation (modal or push), dismiss the view controller differently
+        let isPresentingInAddRecordMode = presentingViewController is UINavigationController
+        if isPresentingInAddRecordMode {
+            dismiss(animated: true, completion: nil)
+        } else {
+            navigationController!.popViewController(animated: true)
+        }
+    }
+    
+    // Prepare to segue away from Measurement view
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        locationManager.stopUpdatingLocation()
+        
+        // Handle actions when save button was pressed
+        if sender is UIBarButtonItem && saveButton === (sender as! UIBarButtonItem) {
+            print("Saving record using location \(userLoc!) with best accuracy \(gpsAcc) m")
+            
+            let props = ["name": nameTextField.text! as AnyObject, "tags": tagArray as AnyObject, "datatype": "meas" as AnyObject, "datetime": dateTime! as AnyObject, "access": accessArray as AnyObject, "accuracy": gpsAcc as AnyObject, "text": notesTextField.text as AnyObject, "value": valTextField.text! as AnyObject, "species": measTextField.text! as AnyObject, "units": unitsTextField.text! as AnyObject] as [String:AnyObject]
+            
+            // Set the record to be passed to RecordTableViewController after the unwind segue.
+            record = Record(coords: self.userLoc!, photo: nil, props: props)
+        }
+        
+        // If the add species button was pressed, present the item picker with a species item type
+        if sender is UIButton && measPickerButton === (sender as! UIButton) {
+            let secondVC = segue.destination as! ListPickerViewController
+            secondVC.itemType = "species"
+            
+            // Send previous species to ListPicker
+            if measTextField.text != "" {
+                let measArray = measTextField.text?.components(separatedBy: ", ")
+                for m in measArray! {
+                    secondVC.selectedItems.append(m)
+                }
+            }
+        }
+        
+        // If the add units button was pressed, present the item picker with a units item type
+        if sender is UIButton && unitsPickerButton === (sender as! UIButton) {
+            let secondVC = segue.destination as! ListPickerViewController
+            secondVC.itemType = "units"
+            
+            // Send previous species to ListPicker
+            if unitsTextField.text != "" {
+                let unitsArray = unitsTextField.text?.components(separatedBy: ", ")
+                for u in unitsArray! {
+                    secondVC.selectedItems.append(u)
+                }
+            }
+        }
+        
+        // If the add access button was pressed, present the item picker with an access item type
+        if sender is UIButton && accessPickerButton === (sender as! UIButton) {
+            let secondVC = segue.destination as! ListPickerViewController
+            secondVC.itemType = "access"
+            
+            // Send previous access levels to ListPicker
+            if accessTextField.text != "" {
+                for a in accessArray {
+                    secondVC.selectedItems.append(a)
+                }
+            }
+        }
+        
+        // If the add tags button was pressed, present the item picker with a tags item type
+        if sender is UIButton && tagPickerButton === (sender as! UIButton) {
+            let secondVC = segue.destination as! ListPickerViewController
+            secondVC.itemType = "tags"
+            
+            // Send previous tags to ListPicker
+            if tagTextField.text != "" {
+                for t in tagArray {
+                    secondVC.selectedItems.append(t)
+                }
+            }
+        }
+    }
+    
+    @IBAction func unwindFromTagController(_ segue: UIStoryboardSegue) {
+        // The view controller that initiated the segue
+        let secondVC : ListPickerViewController = segue.source as! ListPickerViewController
+        
+        // The type of the view controller that initiated the segue
+        let secondType = secondVC.itemType
+        
+        // The text field that should be modified by the results of the list picker
+        var targetField : UITextField?
+        
+        // Set the target text field based on the second view controller's type
+        switch secondType! {
+        case "tags":
+            targetField = tagTextField
+        case "species":
+            targetField = measTextField
+        case "units":
+            targetField = unitsTextField
+        case "access":
+            targetField = accessTextField
+        default:
+            targetField = nil
+        }
+        
+        // If the text field already had text, check to see whether any of the old text
+        // needs to be modified in the User Variables lists
+        if targetField != nil && targetField!.text != "" {
+            // Get the previous text in the target text field
+            let prevText = targetField!.text
+            
+            // Coerce the target text field's previous text to an array
+            var prevArray : [String]?
+            switch secondType! {
+            case "tags":
+                prevArray = tagArray
+            case "access":
+                prevArray = accessArray
+            default:
+                prevArray = prevText!.components(separatedBy: ", ")
+            }
+            
+            // For each item in the array, modify the User Variables list
+            for p in prevArray! {
+                switch secondType! {
+                case "tags":
+                    var pTag = UserVars.Tags[p]
+                    if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
+                        pTag![1] = ((pTag![1] as! Int - 1) as AnyObject)
+                        if pTag![1] as! Int == 0 {
+                            UserVars.Tags.removeValue(forKey: p)
+                        } else {
+                            UserVars.Tags[p] = pTag!
+                        }
+                    }
+                case "species":
+                    var pTag = UserVars.Species[p]
+                    if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
+                        pTag![1] = ((pTag![1] as! Int - 1) as AnyObject)
+                        if pTag![1] as! Int == 0 {
+                            UserVars.Species.removeValue(forKey: p)
+                        } else {
+                            UserVars.Species[p] = pTag!
+                        }
+                    }
+                case "units":
+                    var pTag = UserVars.Units[p]
+                    if pTag![0] as! String == "Local" && !secondVC.selectedItems.contains(p) {
+                        pTag![1] = ((pTag![1] as! Int - 1) as AnyObject)
+                        if pTag![1] as! Int == 0 {
+                            UserVars.Units.removeValue(forKey: p)
+                        } else {
+                            UserVars.Units[p] = pTag!
+                        }
+                    }
+                default:
+                    continue
+                }
+            }
+        }
+        
+        for t in secondVC.selectedItems {
+            switch secondType! {
+            case "tags":
+                if !UserVars.Tags.keys.contains(t) {
+                    UserVars.Tags[t] = ["Local" as AnyObject,1 as AnyObject]
+                } else {
+                    var tagInfo = UserVars.Tags[t]
+                    if tagInfo![0] as! String == "Local" {
+                        tagInfo![1] = ((tagInfo![1] as! Int + 1) as AnyObject)
+                        UserVars.Tags[t] = tagInfo
+                    }
+                }
+            case "species":
+                if !UserVars.Species.keys.contains(t) {
+                    UserVars.Species[t] = ["Local" as AnyObject,1 as AnyObject]
+                } else {
+                    var tagInfo = UserVars.Species[t]
+                    if tagInfo![0] as! String == "Local" {
+                        tagInfo![1] = ((tagInfo![1] as! Int + 1) as AnyObject)
+                        UserVars.Species[t] = tagInfo
+                    }
+                }
+            case "units":
+                if !UserVars.Units.keys.contains(t) {
+                    UserVars.Units[t] = ["Local" as AnyObject,1 as AnyObject]
+                } else {
+                    var tagInfo = UserVars.Units[t]
+                    if tagInfo![0] as! String == "Local" {
+                        tagInfo![1] = ((tagInfo![1] as! Int + 1) as AnyObject)
+                        UserVars.Units[t] = tagInfo
+                    }
+                }
+            default:
+                continue
+            }
+        }
+        
+        if secondType == "tags" {
+            tagArray = secondVC.selectedItems
+        } else if secondType == "access" {
+            accessArray = secondVC.selectedItems
+        }
+        
+        targetField!.text = secondVC.selectedItems.joined(separator: ", ")
+        
+        checkValidName()
+    }
+    
+    // MARK: Actions
+    @IBAction func setDefaultNameText(_ sender: UIButton) {
+        nameTextField.text = "Meas" + " - " + dateTime!
+    }
+    
+    // MARK: Helper methods
+    func styleNavigationBar() {
+        let nav = self.navigationController?.navigationBar
+        nav?.barStyle = UIBarStyle.black
+        nav?.backgroundColor = UIColor(red: 0/255 as CGFloat, green: 0/255 as CGFloat, blue: 96/255 as CGFloat, alpha: 1)
+        self.navigationController?.navigationBar.tintColor = UIColor.lightGray
+    }
+    
+    func styleTextView() {
+        self.notesTextField.layer.borderWidth = 0.5
+        self.notesTextField.layer.cornerRadius = 10
+        self.notesTextField.layer.borderColor = UIColor.init(red: 200/255.0, green: 199/255.0, blue: 204/255.0, alpha: 1.0).cgColor
+    }
+    
+    func setupEditingMode(record: Record) {
+        navigationItem.title = "Editing Measurement"
+        nameTextField.text = record.props["name"] as? String
+        accessTextField.text = (record.props["access"] as? [String])?.joined(separator: ", ")
+        accessArray = record.props["access"] as! [String]
+        measTextField.text = record.props["species"] as? String
+        valTextField.text = record.props["value"] as? String
+        unitsTextField.text = record.props["units"] as? String
+        notesTextField.text = record.props["text"] as? String
+        tagTextField.text = (record.props["tags"] as? [String])?.joined(separator: ", ")
+        tagArray = record.props["tags"] as! [String]
+        dateTime = record.props["datetime"] as? String
+        userLoc = record.coords
+        gpsAccView.isHidden = true
     }
     
     func checkValidName() {
@@ -140,9 +417,10 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         let text3 = valTextField.text ?? ""
         let text4 = unitsTextField.text ?? ""
         let text5 = tagTextField.text ?? ""
+        let text6 = accessTextField.text ?? ""
         let loc1 = userLoc ?? nil
         
-        saveButton.enabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty || text4.isEmpty || text5.isEmpty || loc1 == nil || !checkMeasFloatVal())
+        saveButton.isEnabled = !(text1.isEmpty || text2.isEmpty || text3.isEmpty || text4.isEmpty || text5.isEmpty || text6.isEmpty || loc1 == nil || !checkMeasFloatVal())
     }
     
     // TODO: Improve this check (if string starts with valid float it will pass, even if letter is in there)
@@ -153,129 +431,5 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         }
         return true
     }
-    
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
-        
-        //Hide the keyboard.
-        textField.resignFirstResponder()
-        return true
-    }
-    
-    func textFieldDidEndEditing(textField: UITextField) {
-        checkValidName()
-    }
-    
-    // MARK: UITextViewDelegate
-    
-    func textViewDidChange(textView: UITextView) {
-        
-    }
-    
-    func textViewShouldReturn(textView: UITextView) -> Bool {
-        
-        //Hide the keyboard.
-        textView.resignFirstResponder()
-        return true
-    }
-    
-    // MARK: UIPicker delegate and data sources
-        // MARK: Data Sources
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return pickerData.count
-    }
-    
-        // Mark: Delegates
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return pickerData[row]
-    }
-    
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        self.accessLevel = pickerData[row]
-    }
-    
-    // MARK: Location methods
-    
-    func noGPS() {
-        if #available(iOS 8.0, *) {
-            let alertVC = UIAlertController(title: "No GPS", message: "Can't pinpoint your location, using default", preferredStyle: .Alert)
-            let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
-            alertVC.addAction(okAction)
-            presentViewController(alertVC, animated: true, completion: nil)
-        } else {
-            // Fallback on earlier versions
-        }
-    }
-    
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last {
-            // TODO: improve stability check before allowing reading
-            if location.horizontalAccuracy <= 30.0 {
-                let lon = location.coordinate.longitude
-                let lat = location.coordinate.latitude
-                self.userLoc = [lon, lat]
-                print("Location found:  \(userLoc!)")
-            } else {
-                if #available(iOS 9.0, *) {
-                    manager.requestLocation()
-                } else {
-                    // Fallback on earlier versions
-                }
-            }
-        }
-    }
-    
-    func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
-        print("Failed to find user's location: \(error.localizedDescription)")
-        print("No location found, using default")
-        noGPS()
-        let lon = -123.45
-        let lat = 67.89
-        self.userLoc = [lon, lat]
-        checkValidName()
-    }
-    
-    // MARK: Date methods
-    
-    func getDateTime(){
-        let currentDate = NSDate()
-        let dateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateTime = dateFormatter.stringFromDate(currentDate)
-    }
-    
-    // MARK: Navigation
-    
-    @IBAction func cancel(sender: UIBarButtonItem) {
-        // Depending on style of presentation (modal or push), dismiss the view controller differently
-        let isPresentingInAddRecordMode = presentingViewController is UINavigationController
-        if isPresentingInAddRecordMode {
-            dismissViewControllerAnimated(true, completion: nil)
-        } else {
-            navigationController!.popViewControllerAnimated(true)
-        }
-    }
-    
-    // This method lets you configure a view controller before it's presented.
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if saveButton === sender {
-            let name = nameTextField.text ?? ""
-            
-            let props = ["name": name, "tags": tagTextField.text, "datatype": "meas", "datetime": dateTime, "access": accessLevel, "text": notesTextField.text, "value": valTextField.text, "species": measTextField.text, "units": unitsTextField.text]
-            
-            // Set the record to be passed to RecordTableViewController after the unwind segue.
-            record = Record(coords: self.userLoc!, photo: nil, props: props)
-        }
-    }
-    
-    // MARK: Actions
-    
-    @IBAction func setDefaultNameText(sender: UIButton) {
-        nameTextField.text = "Meas" + " - " + dateTime!
-    }
-    
 }
 
