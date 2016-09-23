@@ -1,5 +1,8 @@
 package popups;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import processing.core.PApplet;
 
@@ -31,7 +34,7 @@ public class MapTags extends MapPopups{
 		p.stroke(color(150, 150, 150));
 		p.strokeWeight(1);
 		float xBump = (float) (textLine + p.textWidth("Tags:  ") - 1.7);
-		String[] tagArray = getProp("tags").split(";");
+		String[] tagArray = getStringArrayFromJSONArray((JSONArray) getProp("tags"));
 		for (String tag : tagArray){
 			p.rect(xBump, (float) (getIntY() + 0.4 * fontSize), (float) (p.textWidth(tag) + 3.5), (float) (1.25 * fontSize), 2);
 			xBump = (float) (xBump + p.textWidth(tag + "  ") - 0.2);

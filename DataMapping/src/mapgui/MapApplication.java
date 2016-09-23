@@ -25,14 +25,15 @@ public class MapApplication {
         panel.add(applet);
         
         //store the panel in the frame
-        frame.add(panel);
+        frame.add(panel,0);
         
         //assign a size for the frame
         //reading the size from the applet
-//		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-//		int screenWidth = gd.getDisplayMode().getWidth();
-//		int screenHeight = gd.getDisplayMode().getHeight();
-        frame.setSize(1366, 768);
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		int screenWidth = gd.getDisplayMode().getWidth();
+		int screenHeight = gd.getDisplayMode().getHeight();
+        frame.setSize(screenWidth, screenHeight);
+        frame.setLocationRelativeTo(null);
         
         //display the frame
         frame.setVisible(true);

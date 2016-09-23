@@ -1,5 +1,6 @@
 package dataproc;
 
+import java.io.Console;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -7,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import de.fhpotsdam.unfolding.marker.Marker;
 import markers.MeasMarker;
@@ -79,7 +83,6 @@ public class Filtering {
 		availTags = new ArrayList<String>();
 		
 		for (Marker m : filteredMarkers){
-			String[] ts = m.getProperty("tags").toString().split(";");
 			if (!availDT.contains(m.getProperty("datatype").toString())){
 				availDT.add(m.getProperty("datatype").toString());
 			}
@@ -87,9 +90,6 @@ public class Filtering {
 				if (!availSpec.contains(m.getProperty("species".toString()))){
 					availSpec.add(m.getProperty("species").toString());
 				}
-			}
-			if (!availAL.contains(m.getProperty("access").toString())){
-				availAL.add(m.getProperty("access").toString());
 			}
 			if (m.getProperties().containsKey("country") && !availGeo.contains("country")){
 				if (!m.getProperty("country").toString().equals("none")){
@@ -101,10 +101,22 @@ public class Filtering {
 					availGeo.add("state");
 				}
 			}
+			
+			String[] ts = getStringArrayFromJSONArray((JSONArray) m.getProperty("tags"));
+			String[] as = getStringArrayFromJSONArray((JSONArray) m.getProperty("access"));
+			
 			if (ts.length > 0){
 				for (String t : ts){
 					if (!availTags.contains(t)){
 						availTags.add(t);
+					}
+				}
+			}
+			
+			if (as.length > 0){
+				for (String a : as){
+					if (!availAL.contains(a)){
+						availAL.add(a);
 					}
 				}
 			}
@@ -189,16 +201,32 @@ public class Filtering {
 		try {
 			markDate = df.parse(markDateString);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			System.out.println("Date parse error while filtering: " + e.toString());
+		}
+		
+		// Get tag list
+		JSONArray tagArray = (JSONArray) mark.getProperty("tags");
+		List<String> tagList = new ArrayList<String>();
+		for (int i = 0; i < tagArray.length(); i++){
+			try {
+				tagList.add(tagArray.getString(i));
+			} catch (JSONException e) {
+				System.out.println("JSON Array parse error while filtering tags: " + e.toString());
+			}
+		}
+		
+		// Get access list
+		JSONArray accessArray = (JSONArray) mark.getProperty("access");
+		List<String> accessList = new ArrayList<String>();
+		for (int i = 0; i < accessArray.length(); i++){
+			try {
+				accessList.add(accessArray.getString(i));
+			} catch (JSONException e) {
+				System.out.println("Json Array parse error while filtering access: " + e.toString());
+			}
 		}
 		
 		//TODO: after standardizing filters as lists, change this to a loop
-		if (alFilter != ""){
-			if (mark.getProperty("access").toString().contains(alFilter)){
-				alCheck = true;
-			}
-		} else {alCheck = true;}
-		
 		if (geoFilterType != ""){
 			if (mark.getProperty(geoFilterType).toString().equals(geoFilter)){
 				geoCheck = true;
@@ -219,10 +247,22 @@ public class Filtering {
 			}
 		} else specCheck = true;
 		
+		if (alFilter != ""){
+			for (String a : accessList) {
+				if (a.equals(alFilter)) {
+					alCheck = true;
+					break;
+				}
+			}
+		} else {alCheck = true;}
+		
 		if (tagFilter != null){
 			for (String t : tagFilter){
-				if (mark.getProperty("tags").toString().contains(t)){
-					tagCheck = true;
+				for (String tag : tagList) {
+					if (t.equals(tag)) {
+						tagCheck = true;
+						break;
+					}
 				}
 			}
 		} else {tagCheck = true;}
@@ -290,6 +330,22 @@ public class Filtering {
 		
 		dateFilters[0] = minDate;
 		dateFilters[1] = maxDate;
+	}
+	
+	//helper methods
+	private String[] getStringArrayFromJSONArray(JSONArray arr) {
+		if (arr == null) return null;
+		
+		String[] temp = new String[arr.length()];
+		for (int i=0; i < arr.length(); i++) {
+			try {
+				temp[i] = arr.getString(i);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return temp;
 	}
 	
 	//getters and setters

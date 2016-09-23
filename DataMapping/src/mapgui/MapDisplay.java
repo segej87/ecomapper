@@ -28,7 +28,7 @@ public class MapDisplay extends PApplet {
 	private static final long serialVersionUID = 1L;
 	
 	//flag indicating whether the user is offline
-	private static final boolean offline = false;
+	private static final boolean offline = true;
 	//flag indicating whether states should be included in geofilter
 	private static final boolean stateson = true;
 	
@@ -104,8 +104,8 @@ public class MapDisplay extends PApplet {
 		}
 		
 		//read in point data from geoJSON
-		//SQLReader sqr = new SQLReader("segej87", "J5e14s87!");
-		SQLReader sqr = new SQLReader("mruth", "M@rty9!");
+		SQLReader sqr = new SQLReader("segej87", "J5e14s87!");
+//		SQLReader sqr = new SQLReader("mruth", "M@rty9!");
 		//SQLReader sqr = new SQLReader("ctsege", "ctsege85");
 		List<Feature> personFeats = GeoJSONReader.loadDataFromJSON(this, sqr.jsonString);
 		//List<Feature> personFeats = GeoJSONReader.loadData(this, "c:/users/jon sege/dropbox/kumpi mayu/mapdev/geojson/personal.json");

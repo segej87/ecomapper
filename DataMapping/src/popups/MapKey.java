@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.json.JSONArray;
+
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.marker.Marker;
 import processing.core.PApplet;
@@ -56,7 +58,7 @@ public class MapKey extends MapPopups {
 		p.textSize(fontSize);
 		
 		//TODO: After tag-wrapping functionality added, remove tags from this calculation
-		String[] tagArray = getProp("tags").split(";");
+		String[] tagArray = getStringArrayFromJSONArray((JSONArray) getProp("tags"));
 		String[] str = new String[info.size() + 1];
 		str[0] = "Tags: " + String.join("  ", tagArray);
 		int counter = 1;

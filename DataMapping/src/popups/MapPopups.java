@@ -1,5 +1,8 @@
 package popups;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.marker.Marker;
 import processing.core.PApplet;
@@ -39,6 +42,22 @@ public abstract class MapPopups extends PApplet{
 		p.popStyle();
 	}
 	
+	// MARK: Helper methods
+	public String[] getStringArrayFromJSONArray(JSONArray arr) {
+		if (arr == null) return null;
+		
+		String[] temp = new String[arr.length()];
+		for (int i=0; i < arr.length(); i++) {
+			try {
+				temp[i] = arr.getString(i);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return temp;
+	}
+	
 	//getters and setters for click quadrant
 	public void calcQuadrant(float x, float y){
 		boolean[] quad = new boolean[2];
@@ -60,8 +79,8 @@ public abstract class MapPopups extends PApplet{
 	}
 	
 	//getter of marker properties (no setter)
-	public String getProp(String p){
-		return mark.getProperty(p).toString();
+	public Object getProp(String p){
+		return mark.getProperty(p);
 	}
 	
 	//setters and getters for interface x and y coordinates
