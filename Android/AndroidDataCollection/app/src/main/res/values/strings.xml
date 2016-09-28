@@ -4,8 +4,8 @@
     <!-- Strings related to login -->
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_sign_in_short">Login</string>
     <string name="error_invalid_email">Please enter a valid username</string>
     <string name="error_invalid_password">This password is invalid</string>
     <string name="error_incorrect_password">This password is incorrect</string>
@@ -14,8 +14,10 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="internet_failure">Network problem. Please check your connection</string>
     <string name="php_server_root">http://ecocollector.azurewebsites.net/</string>
     <string name="php_get_login">get_login.php/</string>
+    <string name="php_get_lists">get_lists.php/</string>
     <string name="title_activity_main">MainActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

@@ -3,19 +3,12 @@ package com.gmail.jonsege.androiddatacollection;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build.VERSION;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -24,19 +17,14 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -44,19 +32,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static android.Manifest.permission.READ_CONTACTS;
+import org.json.*;
 
 /**
- * A login screen that offers login via email/password.
+ * A login screen that offers login via username/password.
  */
 public class LoginActivity extends AppCompatActivity {
 
-    /**
-     * Static variables to record during login process.
-     */
-    static final String UID = "com.gmail.jonsege.androiddatacollection.UID";
-    static final String UNAME = "com.gmail.jonsege.androiddatacollection.UNAME";
+    //region Class Variables
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -68,6 +51,10 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    //endregion
+
+    //region Initialization
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +86,10 @@ public class LoginActivity extends AppCompatActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
+
+    //endregion
+
+    //region Login Methods
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -152,6 +143,228 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Represents an asynchronous login/registration task used to authenticate
+     * the user.
+     */
+    public class UserLoginTask extends AsyncTask<Void, Void, String> {
+
+        private final String mUsername;
+        private final String mPassword;
+        private final String loginURL = getString(R.string.php_server_root) + getString(R.string.php_get_login);
+
+        UserLoginTask(String email, String password) {
+            mUsername = email;
+            mPassword = password;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String response = new String();
+            Map<String,Object> pars = new LinkedHashMap<>();
+            pars.put("username", mUsername);
+            pars.put("password", mPassword);
+
+            try {
+                StringBuilder postData = new StringBuilder();
+                for (Map.Entry<String,Object> par : pars.entrySet()) {
+                    if (postData.length() != 0) postData.append('&');
+                    postData.append(URLEncoder.encode(par.getKey(), "UTF-8"));
+                    postData.append('=');
+                    postData.append(URLEncoder.encode(String.valueOf(par.getValue()), "UTF-8"));
+                }
+                byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+
+                //TODO: Check for internet connection. If not return error.
+
+                URL url = new URL(loginURL);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                conn.setRequestProperty( "Content-Length", String.valueOf(postDataBytes.length));
+                conn.setDoOutput(true);
+                conn.getOutputStream().write(postDataBytes);
+
+                Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+                StringBuilder sb = new StringBuilder();
+                for (int c; (c = in.read()) >= 0;)
+                    sb.append((char)c);
+                response = sb.toString();
+
+                conn.disconnect();
+
+                return response;
+            } catch (Exception e) {
+                return "Server Error: " + e.getMessage();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            System.out.println("Login server response: " + result);
+
+            if (!(result.contains("Error:"))) {
+                String uid = result;
+                String uName = mUsername.toString();
+                UserVars.uuid = uid;
+                UserVars.uName = uName;
+
+                UserListsTask mListTask = new UserListsTask(UserVars.uuid);
+                mListTask.execute((Void) null);
+            } else {
+                mAuthTask = null;
+                showProgress(false);
+                if (result.contains("Server Error: ")) {
+                    showError("Connection problem");
+                }
+                if (result.contains("do not match")) {
+                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                    mPasswordView.requestFocus();
+                } else if (result.contains("not found")) {
+                    mPasswordView.setError(getString(R.string.error_username_not_found));
+                    mPasswordView.requestFocus();
+                }
+
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+            showProgress(false);
+        }
+    }
+
+    /**
+     * Represents an asynchronous login/registration task used to authenticate
+     * the user.
+     */
+    public class UserListsTask extends AsyncTask<Void, Void, String> {
+
+        private final String uuid;
+        private final String listsURL = getString(R.string.php_server_root) + getString(R.string.php_get_lists);
+
+        UserListsTask(String uuidIn) {
+            uuid = uuidIn;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String response = new String();
+            Map<String,Object> pars = new LinkedHashMap<>();
+            pars.put("GUID", uuid);
+
+            try {
+                StringBuilder postData = new StringBuilder();
+                for (Map.Entry<String,Object> par : pars.entrySet()) {
+                    if (postData.length() != 0) postData.append('&');
+                    postData.append(URLEncoder.encode(par.getKey(), "UTF-8"));
+                    postData.append('=');
+                    postData.append(URLEncoder.encode(String.valueOf(par.getValue()), "UTF-8"));
+                }
+                byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+
+                //TODO: Check for internet connection. If not return error.
+
+                URL url = new URL(listsURL);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                conn.setRequestProperty( "Content-Length", String.valueOf(postDataBytes.length));
+                conn.setDoOutput(true);
+                conn.getOutputStream().write(postDataBytes);
+
+                Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+                StringBuilder sb = new StringBuilder();
+                for (int c; (c = in.read()) >= 0;)
+                    sb.append((char)c);
+                response = sb.toString();
+
+                conn.disconnect();
+
+                return response;
+            } catch (Exception e) {
+                return "Server Error: " + e.getMessage();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            mAuthTask = null;
+            showProgress(false);
+
+            System.out.println("List server response: " + result);
+
+            if (!(result.startsWith("Error:"))) {
+                String jsonString = result;
+
+                try {
+                    JSONObject jObject = new JSONObject(result);
+
+                    JSONArray accessArray = jObject.getJSONArray("institutions");
+                    for (int i = 0; i < accessArray.length(); i++) {
+                        UserVars.AccessLevels.add(accessArray.getString(i));
+                    }
+
+                    Object[] addArray = new Object[2];
+                    addArray[0] = "Server";
+                    addArray[1] = 0;
+
+                    JSONArray tagsArray = jObject.getJSONArray("tags");
+                    for (int i = 0; i < tagsArray.length(); i++) {
+                        UserVars.Tags.put(tagsArray.getString(i),addArray);
+                    }
+
+                    JSONArray specArray = jObject.getJSONArray("species");
+                    for (int i = 0; i < specArray.length(); i++) {
+                        UserVars.Species.put(specArray.getString(i),addArray);
+                    }
+
+                    JSONArray unitArray = jObject.getJSONArray("units");
+                    for (int i = 0; i < unitArray.length(); i++) {
+                        UserVars.Units.put(unitArray.getString(i),addArray);
+                    }
+                } catch (JSONException e) {
+                    System.out.println("Error parsing JSON response: " + e.getMessage());
+                }
+
+                Intent intent = new Intent(LoginActivity.this, Notebook.class);
+                startActivity(intent);
+            } else {
+                if (result.contains("Server Error: ")) {
+                    showError("Connection problem");
+                }
+                //TODO: Add possible returned errors.
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+            showProgress(false);
+        }
+    }
+
+    private void showError(String title) {
+        String message = new String();
+
+        if (title == "Connection problem") {
+            message = getString(R.string.internet_failure);
+        }
+        AlertDialog.Builder intAlert = new AlertDialog.Builder(this);
+        intAlert.setMessage(message);
+        intAlert.setTitle(title);
+        intAlert.setPositiveButton("OK",null);
+        intAlert.setCancelable(false);
+        intAlert.create().show();
+    }
+
+    //endregion
+
+    //region Helper Methods
+
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
         return email.length() > 4;
@@ -161,6 +374,10 @@ public class LoginActivity extends AppCompatActivity {
         //TODO: Replace this with your own logic
         return password.length() > 4;
     }
+
+    //endregion
+
+    //region UIMethods
 
     /**
      * Shows the progress UI and hides the login form.
@@ -198,116 +415,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Use an AsyncTask to fetch the user's email addresses on a background thread, and update
-     * the email text field with results on the main UI thread.
-     */
-    class SetupEmailAutoCompleteTask extends AsyncTask<Void, Void, List<String>> {
-
-        @Override
-        protected List<String> doInBackground(Void... voids) {
-            ArrayList<String> emailAddressCollection = new ArrayList<>();
-
-            // Get all emails from the user's contacts and copy them to a list.
-            ContentResolver cr = getContentResolver();
-            Cursor emailCur = cr.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null,
-                    null, null, null);
-            while (emailCur.moveToNext()) {
-                String email = emailCur.getString(emailCur.getColumnIndex(ContactsContract
-                        .CommonDataKinds.Email.DATA));
-                emailAddressCollection.add(email);
-            }
-            emailCur.close();
-
-            return emailAddressCollection;
-        }
-    }
-
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, String> {
-
-        private final String mUsername;
-        private final String mPassword;
-        private final String loginURL = getString(R.string.php_server_root) + getString(R.string.php_get_login);
-
-        UserLoginTask(String email, String password) {
-            mUsername = email;
-            mPassword = password;
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            String response = new String();
-            Map<String,Object> pars = new LinkedHashMap<>();
-            pars.put("username", mUsername);
-            pars.put("password", mPassword);
-
-            try {
-                StringBuilder postData = new StringBuilder();
-                for (Map.Entry<String,Object> par : pars.entrySet()) {
-                    if (postData.length() != 0) postData.append('&');
-                    postData.append(URLEncoder.encode(par.getKey(), "UTF-8"));
-                    postData.append('=');
-                    postData.append(URLEncoder.encode(String.valueOf(par.getValue()), "UTF-8"));
-                }
-                byte[] postDataBytes = postData.toString().getBytes("UTF-8");
-
-                URL url = new URL(loginURL);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                conn.setRequestProperty( "Content-Length", String.valueOf(postDataBytes.length));
-                conn.setDoOutput(true);
-                conn.getOutputStream().write(postDataBytes);
-
-                Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-
-                StringBuilder sb = new StringBuilder();
-                for (int c; (c = in.read()) >= 0;)
-                    sb.append((char)c);
-                response = sb.toString();
-
-                conn.disconnect();
-
-                return response;
-            } catch (Exception e) {
-                return e.getMessage();
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (!(result.contains("Error:"))) {
-                String uid = result;
-                String uName = mUsername.toString();
-                //finish();
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra(UNAME, uName);
-                intent.putExtra(UID, uid);
-                startActivity(intent);
-            } else {
-                if (result.contains("do not match")) {
-                    mPasswordView.setError(getString(R.string.error_incorrect_password));
-                    mPasswordView.requestFocus();
-                } else if (result.contains("not found")) {
-                    mPasswordView.setError(getString(R.string.error_username_not_found));
-                    mPasswordView.requestFocus();
-                }
-
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
-    }
+    //endregion
 }
 

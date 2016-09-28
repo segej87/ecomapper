@@ -28,4 +28,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.android.support:design:23.2.1'
     compile 'jdbc:jdbc:2.0'
+    compile 'com.android.support:gridlayout-v7:24.2.1'
 }
