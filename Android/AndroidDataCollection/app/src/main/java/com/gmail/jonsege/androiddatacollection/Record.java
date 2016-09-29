@@ -16,17 +16,17 @@ public class Record {
     //region Class Variables
 
     Double[] coords = new Double[3];
-    BitmapFactory photo = new BitmapFactory();
+    String photoPath = new String();
     Map<String, Object> props = new HashMap<String, Object>();
 
     //endregion
 
     //region Initialization
 
-    public Record(Double[] coords, BitmapFactory photo, Map<String, Object> props){
+    public Record(Double[] coords, String photo, Map<String, Object> props){
         this.coords = coords;
-        this.photo = photo;
         this.props = props;
+        this.photoPath = photo;
     }
 
     //endregion

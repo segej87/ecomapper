@@ -46,8 +46,15 @@ public class Notebook extends AppCompatActivity {
 
         Map<String, Object> testprops = new HashMap<>();
         testprops.put("name", "test1");
+        testprops.put("datatype","meas");
         Record record1 = new Record(null, null, testprops);
         records.add(record1);
+
+        Map<String, Object> testprops2 = new HashMap<>();
+        testprops2.put("name","test note");
+        testprops2.put("datatype","note");
+        Record record2 = new Record(null, null, testprops2);
+        records.add(record2);
 
         NotebookArrayAdapter adapter = new NotebookArrayAdapter(this,records);
 
