@@ -1,5 +1,6 @@
 package com.gmail.jonsege.androiddatacollection;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -10,19 +11,34 @@ import java.util.Map;
  */
 
 public class UserVars {
-    static String uuid = new String();
+    // The user ID of the current user
+    static String UUID;
 
-    static String uName = new String();
+    // The username of the current user
+    static String UName;
 
+    // Filename to save these user variables
+    static String UserVarsSaveFileName;
+
+    // Filename to save records
+    static String RecordsSaveFileName;
+
+    // Filename to save media
+    static String MediasSaveFileName;
+
+    // An array of access levels, with the built-in public and private options
     static List<String> AccessLevels = new ArrayList<String>() {{
         add("Public");
         add("Private");
     }};
 
-    static Map<String, Object[]> Tags = new HashMap<String, Object[]>();
+    // New key-value pairs object for tags
+    static Map<String, Object[]> Tags = new HashMap<>();
 
-    static Map<String, Object[]> Species = new HashMap<String, Object[]>();
+    // New key-value pairs object for species
+    static Map<String, Object[]> Species = new HashMap<>();
 
-    static Map<String, Object[]> Units = new HashMap<String, Object[]>();
+    // New key-value pairs object for units
+    static Map<String, Object[]> Units = new HashMap<>();
 
 }

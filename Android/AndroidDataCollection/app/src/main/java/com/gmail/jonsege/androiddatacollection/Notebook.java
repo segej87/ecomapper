@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,10 @@ public class Notebook extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notebook);
 
+        // Set the logged in text
+        TextView loggedInText = (TextView) findViewById(R.id.logged_in_text);
+        loggedInText.setText(getText(R.string.logged_in_text_string) + UserVars.UName);
+
         Button mAddButton = (Button) findViewById(R.id.add_button);
         mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,17 +49,9 @@ public class Notebook extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.recordsList);
 
-        Map<String, Object> testprops = new HashMap<>();
-        testprops.put("name", "test1");
-        testprops.put("datatype","meas");
-        Record record1 = new Record(null, null, testprops);
-        records.add(record1);
-
-        Map<String, Object> testprops2 = new HashMap<>();
-        testprops2.put("name","test note");
-        testprops2.put("datatype","note");
-        Record record2 = new Record(null, null, testprops2);
-        records.add(record2);
+        if (DataIO.loadRecords(this).size() > 0) {
+            records = DataIO.loadRecords(this);
+        }
 
         NotebookArrayAdapter adapter = new NotebookArrayAdapter(this,records);
 

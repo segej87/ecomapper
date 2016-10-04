@@ -50,8 +50,9 @@ Temporary Items
 # Eclipse folders and files
 # =========================
 #Eclipse config folders
-/.metadata/*
-/.recommenders/*
+*/.metadata/*
+.metadata/*
+*/.recommenders/*
 
 # =========================
 # PyCharm folders and files

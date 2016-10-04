@@ -24,7 +24,7 @@ public class AddNew extends AppCompatActivity {
 
         Intent intent = getIntent();
         mUname = (TextView) findViewById(R.id.userText);
-        mUname.setText("Logged in as: " + UserVars.uName);
+        mUname.setText("Logged in as: " + UserVars.UName);
 
         // Link and wire up buttons.
         Button mNewMeasButton = (Button) findViewById(R.id.meas_button);

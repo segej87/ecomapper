@@ -14,11 +14,33 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="internet_failure_title">Connection problem</string>
     <string name="internet_failure">Network problem. Please check your connection</string>
     <string name="php_server_root">http://ecocollector.azurewebsites.net/</string>
     <string name="php_get_login">get_login.php/</string>
     <string name="php_get_lists">get_lists.php/</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="saved_login_log">Logging in with saved uuid: </string>
+    <string name="new_login_log">Logging in with new uuid: </string>
+
+    <!-- Strings related to DataIO -->
+    <string name="uuid_save_key">Saved_UUID</string>
+    <string name="save_login_failure">Failed to save login</string>
+    <string name="load_login_failure">Failed to load login</string>
+    <string name="user_vars_file_prefix">UserVars-</string>
+    <string name="save_user_vars_failure">Failed to save user variables</string>
+    <string name="load_user_vars_failure">Failed to load user variables</string>
+    <string name="record_file_prefix">Records-</string>
+    <string name="save_record_failure">Failed to save records: </string>
+    <string name="load_record_failure">Failed to load records: </string>
+    <string name="media_file_prefix">Medias-</string>
+    <string name="save_medias_failure">Failed to save media</string>
+    <string name="io_success">Success</string>
+    <string name="json_encode_error">"Error encoding json object"</string>
+    <string name="json_decode_error">"Error decoding json object"</string>
+
+    <!-- Strings related to menus -->
+    <string name="logged_in_text_string">Logged in as: </string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

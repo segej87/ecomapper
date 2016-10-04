@@ -3,23 +3,19 @@ package com.gmail.jonsege.androiddatacollection;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -28,9 +24,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import org.json.*;
 
@@ -47,8 +41,8 @@ public class LoginActivity extends AppCompatActivity {
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mUsernameView;
-    private EditText mPasswordView;
+    private TextInputEditText mUsernameView;
+    private TextInputEditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -60,10 +54,11 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Set up the login form.
-        mUsernameView = (AutoCompleteTextView) findViewById(R.id.username);
 
-        mPasswordView = (EditText) findViewById(R.id.password);
+        // Set up the login form.
+        mUsernameView = (TextInputEditText) findViewById(R.id.username);
+
+        mPasswordView = (TextInputEditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -85,6 +80,23 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        // Check for saved uuid and go to notebook if there is one
+        String savedLogin = DataIO.loadLogin(this);
+        if (savedLogin.contains(getString(R.string.io_success))){
+            String savedUUID = savedLogin.replace(getString(R.string.io_success) + ": ","");
+            System.out.println(getString(R.string.saved_login_log) + savedUUID);
+            if (!savedUUID.equals("")) {
+                UserVars.UUID = savedUUID;
+                UserVars.UserVarsSaveFileName = getString(R.string.user_vars_file_prefix) + savedUUID;
+                System.out.println(UserVars.UserVarsSaveFileName);
+                String userVarsResult = DataIO.loadUserVars(this);
+                System.out.println(userVarsResult);
+                moveToNotebook();
+            }
+        } else if (savedLogin.contains(getString(R.string.load_login_failure))){
+            showError(savedLogin);
+        }
     }
 
     //endregion
@@ -205,18 +217,21 @@ public class LoginActivity extends AppCompatActivity {
             System.out.println("Login server response: " + result);
 
             if (!(result.contains("Error:"))) {
-                String uid = result;
+                String uid = result.toLowerCase();
                 String uName = mUsername.toString();
-                UserVars.uuid = uid;
-                UserVars.uName = uName;
+                UserVars.UUID = uid;
+                UserVars.UserVarsSaveFileName = getString(R.string.user_vars_file_prefix) + uid;
+                UserVars.RecordsSaveFileName = getString(R.string.record_file_prefix) + uid;
+                UserVars.MediasSaveFileName = getString(R.string.media_file_prefix) + uid;
+                UserVars.UName = uName;
 
-                UserListsTask mListTask = new UserListsTask(UserVars.uuid);
+                UserListsTask mListTask = new UserListsTask(UserVars.UUID);
                 mListTask.execute((Void) null);
             } else {
                 mAuthTask = null;
                 showProgress(false);
                 if (result.contains("Server Error: ")) {
-                    showError("Connection problem");
+                    showError(getString(R.string.internet_failure_title));
                 }
                 if (result.contains("do not match")) {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -298,8 +313,6 @@ public class LoginActivity extends AppCompatActivity {
             System.out.println("List server response: " + result);
 
             if (!(result.startsWith("Error:"))) {
-                String jsonString = result;
-
                 try {
                     JSONObject jObject = new JSONObject(result);
 
@@ -330,8 +343,16 @@ public class LoginActivity extends AppCompatActivity {
                     System.out.println("Error parsing JSON response: " + e.getMessage());
                 }
 
-                Intent intent = new Intent(LoginActivity.this, Notebook.class);
-                startActivity(intent);
+                //TODO: Move to background thread
+                String loginResult = saveLogin(uuid);
+                String userVarResult = saveUserVars();
+
+                if (loginResult.equals(getString(R.string.io_success))) {
+                    System.out.println(getString(R.string.new_login_log) + uuid);
+                    moveToNotebook();
+                } else {
+                    showError(loginResult);
+                }
             } else {
                 if (result.contains("Server Error: ")) {
                     showError("Connection problem");
@@ -347,20 +368,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void showError(String title) {
-        String message = new String();
-
-        if (title == "Connection problem") {
-            message = getString(R.string.internet_failure);
-        }
-        AlertDialog.Builder intAlert = new AlertDialog.Builder(this);
-        intAlert.setMessage(message);
-        intAlert.setTitle(title);
-        intAlert.setPositiveButton("OK",null);
-        intAlert.setCancelable(false);
-        intAlert.create().show();
-    }
-
     //endregion
 
     //region Helper Methods
@@ -373,6 +380,58 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
         return password.length() > 4;
+    }
+
+    private void showError(String title) {
+        String showTitle = new String();
+        String message = new String();
+
+        if (title.equals(getString(R.string.internet_failure_title))) {
+            showTitle = title;
+            message = getString(R.string.internet_failure);
+        } else if (title.contains(getString(R.string.save_login_failure))) {
+            showTitle = getString(R.string.save_login_failure);
+            message = title;
+        } else if (title.contains(getString(R.string.load_login_failure))) {
+            showTitle = getString(R.string.load_login_failure);
+            message = title;
+        }
+
+        AlertDialog.Builder intAlert = new AlertDialog.Builder(this);
+        intAlert.setMessage(message);
+        intAlert.setTitle(showTitle);
+        intAlert.setPositiveButton("OK",null);
+        intAlert.setCancelable(false);
+        intAlert.create().show();
+    }
+
+    private String saveLogin(String uuid) {
+        String result = new String();
+
+        result = DataIO.saveLogin(this, uuid);
+
+        return result;
+    }
+
+    private String saveUserVars() {
+        String result = new String();
+
+        result = DataIO.saveUserVars(this);
+
+        return result;
+    }
+
+    //endregion
+
+    //region Navigation
+
+    private void moveToNotebook() {
+        // Clear this login activity's views.
+        this.mUsernameView.setText("");
+        this.mPasswordView.setText("");
+
+        Intent intent = new Intent(LoginActivity.this, Notebook.class);
+        startActivity(intent);
     }
 
     //endregion

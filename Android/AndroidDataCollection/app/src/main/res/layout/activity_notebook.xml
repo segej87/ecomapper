@@ -11,13 +11,25 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.gmail.jonsege.androiddatacollection.Notebook">
 
+    <TextView
+        android:id="@+id/logged_in_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:paddingBottom="5dip"
+        android:textColor="@color/darkBlue"
+        android:text="@string/logged_in_text_string"
+        />
+
     <android.support.v7.widget.GridLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="14dp"
+        android:layout_below="@id/logged_in_text"
+        android:layout_marginTop="5dp"
         android:id="@+id/gridLayout"
         app:columnCount="3"
         app:rowCount="2">
