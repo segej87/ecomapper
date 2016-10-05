@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -54,6 +55,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
 
         // Set up the login form.
         mUsernameView = (TextInputEditText) findViewById(R.id.username);
@@ -347,7 +350,7 @@ public class LoginActivity extends AppCompatActivity {
                 String loginResult = saveLogin(uuid);
                 String userVarResult = saveUserVars();
 
-                if (loginResult.equals(getString(R.string.io_success))) {
+                if (loginResult.contains(getString(R.string.io_success))) {
                     System.out.println(getString(R.string.new_login_log) + uuid);
                     moveToNotebook();
                 } else {

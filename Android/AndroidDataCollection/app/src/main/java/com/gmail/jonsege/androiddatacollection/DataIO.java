@@ -36,7 +36,7 @@ public final class DataIO extends AppCompatActivity {
             editor.putString(context.getString(R.string.uuid_save_key), uuid);
             editor.apply();
 
-            return context.getString(R.string.io_success);
+            return context.getString(R.string.io_success) + ": " + uuid;
         } catch (Exception e) {
             errorString = e.getLocalizedMessage();
         }
@@ -148,6 +148,23 @@ public final class DataIO extends AppCompatActivity {
         }
 
         return context.getString(R.string.load_user_vars_failure) + ": " + errorString;
+    }
+
+    public static void clearUserVars() {
+        UserVars.UUID = new String();
+        UserVars.UName = new String();
+        UserVars.UserVarsSaveFileName = new String();
+        UserVars.RecordsSaveFileName = new String();
+        UserVars.MediasSaveFileName = new String();
+        UserVars.AccessLevels = new ArrayList<String>() {{
+            add("Public");
+            add("Private");
+        }};
+        UserVars.Tags = new HashMap<>();
+        UserVars.Species = new HashMap<>();
+        UserVars.Units = new HashMap<>();
+        System.out.println(UserVars.UUID);
+        System.out.println(UserVars.UName);
     }
 
     //endregion

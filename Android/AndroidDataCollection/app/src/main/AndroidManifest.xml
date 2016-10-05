@@ -13,8 +13,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        andoid:debuggable="true"
+        android:theme="@style/AppTheme.NoActionBar">
+        android:debuggable="true"
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name">
@@ -28,7 +28,8 @@
         <activity android:name=".NewMeas" />
         <activity android:name=".NewPhoto" />
         <activity android:name=".NewNote" />
-        <activity android:name=".Notebook"></activity>
+        <activity android:name=".Notebook" />
+        <activity android:name=".ListPickerActivity"></activity>
     </application>
 
 </manifest>

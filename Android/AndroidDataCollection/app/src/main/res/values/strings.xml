@@ -22,6 +22,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="saved_login_log">Logging in with saved uuid: </string>
     <string name="new_login_log">Logging in with new uuid: </string>
+    <string name="saved_logout_log">Logging out of uuid: </string>
 
     <!-- Strings related to DataIO -->
     <string name="uuid_save_key">Saved_UUID</string>
@@ -38,9 +39,28 @@
     <string name="io_success">Success</string>
     <string name="json_encode_error">"Error encoding json object"</string>
     <string name="json_decode_error">"Error decoding json object"</string>
+    <string name="general_error_prefix">Error: </string>
+
+    <!-- Strings related to new records -->
+    <string name="enter_name_hint">Enter a name for this %1$s</string>
+    <string name="default_name_button">Use default name</string>
+    <string name="access_header">Access level</string>
+    <string name="access_hint">Selected access levels</string>
+    <string name="measured_header">Measured item</string>
+    <string name="measured_hint">Selected measured item</string>
+    <string name="value_header">Value</string>
+    <string name="value_hint">Enter the value of the measurement</string>
+    <string name="unit_header">Units</string>
+    <string name="unit_hint">Selected unit of measurement</string>
+    <string name="note_header">Note (optional)</string>
+    <string name="tags_header">Tags</string>
+    <string name="tags_hint">Selected tags</string>
+    <string name="add_button_string">+</string>
+    <string name="default_name">%1$s - %2$s</string>
+    <string name="gps_acc_starter">Current CPS Accuracy: %1$d</string>
 
     <!-- Strings related to menus -->
-    <string name="logged_in_text_string">Logged in as: </string>
+    <string name="logged_in_text_string">Logged in as: %1$s</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
