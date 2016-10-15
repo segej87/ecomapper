@@ -13,9 +13,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,12 +37,19 @@ public final class DataIO extends AppCompatActivity {
         String errorString = new String();
 
         try {
-            SharedPreferences sharedPref = ((Activity) context).getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.login_save_file),0);
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString(context.getString(R.string.uuid_save_key), uuid);
-            editor.apply();
 
-            return context.getString(R.string.io_success) + ": " + uuid;
+            if (uuid.equals(context.getString(R.string.logout_flag))) {
+                String oldUUID = loadLogin(context);
+                editor.remove(context.getString(R.string.uuid_save_key));
+                editor.apply();
+                return context.getString(R.string.io_success) + ": " + oldUUID.replace(context.getString(R.string.io_success) + ": ","");
+            } else {
+                editor.putString(context.getString(R.string.uuid_save_key), uuid);
+                editor.apply();
+                return context.getString(R.string.io_success) + ": " + uuid;
+            }
         } catch (Exception e) {
             errorString = e.getLocalizedMessage();
         }
@@ -48,7 +61,7 @@ public final class DataIO extends AppCompatActivity {
         String errorString = new String();
 
         try {
-            SharedPreferences sharedPref = ((Activity) context).getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.login_save_file),0);
             String defaultUUID = "";
             String savedUUID = sharedPref.getString(context.getString(R.string.uuid_save_key), defaultUUID);
 
@@ -94,7 +107,8 @@ public final class DataIO extends AppCompatActivity {
             os.write(jsonObject.toString().getBytes());
             os.close();
 
-            return context.getString(R.string.io_success) + ": " + jsonObject.toString();
+//            return context.getString(R.string.io_success) + ": " + jsonObject.toString();
+            return context.getString(R.string.io_success) + ": " + UserVars.UserVarsSaveFileName;
         } catch (Exception e) {
             errorString = e.getLocalizedMessage();
         }
@@ -182,6 +196,9 @@ public final class DataIO extends AppCompatActivity {
             for (Record r : records) {
                 recordsJArray.put(r.recordJsonEncode());
             }
+
+            System.out.println("Saving " + recordsJArray.length() + " records");
+
             recordsJObject.put("type", "FeatureCollection");
             recordsJObject.put("features", recordsJArray);
         } catch (Exception e) {
@@ -224,16 +241,19 @@ public final class DataIO extends AppCompatActivity {
 
             JSONArray recJArray = (JSONArray) jResult.get("features");
 
+            System.out.println("Loading " + recJArray.length() + " records");
+
             for (int i=0; i<recJArray.length(); i++) {
                 JSONObject rec = (JSONObject) recJArray.get(i);
                 JSONObject geom = (JSONObject) rec.get("geometry");
                 JSONArray coords = (JSONArray) geom.get("coordinates");
                 Double[] coordsOut = new Double[coords.length()];
-                for (i=0; i<coords.length(); i++) {
-                    coordsOut[i] = (Double) coords.get(i);
+                for (int j=0; j<coords.length(); j++) {
+                    coordsOut[j] = Double.valueOf(coords.get(j).toString());
                 }
 
                 JSONObject props = (JSONObject) rec.get("properties");
+
                 Iterator<String> iter = props.keys();
                 Map<String, Object> propsOut = new HashMap<>();
                 while (iter.hasNext()) {
@@ -241,15 +261,16 @@ public final class DataIO extends AppCompatActivity {
                     Object prop = props.get(k);
                     if (prop instanceof JSONArray) {
                         List<String> propArray = new ArrayList<>();
-                        for (i=0; i<((JSONArray) prop).length(); i++) {
-                            propArray.add(((JSONArray) prop).get(i).toString());
+                        for (int l=0; l<((JSONArray) prop).length(); l++) {
+                            propArray.add(((JSONArray) prop).get(l).toString());
                         }
-                        String[] propStringArray = new String[((JSONArray) prop).length()];
-                        propsOut.put(k, propArray.toArray(propStringArray));
+                        propsOut.put(k, propArray);
                     } else {
                         propsOut.put(k, prop);
                     }
                 }
+
+                iter.remove();
 
                 recordsOut.add(new Record(coordsOut, null, propsOut));
             }
@@ -305,6 +326,89 @@ public final class DataIO extends AppCompatActivity {
         }
 
         return null;
+    }
+
+    //endregion
+
+    //region Server Ops
+
+    public static String retrieveLists (Context context, String uuid) {
+        String response;
+        final String listsURL = context.getString(R.string.php_server_root) + context.getString(R.string.php_get_lists);
+
+        Map<String,Object> pars = new LinkedHashMap<>();
+        pars.put("GUID", uuid);
+
+        try {
+            StringBuilder postData = new StringBuilder();
+            for (Map.Entry<String,Object> par : pars.entrySet()) {
+                if (postData.length() != 0) postData.append('&');
+                postData.append(URLEncoder.encode(par.getKey(), "UTF-8"));
+                postData.append('=');
+                postData.append(URLEncoder.encode(String.valueOf(par.getValue()), "UTF-8"));
+            }
+            byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+
+            //TODO: Check for internet connection. If not return error.
+
+            URL url = new URL(listsURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty( "Content-Length", String.valueOf(postDataBytes.length));
+            conn.setDoOutput(true);
+            conn.getOutputStream().write(postDataBytes);
+
+            Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+            StringBuilder sb = new StringBuilder();
+            for (int c; (c = in.read()) >= 0;)
+                sb.append((char)c);
+            response = sb.toString();
+
+            conn.disconnect();
+
+            return response;
+        } catch (Exception e) {
+            return context.getString(R.string.server_connection_error) + e.getMessage();
+        }
+    }
+
+    public static boolean setLists (Context context, String result) {
+        System.out.println(context.getString(R.string.list_server_response) + result);
+
+        try {
+            JSONObject jObject = new JSONObject(result);
+
+            JSONArray accessArray = jObject.getJSONArray("institutions");
+            for (int i = 0; i < accessArray.length(); i++) {
+                UserVars.AccessLevels.add(accessArray.getString(i));
+            }
+
+            Object[] addArray = new Object[2];
+            addArray[0] = "Server";
+            addArray[1] = 0;
+
+            JSONArray tagsArray = jObject.getJSONArray("tags");
+            for (int i = 0; i < tagsArray.length(); i++) {
+                UserVars.Tags.put(tagsArray.getString(i),addArray);
+            }
+
+            JSONArray specArray = jObject.getJSONArray("species");
+            for (int i = 0; i < specArray.length(); i++) {
+                UserVars.Species.put(specArray.getString(i),addArray);
+            }
+
+            JSONArray unitArray = jObject.getJSONArray("units");
+            for (int i = 0; i < unitArray.length(); i++) {
+                UserVars.Units.put(unitArray.getString(i),addArray);
+            }
+
+            return true;
+        } catch (JSONException e) {
+            System.out.println(context.getString(R.string.json_decode_error) + ": " + e.getLocalizedMessage());
+        }
+        return false;
     }
 
     //endregion

@@ -5,11 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +17,9 @@ public class Notebook extends AppCompatActivity {
 
     //region Class Variables
 
-    private List<Record> records = new ArrayList<Record>();
+    private MyApplication app;
     private ListView listView;
+    private NotebookArrayAdapter adapter;
 
     //endregion
 
@@ -29,12 +30,13 @@ public class Notebook extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notebook);
 
-        //Set up the toolbar.
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        myToolbar.setTitle("");
+        // Get the current application.
+        app = (MyApplication) this.getApplicationContext();
 
-        // Inflate the custom toolbar layout and add it to the view.
-        getLayoutInflater().inflate(R.layout.action_bar, myToolbar);
+        //Set up the toolbar.
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.login_toolbar);
+        getLayoutInflater().inflate(R.layout.action_bar_notebook, myToolbar);
+        myToolbar.setTitle("");
         setSupportActionBar(myToolbar);
 
         // Set the logged in text
@@ -45,12 +47,7 @@ public class Notebook extends AppCompatActivity {
         mLogoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: Move to asynchronous thread
-                String saveLoginResult = saveLogin("");
-                System.out.println(getString(R.string.saved_logout_log) +
-                        saveLoginResult.replace(getString(R.string.io_success) + ": ",""));
-                DataIO.clearUserVars();
-                finish();
+                logout();
             }
         });
 
@@ -65,13 +62,23 @@ public class Notebook extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.recordsList);
 
-        if (DataIO.loadRecords(this).size() > 0) {
-            records = DataIO.loadRecords(this);
+        List<Record> records = DataIO.loadRecords(this);
+        if (records.size() > 0) {
+            app.addRecords(records);
         }
 
-        NotebookArrayAdapter adapter = new NotebookArrayAdapter(this,records);
+        adapter = new NotebookArrayAdapter(this, app.getRecords());
 
         listView.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onResume() {
+        //TODO: figure out how to refresh adapter without reinitializing
+        super.onResume();
+        adapter = new NotebookArrayAdapter(this, app.getRecords());
+        listView.setAdapter(adapter);
+//        listView.refreshDrawableState();
     }
 
     //endregion
@@ -79,8 +86,30 @@ public class Notebook extends AppCompatActivity {
     //region Helper Methods
 
     private String saveLogin(String uuid) {
-        String saveLoginResult = DataIO.saveLogin(this, uuid);
-        return saveLoginResult;
+        return DataIO.saveLogin(this, uuid);
+    }
+
+    /**
+     * A method to log out of the current user state and return to the login page.
+     */
+    private void logout() {
+        //TODO: Move to asynchronous thread
+        String saveLoginResult = saveLogin(getString(R.string.logout_flag));
+        System.out.println(getString(R.string.saved_logout_log) +
+                saveLoginResult.replace(getString(R.string.io_success) + ": ",""));
+
+        DataIO.clearUserVars();
+        app.addRecords(new ArrayList<Record>());
+        finish();
+    }
+
+    /**
+    *A method to delete the saved records file. Should be deleted after testing.
+     */
+    private void deleteRecordsFile() {
+        File deleteFile = new File(this.getFilesDir(), UserVars.RecordsSaveFileName);
+        boolean deleted = deleteFile.delete();
+        System.out.println("File deleted: " + deleted + ": " + deleteFile.getAbsolutePath());
     }
 
     //endregion

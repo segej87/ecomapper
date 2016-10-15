@@ -12,19 +12,19 @@ import java.util.Map;
 
 public class UserVars {
     // The user ID of the current user
-    static String UUID;
+    static String UUID = "testing";
 
     // The username of the current user
-    static String UName;
+    static String UName = "Testing";
 
     // Filename to save these user variables
-    static String UserVarsSaveFileName;
+    static String UserVarsSaveFileName = "UserVars-testing";
 
     // Filename to save records
-    static String RecordsSaveFileName;
+    static String RecordsSaveFileName = "Records-testing";
 
     // Filename to save media
-    static String MediasSaveFileName;
+    static String MediasSaveFileName = "Medias-testing";
 
     // An array of access levels, with the built-in public and private options
     static List<String> AccessLevels = new ArrayList<String>() {{

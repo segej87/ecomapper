@@ -55,7 +55,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+
+        // Set up the toolbar
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.login_toolbar);
         setSupportActionBar(myToolbar);
 
         // Set up the login form.
@@ -92,7 +94,6 @@ public class LoginActivity extends AppCompatActivity {
             if (!savedUUID.equals("")) {
                 UserVars.UUID = savedUUID;
                 UserVars.UserVarsSaveFileName = getString(R.string.user_vars_file_prefix) + savedUUID;
-                System.out.println(UserVars.UserVarsSaveFileName);
                 String userVarsResult = DataIO.loadUserVars(this);
                 System.out.println(userVarsResult);
                 moveToNotebook();
@@ -134,7 +135,7 @@ public class LoginActivity extends AppCompatActivity {
             cancel = true;
         }
 
-        // Check for a valid email address.
+        // Check for a valid username.
         if (TextUtils.isEmpty(username)) {
             mUsernameView.setError(getString(R.string.error_field_required));
             focusView = mUsernameView;
@@ -150,17 +151,33 @@ public class LoginActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgress(true);
-            mAuthTask = new UserLoginTask(username, password);
-            mAuthTask.execute((Void) null);
+            //TODO: remove after testing
+            if (username.equals("letmepass") && password.equals("letsdothis")) {
+                UserVars.UUID = "testing";
+                UserVars.UName = "Testing";
+                UserVars.UserVarsSaveFileName = getString(R.string.user_vars_file_prefix) + UserVars.UUID;
+                UserVars.RecordsSaveFileName = getString(R.string.record_file_prefix) + UserVars.UUID;
+                String loginResult = DataIO.saveLogin(this.getApplicationContext(), UserVars.UUID);
+                if (loginResult.contains(getString(R.string.save_login_failure))) {
+                    showError(getString(R.string.save_login_failure));
+                } else {
+                    String userVarsResult = DataIO.saveUserVars(this.getApplicationContext());
+                    System.out.println("Save login: " + loginResult + ", Save user vars: " + userVarsResult);
+                    focusView = null;
+                    moveToNotebook();
+                }
+            } else {
+                // Show a progress spinner, and kick off a background task to
+                // perform the user login attempt.
+                showProgress(true);
+                mAuthTask = new UserLoginTask(username, password);
+                mAuthTask.execute((Void) null);
+            }
         }
     }
 
     /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
+     * An asynchronous login task to get the user id for the provided username and password
      */
     public class UserLoginTask extends AsyncTask<Void, Void, String> {
 
@@ -168,14 +185,14 @@ public class LoginActivity extends AppCompatActivity {
         private final String mPassword;
         private final String loginURL = getString(R.string.php_server_root) + getString(R.string.php_get_login);
 
-        UserLoginTask(String email, String password) {
-            mUsername = email;
+        UserLoginTask(String username, String password) {
+            mUsername = username;
             mPassword = password;
         }
 
         @Override
         protected String doInBackground(Void... params) {
-            String response = new String();
+            String response;
             Map<String,Object> pars = new LinkedHashMap<>();
             pars.put("username", mUsername);
             pars.put("password", mPassword);
@@ -211,35 +228,34 @@ public class LoginActivity extends AppCompatActivity {
 
                 return response;
             } catch (Exception e) {
-                return "Server Error: " + e.getMessage();
+                return getString(R.string.server_connection_error) + e.getMessage();
             }
         }
 
         @Override
         protected void onPostExecute(String result) {
-            System.out.println("Login server response: " + result);
+            System.out.println(getString(R.string.login_server_response) + result);
 
-            if (!(result.contains("Error:"))) {
+            if (!(result.contains(getString(R.string.server_error_string)))) {
                 String uid = result.toLowerCase();
-                String uName = mUsername.toString();
                 UserVars.UUID = uid;
+                UserVars.UName = mUsername;
                 UserVars.UserVarsSaveFileName = getString(R.string.user_vars_file_prefix) + uid;
                 UserVars.RecordsSaveFileName = getString(R.string.record_file_prefix) + uid;
                 UserVars.MediasSaveFileName = getString(R.string.media_file_prefix) + uid;
-                UserVars.UName = uName;
 
                 UserListsTask mListTask = new UserListsTask(UserVars.UUID);
                 mListTask.execute((Void) null);
             } else {
                 mAuthTask = null;
                 showProgress(false);
-                if (result.contains("Server Error: ")) {
+                if (result.contains(getString(R.string.server_connection_error))) {
                     showError(getString(R.string.internet_failure_title));
                 }
-                if (result.contains("do not match")) {
+                if (result.contains(getString(R.string.server_password_error))) {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
                     mPasswordView.requestFocus();
-                } else if (result.contains("not found")) {
+                } else if (result.contains(getString(R.string.server_username_error))) {
                     mPasswordView.setError(getString(R.string.error_username_not_found));
                     mPasswordView.requestFocus();
                 }
@@ -255,8 +271,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
+     * An asynchronous task to retrieve user-specific lists and variables from the server.
      */
     public class UserListsTask extends AsyncTask<Void, Void, String> {
 
@@ -269,43 +284,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Void... params) {
-            String response = new String();
-            Map<String,Object> pars = new LinkedHashMap<>();
-            pars.put("GUID", uuid);
-
-            try {
-                StringBuilder postData = new StringBuilder();
-                for (Map.Entry<String,Object> par : pars.entrySet()) {
-                    if (postData.length() != 0) postData.append('&');
-                    postData.append(URLEncoder.encode(par.getKey(), "UTF-8"));
-                    postData.append('=');
-                    postData.append(URLEncoder.encode(String.valueOf(par.getValue()), "UTF-8"));
-                }
-                byte[] postDataBytes = postData.toString().getBytes("UTF-8");
-
-                //TODO: Check for internet connection. If not return error.
-
-                URL url = new URL(listsURL);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                conn.setRequestProperty( "Content-Length", String.valueOf(postDataBytes.length));
-                conn.setDoOutput(true);
-                conn.getOutputStream().write(postDataBytes);
-
-                Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-
-                StringBuilder sb = new StringBuilder();
-                for (int c; (c = in.read()) >= 0;)
-                    sb.append((char)c);
-                response = sb.toString();
-
-                conn.disconnect();
-
-                return response;
-            } catch (Exception e) {
-                return "Server Error: " + e.getMessage();
-            }
+            return DataIO.retrieveLists(LoginActivity.this, uuid);
         }
 
         @Override
@@ -313,42 +292,11 @@ public class LoginActivity extends AppCompatActivity {
             mAuthTask = null;
             showProgress(false);
 
-            System.out.println("List server response: " + result);
+            boolean setListResult = DataIO.setLists(LoginActivity.this, result);
 
-            if (!(result.startsWith("Error:"))) {
-                try {
-                    JSONObject jObject = new JSONObject(result);
-
-                    JSONArray accessArray = jObject.getJSONArray("institutions");
-                    for (int i = 0; i < accessArray.length(); i++) {
-                        UserVars.AccessLevels.add(accessArray.getString(i));
-                    }
-
-                    Object[] addArray = new Object[2];
-                    addArray[0] = "Server";
-                    addArray[1] = 0;
-
-                    JSONArray tagsArray = jObject.getJSONArray("tags");
-                    for (int i = 0; i < tagsArray.length(); i++) {
-                        UserVars.Tags.put(tagsArray.getString(i),addArray);
-                    }
-
-                    JSONArray specArray = jObject.getJSONArray("species");
-                    for (int i = 0; i < specArray.length(); i++) {
-                        UserVars.Species.put(specArray.getString(i),addArray);
-                    }
-
-                    JSONArray unitArray = jObject.getJSONArray("units");
-                    for (int i = 0; i < unitArray.length(); i++) {
-                        UserVars.Units.put(unitArray.getString(i),addArray);
-                    }
-                } catch (JSONException e) {
-                    System.out.println("Error parsing JSON response: " + e.getMessage());
-                }
-
+            if (setListResult && !(result.startsWith(getString(R.string.server_error_string)))) {
                 //TODO: Move to background thread
                 String loginResult = saveLogin(uuid);
-                String userVarResult = saveUserVars();
 
                 if (loginResult.contains(getString(R.string.io_success))) {
                     System.out.println(getString(R.string.new_login_log) + uuid);
@@ -356,9 +304,11 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     showError(loginResult);
                 }
-            } else {
-                if (result.contains("Server Error: ")) {
-                    showError("Connection problem");
+            } else if (!setListResult) {
+                showError(getString(R.string.save_user_vars_failure));
+            }else {
+                if (setListResult && result.contains(getString(R.string.server_connection_error))) {
+                    showError(getString(R.string.internet_failure_title));
                 }
                 //TODO: Add possible returned errors.
             }
@@ -377,7 +327,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.length() > 4;
+        return email.length() > 3;
     }
 
     private boolean isPasswordValid(String password) {
@@ -386,8 +336,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showError(String title) {
-        String showTitle = new String();
-        String message = new String();
+        String showTitle = getString(R.string.general_error_report);
+        String message = getString(R.string.general_error_report);
 
         if (title.equals(getString(R.string.internet_failure_title))) {
             showTitle = title;
@@ -409,17 +359,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private String saveLogin(String uuid) {
-        String result = new String();
+        String result;
 
         result = DataIO.saveLogin(this, uuid);
-
-        return result;
-    }
-
-    private String saveUserVars() {
-        String result = new String();
-
-        result = DataIO.saveUserVars(this);
 
         return result;
     }
