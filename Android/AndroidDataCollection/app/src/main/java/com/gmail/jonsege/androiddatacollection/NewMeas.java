@@ -1,30 +1,32 @@
 package com.gmail.jonsege.androiddatacollection;
 
-import android.*;
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.IntentSender;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,12 +35,15 @@ import java.util.List;
 import java.util.Map;
 
 public class NewMeas extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     //region Class Variables
 
     // The application
     private MyApplication app;
+
+    // A tag for logging from this activity
+    private static final String TAG = "new_meas";
 
     // UI elements.
     private EditText mNameTextField;
@@ -61,11 +66,16 @@ public class NewMeas extends AppCompatActivity implements GoogleApiClient.Connec
 
     // Variables for the user location request
     private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    private static final int LOCATION_REQUEST_INTERVAL = 10000;
+    private static final int LOCATION_REQUEST_FASTEST_INTERVAL = 5000;
+    private static final int LOCATION_REQUEST_PRIORITY = LocationRequest.PRIORITY_HIGH_ACCURACY;
+    private boolean mRequestingLocationUpdates = true;
+    private String mLastUpdateTime;
 
     // The user's last known location
     Location mLastLocation;
-    Double mLatitude;
-    Double mLongitude;
+    Location mCurrentLocation;
 
     // The record (either passed in or constructed)
     private Record record;
@@ -92,6 +102,8 @@ public class NewMeas extends AppCompatActivity implements GoogleApiClient.Connec
         TextView loggedInText = (TextView) findViewById(R.id.action_bar_title);
         loggedInText.setText(String.format(getString(R.string.logged_in_text_string),UserVars.UName));
 
+        // Decide to use Play Services Location based on the API level
+
         // Get the current record mode.
         Intent intent = getIntent();
         String mode = intent.getStringExtra("MODE");
@@ -105,7 +117,7 @@ public class NewMeas extends AppCompatActivity implements GoogleApiClient.Connec
         } else if (mode.equals("old")) {
             int recordIndex = intent.getIntExtra("INDEX",-1);
             if (recordIndex == -1) {
-                System.out.println(getString(R.string.load_record_failure));
+                Log.i(TAG,getString(R.string.load_record_failure));
             } else {
                 record = app.getRecord(recordIndex);
             }
@@ -148,28 +160,42 @@ public class NewMeas extends AppCompatActivity implements GoogleApiClient.Connec
 
     @Override
     protected void onStart() {
+        super.onStart();
         if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
         }
-        super.onStart();
     }
 
     @Override
     protected void onStop() {
+        super.onStop();
         if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
         }
-        super.onStop();
+
+        if (mRequestingLocationUpdates) {
+            stopLocationUpdates();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mRequestingLocationUpdates) {
+            stopLocationUpdates();
+        }
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        getUserLocation();
+        getLastLocation();
+        initializeLocationUpdates();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        System.out.println("Connection to Play Services failed: " + connectionResult.getErrorMessage());
+        Log.i(TAG,getString(R.string.play_services_connection_failure) + connectionResult.getErrorMessage());
     }
 
     @Override
@@ -220,23 +246,111 @@ public class NewMeas extends AppCompatActivity implements GoogleApiClient.Connec
         }
     }
 
-    private void getUserLocation() {
-        if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] {
-                    Manifest.permission.ACCESS_FINE_LOCATION
-            }, 0);
+    private void getLastLocation() {
+        try {
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+        } catch (SecurityException e) {
+            Log.i(TAG,getString(R.string.last_location_retrieve_failure, e.getLocalizedMessage()));
+            checkLocationSettings();
         }
-
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
         if (mLastLocation != null) {
-            mLatitude = mLastLocation.getLatitude();
-            mLongitude = mLastLocation.getLongitude();
+            userLoc[0] = mLastLocation.getLongitude();
+            userLoc[1] = mLastLocation.getLatitude();
+            userLoc[2] = mLastLocation.getAltitude();
         } else {
-            System.out.println("Could not retrieve user's location");
+            Log.i(TAG,getString(R.string.last_location_retrieve_failure));
         }
+    }
+
+    private void checkLocationSettings() {
+        createLocationRequest();
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient,
+                        builder.build());
+
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(@NonNull LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        // All location settings are satisfied. The client can
+                        // initialize location requests here.
+                        mRequestingLocationUpdates = true;
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied, but this can be fixed
+                        // by showing the user a dialog.
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            Log.i(TAG,getString(R.string.requesting_settings_change, "Location"));
+                            status.startResolutionForResult(
+                                    NewMeas.this,
+                                    0);
+                            mRequestingLocationUpdates = true;
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                            mRequestingLocationUpdates =false;
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way
+                        // to fix the settings so we won't show the dialog.
+                        Log.i(TAG,getString(R.string.settings_change_error, "Location"));
+                        mRequestingLocationUpdates =false;
+                        break;
+                }
+            }
+        });
+    }
+
+    private void initializeLocationUpdates() {
+        checkLocationSettings();
+
+        Log.i(TAG,getString(R.string.start_location_updates_report, mRequestingLocationUpdates));
+
+        if (mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
+    }
+
+    private void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(LOCATION_REQUEST_INTERVAL);
+        mLocationRequest.setFastestInterval(LOCATION_REQUEST_FASTEST_INTERVAL);
+        mLocationRequest.setPriority(LOCATION_REQUEST_PRIORITY);
+    }
+
+    private void startLocationUpdates() {
+        try {
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+            Log.i(TAG,getString(R.string.location_updates_start));
+        } catch (SecurityException e) {
+            Log.i(TAG,getString(R.string.location_updates_start_error, e.getLocalizedMessage()));
+            checkLocationSettings();
+        }
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mCurrentLocation = location;
+        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+        userLoc[0] = mCurrentLocation.getLongitude();
+        userLoc[1] = mCurrentLocation.getLatitude();
+        userLoc[2] = mCurrentLocation.getAltitude();
+        gpsAcc = mCurrentLocation.getAccuracy();
     }
 
     //endregion
@@ -263,7 +377,7 @@ public class NewMeas extends AppCompatActivity implements GoogleApiClient.Connec
             itemsOut.put("value", valueOut);
         } catch (Exception e) {
             //TODO: present error to user and prevent leaving without fixing double issue
-            System.out.println(getString(R.string.general_error_prefix) + e.getLocalizedMessage());
+            Log.i(TAG,getString(R.string.general_error_prefix, e.getLocalizedMessage()));
         }
 
         itemsOut.put("species", mMeasTextField.getText().toString());
@@ -287,7 +401,7 @@ public class NewMeas extends AppCompatActivity implements GoogleApiClient.Connec
             context.setItemsOut();
 
             if (userLoc[0] == null) {
-                System.out.println("No user location found. Sending to null island");
+                Log.i(TAG,getString(R.string.no_user_location_found));
                 userLoc[0] = 0.0;
                 userLoc[1] = 0.0;
                 userLoc[2] = 0.0;
@@ -302,10 +416,10 @@ public class NewMeas extends AppCompatActivity implements GoogleApiClient.Connec
             if (result) {
                 app.addRecord(record);
                 String saveResult = DataIO.saveRecords(this.context, app.getRecords());
-                System.out.println(saveResult);
+                Log.i(TAG,saveResult);
                 moveToAddNew();
             } else {
-                System.out.println(getString(R.string.save_record_failure));
+                Log.i(TAG,getString(R.string.save_record_failure));
             }
         }
 
@@ -350,7 +464,7 @@ public class NewMeas extends AppCompatActivity implements GoogleApiClient.Connec
             try {
                 dateTime = df.parse(record.props.get("datetime").toString());
             } catch (Exception e) {
-                System.out.println(getString(R.string.parse_failure, e.getLocalizedMessage()));
+                Log.i(TAG,getString(R.string.parse_failure, e.getLocalizedMessage()));
             }
             tagArray = (ArrayList<String>) record.props.get("tags");
             accessArray = (ArrayList<String>) record.props.get("access");
@@ -358,7 +472,7 @@ public class NewMeas extends AppCompatActivity implements GoogleApiClient.Connec
             try {
                 gpsAcc = Double.valueOf(record.props.get("accuracy").toString());
             } catch (Exception e) {
-                System.out.println(getString(R.string.parse_failure, e.getLocalizedMessage()));
+                Log.i(TAG,getString(R.string.parse_failure, e.getLocalizedMessage()));
             }
         }
     }

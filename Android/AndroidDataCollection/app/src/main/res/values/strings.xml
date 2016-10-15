@@ -50,7 +50,7 @@
     <string name="io_success">Success</string>
     <string name="json_encode_error">"Error encoding json object"</string>
     <string name="json_decode_error">"Error decoding json object"</string>
-    <string name="general_error_prefix">Error: </string>
+    <string name="general_error_prefix">Error: %1$s</string>
 
     <!-- Strings related to new records -->
     <string name="notebook_context_name">NOTEBOOK</string>
@@ -70,6 +70,16 @@
     <string name="add_button_string">+</string>
     <string name="default_name">%1$s - %2$s</string>
     <string name="gps_acc_starter">Current CPS Accuracy: %1$s</string>
+
+    <!--Strings related to location methods-->
+    <string name="play_services_connection_failure">Connection to Play Services failed: </string>
+    <string name="last_location_retrieve_failure">Could not retrieve user initial location: %1$s</string>
+    <string name="start_location_updates_report">Requesting location updates: %1$b</string>
+    <string name="requesting_settings_change">Requesting settings change: %1$s</string>
+    <string name="settings_change_error">Can not update user settings: %1$s</string>
+    <string name="location_updates_start">Starting location updates</string>
+    <string name="location_updates_start_error">Error starting location updates: %1$s</string>
+    <string name="no_user_location_found">No user location found. Sending to null island.</string>
 
     <!-- Strings related to menus -->
     <string name="logged_in_text_string">Logged in as: %1$s</string>
