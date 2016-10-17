@@ -15,7 +15,7 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:titleTextColor="@color/white"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:theme="@style/MyActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
     <!-- Login progress -->

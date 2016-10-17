@@ -36,6 +36,7 @@ public class NewMeas extends NewRecord {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.TAG = this.TAG;
+        super.type = "Point";
         setContentView(R.layout.activity_new_meas);
 
         //Set up the toolbar.
@@ -76,12 +77,20 @@ public class NewMeas extends NewRecord {
 
     //region Navigation
 
+    /**
+     * Finishes the NewMeas activity
+     */
     @Override
     void moveToAddNew() {
         super.finish();
         this.finish();
     }
 
+    /**
+     * Handles values supplied to the NewMeas activity by a ListPickerActivity
+     * @param mode mode
+     * @param values values
+     */
     private void returnFromListPicker(String mode, List<String> values) {
         StringBuilder sb = new StringBuilder();
         String delimiter = "";
@@ -108,6 +117,9 @@ public class NewMeas extends NewRecord {
 
     //region UI Methods
 
+    /**
+     * Changes the accuracy text field to show the current location accuracy
+     */
     @Override
     void updateGPSField() {
         mGPSAccField.setText(getString(R.string.gps_acc_starter,String.valueOf(gpsAcc)));
@@ -117,6 +129,9 @@ public class NewMeas extends NewRecord {
 
     //region Data I/O
 
+    /**
+     * Fills the properties map to add to the Record object
+     */
     @Override
     void setItemsOut() {
         itemsOut.put("datatype", "meas");
@@ -149,6 +164,9 @@ public class NewMeas extends NewRecord {
 
     //region Helper Methods
 
+    /**
+     * Sets up the activity's toolbar
+     */
     private void setUpToolbar () {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.new_toolbar);
         getLayoutInflater().inflate(R.layout.action_bar_new_record, myToolbar);
@@ -160,8 +178,11 @@ public class NewMeas extends NewRecord {
         loggedInText.setText(String.format(getString(R.string.logged_in_text_string),UserVars.UName));
     }
 
+    /**
+     * Sets up the UI fields in the activity
+     */
     @Override
-    void setUpFields () {
+    @SuppressWarnings("unchecked") void setUpFields () {
         mNameTextField = (EditText) findViewById(R.id.nameTextField);
         mAccessTextField = (TextView) findViewById(R.id.accessTextField);
         mMeasTextField = (TextView) findViewById(R.id.measTextField);

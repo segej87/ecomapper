@@ -21,28 +21,42 @@ public abstract class NewRecord extends AppCompatActivity {
 
     //region Class Variables
 
-    // The application
+    /**
+     * The application context
+     */
     private MyApplication app;
 
-    // A tag for logging from this activity
-    protected String TAG;
+    /**
+     * Tag for this activity. Will be replaced by child class.
+     */
+    protected String TAG = "new_record";
 
-    // The current mode of record entry
+    /**
+     * The current mode of record entry (new or old)
+     */
     protected String mode;
 
-    // Data to construct the record
-    protected SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    /**
+     * Data to construct the record
+     */
+    protected String type;
+    protected final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
     protected Date dateTime;
     protected List<String> tagArray = new ArrayList<>();
     protected List<String> accessArray = new ArrayList<>();
     protected Double[] userLoc = new Double[3];
     protected double gpsAcc = 0.0;
     protected Map<String, Object> itemsOut = new HashMap<>();
+    protected String mPhoto = null;
 
-    // The location object
+    /**
+     * The location object
+     */
     private UserLocation userLocation;
 
-    // The record created or loaded by the activity
+    /**
+     * The record created or loaded by the user
+     */
     protected Record record;
 
     //endregion
@@ -56,37 +70,50 @@ public abstract class NewRecord extends AppCompatActivity {
         // Get the current application.
         app = (MyApplication) this.getApplicationContext();
 
+        // Create an object to handle location requests
         userLocation = new UserLocation(this);
 
         // Get the current record mode.
         Intent intent = getIntent();
         mode = intent.getStringExtra("MODE");
-        if (mode.equals("new")) {
-            // Get the date and time this view was created.
-            // TODO: allow user to update
-            dateTime = new Date();
 
-            userLocation.buildGoogleApiClient();
+        // If the mode is new, get the current datetime and start tracking location.
+        switch(mode) {
+            case "new":
+                // Get the date and time this view was created.
+                // TODO: allow user to update datetime
+                dateTime = new Date();
 
-        } else if (mode.equals("old")) {
-            int recordIndex = intent.getIntExtra("INDEX",-1);
-            if (recordIndex == -1) {
-                Log.i(TAG,getString(R.string.load_record_failure));
-            } else {
-                record = app.getRecord(recordIndex);
-            }
+                // Build a Google API Client to connect to Play Services.
+                userLocation.buildGoogleApiClient();
+                break;
+            case "old":
+                // Get the index of the record to load
+                int recordIndex = intent.getIntExtra("INDEX",-1);
+
+                // If the index is -1, return an error. Otherwise, load the record.
+                if (recordIndex == -1) {
+                    Log.i(TAG,getString(R.string.load_record_failure));
+                } else {
+                    record = app.getRecord(recordIndex);
+                }
+                break;
         }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        // Connect to Play Services and track location.
         userLocation.connectToGoogleApi();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+
+        // Stop tracking location and disconnect from Play Services.
         userLocation.stopLocationUpdates();
         userLocation.disconnectFromGoogleApi();
     }
@@ -95,6 +122,7 @@ public abstract class NewRecord extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
+        // Stop tracking the user's location;
         userLocation.stopLocationUpdates();
     }
 
@@ -102,34 +130,58 @@ public abstract class NewRecord extends AppCompatActivity {
 
     //region Abstract Methods
 
+    /**
+     * Sets up the UI fields in the activity
+     */
     abstract void setUpFields();
 
+    /**
+     * Fills the properties map to add to the Record object
+     */
     abstract void setItemsOut();
 
+    /**
+     * Finishes the activity
+     */
     abstract void moveToAddNew();
 
+    /**
+     * Changes the accuracy text field to show the current location accuracy
+     */
     abstract void updateGPSField();
 
     //endregion
 
     //region UI Methods
 
+    /**
+     * Creates the default name from the datatype and datetime
+     * @param type datatype
+     * @return name
+     */
     protected String setDefaultName (String type) {
-        String result;
+        // Format the datetime object as as string.
         String dateString = df.format(dateTime);
-        result = getString(R.string.default_name,type,dateString);
-        return result;
+
+        // Return the formatted default name.
+        return getString(R.string.default_name,type,dateString);
     }
 
     //endregion
 
     //region Data I/O
 
+    /**
+     * Creates and executes an asynchronous task to save the new record.
+     */
     protected void saveRecord () {
         SaveRecord saveRecord = new SaveRecord(this);
         saveRecord.execute();
     }
 
+    /**
+     * An asynchronous task to save the new record.
+     */
     public class SaveRecord extends AsyncTask<NewMeas, Void, Boolean> {
         final NewRecord context;
 
@@ -139,8 +191,11 @@ public abstract class NewRecord extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(NewMeas...Params) {
+
+            // Create the properties map using the helper method.
             setItemsOut();
 
+            // If the user's location was not found, set to default (null island).
             if (userLoc[0] == null) {
                 Log.i(TAG,getString(R.string.no_user_location_found));
                 userLoc[0] = 0.0;
@@ -148,25 +203,38 @@ public abstract class NewRecord extends AppCompatActivity {
                 userLoc[2] = 0.0;
             }
 
-            context.record = new Record(userLoc, null, itemsOut);
+            // Set the activity's record object to the newly created record.
+            context.record = new Record(this.context, type, userLoc, mPhoto, itemsOut);
+
+            // Return whether the record's name equals the name selected by the user.
             return context.record.props.get("name").equals(itemsOut.get("name").toString());
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
+
+            // If success, add the record to the list, save the list, and finish the activity.
             if (result) {
+
+                // Add the new record to the application's list.
                 app.addRecord(record);
+
+                // Save the application's list to device storage and log.
                 String saveResult = DataIO.saveRecords(this.context, app.getRecords());
                 Log.i(TAG,saveResult);
+
+                // Finish the activity
                 moveToAddNew();
             } else {
+
+                // Log an error.
                 Log.i(TAG,getString(R.string.save_record_failure));
             }
         }
 
         @Override
         protected void onCancelled() {
-
+            //TODO: warn user about losing data.
         }
     }
 

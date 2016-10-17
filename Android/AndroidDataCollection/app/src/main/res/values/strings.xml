@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EcoCollector</string>
+    <string name="app_name">Kora</string>
 
     <!-- Strings related to login -->
     <string name="prompt_username">Username</string>
@@ -19,40 +19,49 @@
     <string name="php_server_root">http://ecocollector.azurewebsites.net/</string>
     <string name="php_get_login">get_login.php/</string>
     <string name="php_get_lists">get_lists.php/</string>
-    <string name="login_server_response">Login server response: </string>
-    <string name="list_server_response">List server response: </string>
+    <string name="login_server_response">Login server response: %1$s</string>
+    <string name="list_server_response">List server response: %1$s</string>
     <string name="server_error_string">Error:</string>
-    <string name="server_connection_error">Server Error: </string>
+    <string name="server_connection_error">Server Error: %1$s</string>
     <string name="server_password_error">do not match</string>
     <string name="server_username_error">not found</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="saved_login_log">Logging in with saved uuid: </string>
-    <string name="new_login_log">Logging in with new uuid: </string>
-    <string name="saved_logout_log">Logging out of uuid: </string>
+    <string name="saved_login_log">Logging in with saved uuid: %1$s</string>
+    <string name="new_login_log">Logging in with new uuid: %1$s</string>
+    <string name="saved_logout_log">Logging out of uuid: %1$s</string>
     <string name="login_save_file">LoginPref</string>
     <string name="general_error_title">Error</string>
     <string name="general_error_report">The app has encountered an error.</string>
+    <string name="load_user_vars_report">Loading user variables: %1$s</string>
+
+    <!-- Strings related to the Notebook-->
+    <string name="icon_description">An image for the record</string>
 
     <!-- Strings related to DataIO -->
     <string name="uuid_save_key">Saved_UUID</string>
     <string name="uuid_remove_report">Removing old UUID: </string>
     <string name="logout_flag">Logout</string>
-    <string name="save_login_failure">Failed to save login</string>
-    <string name="load_login_failure">Failed to load login</string>
+    <string name="save_login_failure">Failed to save login: %1$s</string>
+    <string name="load_login_failure">Failed to load login: %1$s</string>
     <string name="user_vars_file_prefix">UserVars-</string>
-    <string name="save_user_vars_failure">Failed to save user variables</string>
-    <string name="load_user_vars_failure">Failed to load user variables</string>
+    <string name="save_user_vars_failure">Failed to save user variables: %1$s</string>
+    <string name="load_user_vars_failure">Failed to load user variables: %1$s</string>
     <string name="record_file_prefix">Records-</string>
+    <string name="save_record_report">Saving %1$d records</string>
     <string name="save_record_failure">Failed to save records: </string>
-    <string name="load_record_failure">Failed to load records: </string>
+    <string name="load_record_report">Loading %1$d records</string>
+    <string name="load_record_failure">Failed to load records: %1$s</string>
     <string name="media_file_prefix">Medias-</string>
     <string name="save_medias_failure">Failed to save media</string>
     <string name="io_success">Success</string>
-    <string name="json_encode_error">"Error encoding json object"</string>
-    <string name="json_decode_error">"Error decoding json object"</string>
+    <string name="json_encode_error">"Error encoding json object: %1$s"</string>
+    <string name="json_decode_error">"Error decoding json object: %1$s"</string>
     <string name="general_error_prefix">Error: %1$s</string>
+    <string name="file_deleted_success">File %1$s deleted</string>
+    <string name="file_deleted_failure">File %1$s could not be deleted</string>
 
     <!-- Strings related to new records -->
+    <string name="start_new_record">Starting new add %1$s activity</string>
     <string name="notebook_context_name">NOTEBOOK</string>
     <string name="enter_name_hint">Enter a name for this %1$s</string>
     <string name="default_name_button">Use default name</string>
@@ -70,16 +79,19 @@
     <string name="add_button_string">+</string>
     <string name="default_name">%1$s - %2$s</string>
     <string name="gps_acc_starter">Current CPS Accuracy: %1$s</string>
+    <string name="adding_record">Adding new record</string>
 
     <!--Strings related to location methods-->
-    <string name="play_services_connection_failure">Connection to Play Services failed: </string>
+    <string name="play_services_connection_failure">Connection to Play Services failed: %1$s</string>
     <string name="last_location_retrieve_failure">Could not retrieve user initial location: %1$s</string>
     <string name="start_location_updates_report">Requesting location updates: %1$b</string>
     <string name="requesting_settings_change">Requesting settings change: %1$s</string>
     <string name="settings_change_error">Can not update user settings: %1$s</string>
     <string name="location_updates_start">Starting location updates</string>
+    <string name="location_updates_stop">Stopping location updates</string>
     <string name="location_updates_start_error">Error starting location updates: %1$s</string>
     <string name="no_user_location_found">No user location found. Sending to null island.</string>
+    <string name="last_location_null">The last location object is empty</string>
 
     <!-- Strings related to menus -->
     <string name="logged_in_text_string">Logged in as: %1$s</string>

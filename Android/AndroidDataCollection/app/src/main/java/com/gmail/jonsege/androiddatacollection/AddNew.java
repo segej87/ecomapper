@@ -3,6 +3,7 @@ package com.gmail.jonsege.androiddatacollection;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,7 +13,10 @@ public class AddNew extends AppCompatActivity {
 
     //region Class Variables
 
-    TextView mUname;
+    /**
+     * Tag for the class
+     */
+    private final static String TAG = "add_new";
 
     //endregion
 
@@ -72,22 +76,36 @@ public class AddNew extends AppCompatActivity {
 
     //region Navigation
 
-    public void goToNew(String type) {
+    /**
+     * Starts an activity to add a new record
+     * @param type datatype
+     */
+    private void goToNew(String type) {
         Intent intent = new Intent();
 
-        if (type.equals("meas")) {
-            intent = new Intent(AddNew.this, NewMeas.class);
-            intent.putExtra("MODE", "new");
-        } else if (type.equals("photo")) {
-            intent = new Intent(AddNew.this, NewPhoto.class);
-        } else if (type.equals("note")) {
-            intent = new Intent(AddNew.this, NewNote.class);
+        switch(type) {
+            case "meas":
+                intent = new Intent(AddNew.this, NewMeas.class);
+                break;
+            case "photo":
+                intent = new Intent(AddNew.this, NewPhoto.class);
+                break;
+            case "note":
+                intent = new Intent(AddNew.this, NewNote.class);
+                break;
         }
 
+        intent.putExtra("MODE", "new");
+
+        Log.i(TAG,getString(R.string.start_new_record,type));
         startActivity(intent);
     }
 
-    public void moveToNotebook() {
+    /**
+     * Finishes the AddNew activity
+     */
+    private void moveToNotebook() {
+        super.finish();
         this.finish();
     }
 

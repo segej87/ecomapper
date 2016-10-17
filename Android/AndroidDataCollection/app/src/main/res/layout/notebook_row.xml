@@ -14,7 +14,7 @@
         android:layout_alignParentStart="true"
         android:layout_marginRight="6dip"
         android:layout_marginEnd="6dip"
-        android:contentDescription="TODO"
+        android:contentDescription="@string/icon_description"
         android:src="@drawable/ic_menu_camera" />
 
     <TextView
@@ -28,7 +28,6 @@
         android:layout_toRightOf="@id/icon"
         android:layout_toEndOf="@id/icon"
         android:gravity="center_vertical"
-        android:text="Example application"
         android:textSize="16sp" />
 
     <TextView
@@ -38,7 +37,6 @@
         android:layout_below="@id/firstLine"
         android:paddingTop="10dip"
         android:ellipsize="marquee"
-        android:text="Description"
         android:textSize="12sp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
@@ -57,7 +55,6 @@
         android:layout_toRightOf="@id/icon"
         android:layout_toEndOf="@id/icon"
         android:ellipsize="marquee"
-        android:text="Content line"
         android:textSize="12sp" />
 
 </RelativeLayout>

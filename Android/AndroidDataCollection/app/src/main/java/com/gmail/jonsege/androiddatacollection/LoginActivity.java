@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,7 +28,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.json.*;
 
 /**
  * A login screen that offers login via username/password.
@@ -37,11 +37,18 @@ public class LoginActivity extends AppCompatActivity {
     //region Class Variables
 
     /**
+     * Tag for this activity.
+     */
+    private static final String TAG = "login";
+
+    /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
 
-    // UI references.
+    /**
+     * UI references.
+     */
     private TextInputEditText mUsernameView;
     private TextInputEditText mPasswordView;
     private View mProgressView;
@@ -90,12 +97,12 @@ public class LoginActivity extends AppCompatActivity {
         String savedLogin = DataIO.loadLogin(this);
         if (savedLogin.contains(getString(R.string.io_success))){
             String savedUUID = savedLogin.replace(getString(R.string.io_success) + ": ","");
-            System.out.println(getString(R.string.saved_login_log) + savedUUID);
             if (!savedUUID.equals("")) {
+                Log.i(TAG,getString(R.string.saved_login_log, savedUUID));
                 UserVars.UUID = savedUUID;
                 UserVars.UserVarsSaveFileName = getString(R.string.user_vars_file_prefix) + savedUUID;
                 String userVarsResult = DataIO.loadUserVars(this);
-                System.out.println(userVarsResult);
+                Log.i(TAG,getString(R.string.load_user_vars_report,userVarsResult));
                 moveToNotebook();
             }
         } else if (savedLogin.contains(getString(R.string.load_login_failure))){
@@ -140,7 +147,7 @@ public class LoginActivity extends AppCompatActivity {
             mUsernameView.setError(getString(R.string.error_field_required));
             focusView = mUsernameView;
             cancel = true;
-        } else if (!isEmailValid(username)) {
+        } else if (!isUNameValid(username)) {
             mUsernameView.setError(getString(R.string.error_invalid_email));
             focusView = mUsernameView;
             cancel = true;
@@ -162,8 +169,7 @@ public class LoginActivity extends AppCompatActivity {
                     showError(getString(R.string.save_login_failure));
                 } else {
                     String userVarsResult = DataIO.saveUserVars(this.getApplicationContext());
-                    System.out.println("Save login: " + loginResult + ", Save user vars: " + userVarsResult);
-                    focusView = null;
+                    Log.i(TAG,"Save login: " + loginResult + ", Save user vars: " + userVarsResult);
                     moveToNotebook();
                 }
             } else {
@@ -234,7 +240,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            System.out.println(getString(R.string.login_server_response) + result);
+            Log.i(TAG,getString(R.string.login_server_response,result));
 
             if (!(result.contains(getString(R.string.server_error_string)))) {
                 String uid = result.toLowerCase();
@@ -276,7 +282,6 @@ public class LoginActivity extends AppCompatActivity {
     public class UserListsTask extends AsyncTask<Void, Void, String> {
 
         private final String uuid;
-        private final String listsURL = getString(R.string.php_server_root) + getString(R.string.php_get_lists);
 
         UserListsTask(String uuidIn) {
             uuid = uuidIn;
@@ -299,7 +304,7 @@ public class LoginActivity extends AppCompatActivity {
                 String loginResult = saveLogin(uuid);
 
                 if (loginResult.contains(getString(R.string.io_success))) {
-                    System.out.println(getString(R.string.new_login_log) + uuid);
+                    Log.i(TAG,getString(R.string.new_login_log,uuid));
                     moveToNotebook();
                 } else {
                     showError(loginResult);
@@ -325,16 +330,29 @@ public class LoginActivity extends AppCompatActivity {
 
     //region Helper Methods
 
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.length() > 3;
+    /**
+     * Checks whether a supplied username is in a valid format.
+     * @param uName username
+     * @return boolean
+     */
+    private boolean isUNameValid(String uName) {
+        return uName.length() > 3;
     }
 
+    /**
+     * Checks whether a supplied password is in a valid format.
+     * @param password password
+     * @return boolean
+     */
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
+    /**
+     * Presents an error to the user.
+     * @param title description
+     */
     private void showError(String title) {
         String showTitle = getString(R.string.general_error_report);
         String message = getString(R.string.general_error_report);
@@ -358,6 +376,11 @@ public class LoginActivity extends AppCompatActivity {
         intAlert.create().show();
     }
 
+    /**
+     * Saves the new user ID to a shared preferences file.
+     * @param uuid UserID
+     * @return result
+     */
     private String saveLogin(String uuid) {
         String result;
 
@@ -370,10 +393,13 @@ public class LoginActivity extends AppCompatActivity {
 
     //region Navigation
 
+    /**
+     * Transitions view to the Notebook activity.
+     */
     private void moveToNotebook() {
         // Clear this login activity's views.
-        this.mUsernameView.setText("");
-        this.mPasswordView.setText("");
+        this.mUsernameView.getText().clear();
+        this.mPasswordView.getText().clear();
 
         Intent intent = new Intent(LoginActivity.this, Notebook.class);
         startActivity(intent);

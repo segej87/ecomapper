@@ -3,7 +3,7 @@ package com.gmail.jonsege.androiddatacollection;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,20 +44,25 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
 
     //region Adapter methods
 
-    // Get and populate the adapter's listview row.
+    // Get and populate the adapter's list view row.
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    @NonNull public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        View rowView;
 
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        // Use the custom notebook row layout.
-        View rowView = inflater.inflate(R.layout.notebook_row, parent, false);
+            // Use the custom notebook row layout.
+            rowView = inflater.inflate(R.layout.notebook_row, parent, false);
+        } else {
+            rowView = convertView;
+        }
 
-        // Get properties from the datasource.
-        Map<String,Object> props = records.get(position).props;
+        // Get properties from the data source.
+        Map<String, Object> props = records.get(position).props;
 
-        // Get the current record type from the datasource.
+        // Get the current record type from the data source.
         String dt = props.get("datatype").toString();
 
         // Fill the image view with the record's photo or with defaults.
@@ -65,7 +70,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
 
         // If the photo path is not null or blank, get it at attempt to set the image view.
         String photoPath = records.get(position).photoPath;
-        if (photoPath != null && photoPath != "") {
+        if (photoPath != null && !photoPath.equals("")) {
             File imgFile = new File(records.get(position).photoPath);
 
             if (imgFile.exists()) {
@@ -74,8 +79,15 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
             }
         } else {
             int resource = 0;
-            if (dt.equals("meas")) resource = R.mipmap.meas_image;
-            if (dt.equals("note")) resource = R.mipmap.note_image;
+
+            switch(dt) {
+                case "meas":
+                    resource = R.mipmap.meas_image;
+                    break;
+                case "note":
+                    resource = R.mipmap.note_image;
+                    break;
+            }
 
             imageView.setImageResource(resource);
         }
@@ -96,7 +108,8 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
             String uni = props.get("units").toString();
             thirdLine.setText(spec + ": " + val + " " + uni);
         } else {
-            thirdLine.setText(TextUtils.join(", ", (String[]) props.get("tags")));
+            @SuppressWarnings("unchecked") List<String> tagsList = (List<String>) props.get("tags");
+            thirdLine.setText(TextUtils.join(", ", tagsList));
         }
 
         return rowView;
