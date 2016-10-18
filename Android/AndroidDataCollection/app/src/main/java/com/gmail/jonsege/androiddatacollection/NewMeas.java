@@ -54,6 +54,15 @@ public class NewMeas extends NewRecord {
             }
         });
 
+        // Set up the tag picker button
+        Button mAccessPickerButton = (Button) findViewById(R.id.accessPickerButton);
+        mAccessPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToListPicker("access", accessArray);
+            }
+        });
+
         // Set up the save button
         Button mSaveButton = (Button) findViewById(R.id.action_bar_save);
         mSaveButton.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +100,8 @@ public class NewMeas extends NewRecord {
      * @param mode mode
      * @param values values
      */
-    private void returnFromListPicker(String mode, List<String> values) {
+    @Override
+    protected void returnFromListPicker(String mode, List<String> values) {
         StringBuilder sb = new StringBuilder();
         String delimiter = "";
         for (String v : values) {
@@ -103,13 +113,19 @@ public class NewMeas extends NewRecord {
 
         switch(mode) {
             case "access":
+                accessArray = values;
                 mAccessTextField.setText(displayString);
+                break;
             case "species":
                 mMeasTextField.setText(displayString);
+                break;
             case "units":
                 mUnitsTextField.setText(displayString);
+                break;
             case "tags":
+                tagArray = values;
                 mTagTextField.setText(displayString);
+                break;
         }
     }
 

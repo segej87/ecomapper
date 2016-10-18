@@ -2,6 +2,8 @@ package com.gmail.jonsege.androiddatacollection;
 
 import android.os.Bundle;
 
+import java.util.List;
+
 public class NewPhoto extends NewRecord {
 
     //region Class Variables
@@ -29,6 +31,11 @@ public class NewPhoto extends NewRecord {
     void moveToAddNew() {
         super.finish();
         this.finish();
+    }
+
+    @Override
+    protected void returnFromListPicker(String mode, List<String> result) {
+
     }
 
     //endregion

@@ -1,5 +1,6 @@
 package com.gmail.jonsege.androiddatacollection;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -149,6 +150,35 @@ public abstract class NewRecord extends AppCompatActivity {
      * Changes the accuracy text field to show the current location accuracy
      */
     abstract void updateGPSField();
+
+    //endregion
+
+    //region Navigation
+
+    protected void goToListPicker(String mode, List<String> previous) {
+
+        Intent intent = new Intent(NewRecord.this, ListPickerActivity.class);
+        intent.putExtra("MODE", mode);
+        intent.putStringArrayListExtra("PREVIOUS", (ArrayList<String>) previous);
+        startActivityForResult(intent, 100);
+    }
+
+    abstract protected void returnFromListPicker(String mode, List<String> values);
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case (100) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    String mode = data.getStringExtra("MODE");
+                    List<String> result = data.getStringArrayListExtra("RESULT");
+                    returnFromListPicker(mode, result);
+                }
+                break;
+            }
+        }
+    }
 
     //endregion
 

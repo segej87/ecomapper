@@ -3,6 +3,7 @@ package com.gmail.jonsege.androiddatacollection;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.graphics.Color;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -65,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Set up the toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.login_toolbar);
+        myToolbar.setTitleTextColor(Color.LTGRAY);
         setSupportActionBar(myToolbar);
 
         // Set up the login form.

@@ -92,7 +92,8 @@ public class NewNote extends NewRecord {
      * @param mode mode
      * @param values values
      */
-    private void returnFromListPicker(String mode, List<String> values) {
+    @Override
+    protected void returnFromListPicker(String mode, List<String> values) {
         StringBuilder sb = new StringBuilder();
         String delimiter = "";
         for (String v : values) {
