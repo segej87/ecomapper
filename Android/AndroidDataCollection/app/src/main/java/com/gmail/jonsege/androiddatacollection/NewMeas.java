@@ -45,21 +45,15 @@ public class NewMeas extends NewRecord {
         // Initialize the text fields and set hints if necessary.
         setUpFields();
 
+        // Set up the picker buttons
+        setUpPickerButtons();
+
         // Set up the default name button
         Button mDefaultNameButton = (Button) findViewById(R.id.defaultNameButton);
         mDefaultNameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mNameTextField.setText(setDefaultName("Meas"));
-            }
-        });
-
-        // Set up the tag picker button
-        Button mAccessPickerButton = (Button) findViewById(R.id.accessPickerButton);
-        mAccessPickerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToListPicker("access", accessArray);
             }
         });
 
@@ -102,15 +96,18 @@ public class NewMeas extends NewRecord {
      */
     @Override
     protected void returnFromListPicker(String mode, List<String> values) {
+
+        // Construct a string from the ArrayList to put in the text view.
         StringBuilder sb = new StringBuilder();
         String delimiter = "";
         for (String v : values) {
             sb.append(delimiter).append(v);
             delimiter = ", ";
         }
-
         String displayString = sb.toString();
 
+        // Set the appropriate array to the list picker result and add text to the
+        // appropriate text view.
         switch(mode) {
             case "access":
                 accessArray = values;
@@ -207,7 +204,6 @@ public class NewMeas extends NewRecord {
         mNoteTextField = (EditText) findViewById(R.id.notesTextField);
         mTagTextField = (TextView) findViewById(R.id.tagTextField);
         mGPSAccField = (TextView) findViewById(R.id.gpsAccView);
-        mNameTextField.setHint(getString(R.string.enter_name_hint,"measurement"));
 
         if (mode.equals("new")) {
             mGPSAccField.setText(getString(R.string.gps_acc_starter, String.valueOf(gpsAcc)));
@@ -240,6 +236,62 @@ public class NewMeas extends NewRecord {
                 Log.i(TAG,getString(R.string.parse_failure, e.getLocalizedMessage()));
             }
         }
+    }
+
+    private void setUpPickerButtons() {
+        // Set up the tag picker button
+        Button mAccessPickerButton = (Button) findViewById(R.id.accessPickerButton);
+        mAccessPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToListPicker("access", accessArray);
+            }
+        });
+
+        Button mSpeciesPickerButton = (Button) findViewById(R.id.measPickerButton);
+        mSpeciesPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToListPicker("species", stringFromViewToArray(mMeasTextField));
+            }
+        });
+
+        Button mUnitsPickerButton = (Button) findViewById(R.id.unitsPickerButton);
+        mUnitsPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToListPicker("units", stringFromViewToArray(mUnitsTextField));
+            }
+        });
+
+        Button mTagsPickerButton = (Button) findViewById(R.id.tagPickerButton);
+        mTagsPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToListPicker("tags", tagArray);
+            }
+        });
+    }
+
+    /**
+     * Adds a single string to an ArrayList for use by the list picker
+     * @param inView TextView
+     * @return ArrayList
+     */
+    private List<String> stringFromViewToArray(TextView inView) {
+
+        // The array to return.
+        List<String> outArray = new ArrayList<>();
+
+        // Text in the text view.
+        String viewText = inView.getText().toString();
+
+        if (viewText.equals("")) {
+            return outArray;
+        }
+
+        outArray.add(viewText);
+        return outArray;
     }
 
     //endregion

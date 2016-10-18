@@ -155,6 +155,12 @@ public abstract class NewRecord extends AppCompatActivity {
 
     //region Navigation
 
+    /**
+     * Navigates to a list picker activity, sending the request mode and any existing
+     * selected items
+     * @param mode type
+     * @param previous existing
+     */
     protected void goToListPicker(String mode, List<String> previous) {
 
         Intent intent = new Intent(NewRecord.this, ListPickerActivity.class);
@@ -163,6 +169,11 @@ public abstract class NewRecord extends AppCompatActivity {
         startActivityForResult(intent, 100);
     }
 
+    /**
+     * Should be overridden to handle the results of a list picker activity
+     * @param mode type
+     * @param values selected
+     */
     abstract protected void returnFromListPicker(String mode, List<String> values);
 
     @Override

@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -48,6 +50,17 @@ public class ListPickerActivity extends AppCompatActivity {
     private List<String> fullList;
     private List<String> filteredList;
     private List<String> selectedList = new ArrayList<>();
+
+    /**
+     * The search and add new text fields.
+     */
+    private SearchView mSearchView;
+    private EditText mAddNew;
+
+    /**
+     * Keep track of search activity
+     */
+    private boolean searchActive = false;
 
     //endregion
 
@@ -91,26 +104,46 @@ public class ListPickerActivity extends AppCompatActivity {
         getInitialData(previous);
 
         // Set the adapters for the list views.
+        setUpListViewAdapters();
+
+        // Set listeners for list view taps.
+        setUpListViewListeners();
+
+        // Set up the search view.
+        setUpSearchView();
+    }
+
+    //endregion
+
+    //region List View Methods
+
+    private void setUpListViewAdapters() {
         mFullAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,fullList);
         mAvailableView.setAdapter(mFullAdapter);
         mSelectedAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,selectedList);
         mSelectedView.setAdapter(mSelectedAdapter);
+    }
 
-        // Set listeners for list view taps.
+    private void setUpListViewListeners() {
         mAvailableView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selected = (String) parent.getAdapter().getItem(position);
-                int posInFullArray = fullList.indexOf(selected);
 
-                fullList.remove(posInFullArray);
+                fullList.remove(selected);
 
                 selectedList.add(selected);
+
+                // If there is an active search, clear the search field
+                if (searchActive) {
+                    mSearchView.setQuery("", true);
+                    mSearchView.clearFocus();
+                    mSearchView.setIconified(true);
+                }
 
                 // Notify the adapters of changes.
                 mFullAdapter.notifyDataSetChanged();
                 mSelectedAdapter.notifyDataSetChanged();
-
             }
         });
 
@@ -130,12 +163,6 @@ public class ListPickerActivity extends AppCompatActivity {
             }
         });
     }
-
-    //endregion
-
-    //region List View Methods
-
-
 
     //endregion
 
@@ -161,6 +188,9 @@ public class ListPickerActivity extends AppCompatActivity {
     private void setUpFields() {
         mAvailableView = (ListView) findViewById(R.id.availableList);
         mSelectedView = (ListView) findViewById(R.id.selectedList);
+
+        mSearchView = (SearchView) findViewById(R.id.searchView);
+        mAddNew = (EditText) findViewById(R.id.addNewText);
     }
 
     //endregion
@@ -181,42 +211,40 @@ public class ListPickerActivity extends AppCompatActivity {
      * Loads data into the full list and filtered list depending on the list picker mode.
      */
     private void getInitialData(List<String> previous) {
-        if (mode != null) {
 
-            // Initialize a list to hold the results from User Vars.
-            List<String> dataList = new ArrayList<>();
+        // Initialize the list view data sources
+        fullList = new ArrayList<>();
+        selectedList = new ArrayList<>();
+
+        if (mode != null) {
 
             switch(mode) {
                 case "access":
-                    dataList = UserVars.AccessLevels;
+                    fullList.addAll(UserVars.AccessLevels);
                     break;
                 case "species":
                     Set<String> specSet = UserVars.Species.keySet();
-                    for (String s : specSet) {
-                        dataList.add(s);
+                    if (specSet.size() > 0) {
+                        for (String s : specSet) {
+                            fullList.add(s);
+                        }
                     }
                     break;
                 case "units":
                     Set<String> unitSet = UserVars.Units.keySet();
                     for (String u : unitSet) {
-                        dataList.add(u);
+                        fullList.add(u);
                     }
                     break;
                 case "tags":
                     Set<String> tagSet = UserVars.Tags.keySet();
                     for (String t : tagSet) {
-                        dataList.add(t);
+                        fullList.add(t);
                     }
                     break;
             }
 
-            // Set the full list equal to the appropriate data list.
-            fullList = dataList;
-
-            // Set the filtered list equal to the full list initially.
-            filteredList = fullList;
-
-            // Deal with previous items.
+            // If the record already had selected items, select them again.
             if (previous != null) {
                 for (String p : previous) {
                     selectedList.add(p);
@@ -231,6 +259,41 @@ public class ListPickerActivity extends AppCompatActivity {
         } else {
             Log.e(TAG, getString(R.string.no_mode_error));
         }
+    }
+
+    /**
+     * Sets up the search view functionality
+     */
+    private void setUpSearchView() {
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                if (!query.equals("")) {
+                    ListPickerActivity.this.mFullAdapter.getFilter().filter(query);
+                    searchActive = true;
+                    return true;
+                }
+
+                setUpListViewAdapters();
+                searchActive = false;
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                if (!newText.equals("")) {
+                    mFullAdapter.getFilter().filter(newText);
+                    searchActive = true;
+                    return true;
+                }
+
+                setUpListViewAdapters();
+                searchActive = false;
+                return false;
+            }
+        });
     }
 
     //endregion
