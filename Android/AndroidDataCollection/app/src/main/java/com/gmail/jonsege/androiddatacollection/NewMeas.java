@@ -204,6 +204,7 @@ public class NewMeas extends NewRecord {
         mNoteTextField = (EditText) findViewById(R.id.notesTextField);
         mTagTextField = (TextView) findViewById(R.id.tagTextField);
         mGPSAccField = (TextView) findViewById(R.id.gpsAccView);
+        mNameTextField.setHint(getString(R.string.enter_name_hint,getString(R.string.measurement_name_tag)));
 
         if (mode.equals("new")) {
             mGPSAccField.setText(getString(R.string.gps_acc_starter, String.valueOf(gpsAcc)));

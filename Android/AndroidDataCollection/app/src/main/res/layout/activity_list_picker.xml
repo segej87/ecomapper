@@ -38,58 +38,79 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:queryHint="@string/search_hint"
             />
 
-        <EditText
-            android:id="@+id/addNewText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:hint="@string/add_new"
-            android:nextFocusUp="@id/addNewText"
-            android:nextFocusLeft="@id/addNewText"/>
+            android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:text="@string/selected_label"/>
+            <EditText
+                android:id="@+id/addNewText"
+                android:layout_width="wrap_content"
+                android:layout_weight="0.99"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:nextFocusUp="@id/addNewText"
+                android:nextFocusLeft="@id/addNewText"/>
 
-        <ListView
+            <Button
+                android:id="@+id/addNewButton"
+                android:layout_width="35dip"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:textSize="@dimen/text_size_medium"
+                android:text="@string/add_button_string"
+                android:layout_marginEnd="10dip"
+                android:layout_marginRight="10dip"
+                android:layout_weight="0.01"
+                android:visibility="invisible"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dip"
-            android:id="@+id/selectedList"
-            app:layout_column="0"
-            app:layout_columnSpan="6"
-            app:layout_row="1"
-            app:layout_rowSpan="1"
-            android:elevation="5dp"
-            android:background="@android:color/background_light" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:text="@string/available_label"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:text="@string/selected_label"/>
 
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="10dip"
-            android:id="@+id/availableList"
-            app:layout_column="0"
-            app:layout_columnSpan="6"
-            app:layout_row="1"
-            app:layout_rowSpan="1"
-            android:layout_below="@id/selectedList"
-            android:elevation="5dp"
-            android:background="@android:color/background_light"
-            />
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:paddingTop="10dip"
+                android:id="@+id/selectedList"
+                android:elevation="5dp"
+                android:background="@android:color/background_light" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:text="@string/available_label"/>
+
+            <ListView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.5"
+                android:paddingTop="10dip"
+                android:id="@+id/availableList"
+                android:elevation="5dp"
+                android:background="@android:color/background_light"
+                />
+
+        </LinearLayout>
 
     </LinearLayout>
 
