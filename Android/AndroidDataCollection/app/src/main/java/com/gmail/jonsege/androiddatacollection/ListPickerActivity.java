@@ -106,7 +106,7 @@ public class ListPickerActivity extends AppCompatActivity {
 
     //endregion
 
-    //region List View Methods
+    //region ListView Methods
 
     private void setUpListViewAdapters() {
         mFullAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,fullList);

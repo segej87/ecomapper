@@ -27,7 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddNew" />
         <activity android:name=".NewMeas" />
         <activity android:name=".NewPhoto" />
         <activity android:name=".NewNote" />

@@ -47,8 +47,8 @@ public class MyApplication extends Application {
 
     /**
      * Adds a single record to the records list
-     * @param record record
-     * @return report
+     * @param record
+     *      the record to add to the list
      */
     public void addRecord(Record record) {
         this.records.add(record);
@@ -57,13 +57,35 @@ public class MyApplication extends Application {
     }
 
     /**
-     * Replaces the application's record list with a provided list
-     * @param records records
-     * @return report
+     * Appends records to the applications records list
+     * @param records
+     *      An array list of records to add to the list
      */
-    public String addRecords(List<Record> records) {
+    public void addRecords(List<Record> records) {
+        this.records.addAll(records);
+    }
+
+    /**
+     * Replaces the application's record list with a provided list
+     * @param records
+     *      The records to replace the existing list
+     * @return
+     *      A report of success or failure
+     */
+    public String replaceRecords(List<Record> records) {
         this.records = records;
         return getString(R.string.io_success);
+    }
+
+    /**
+     * Replaces a specific record in the records list
+     * @param index
+     *      The index of the record to replace
+     * @param record
+     *      The new record to put at the specified index
+     */
+    public void replaceRecord(int index, Record record) {
+        this.records.set(index, record);
     }
 
     //endregion

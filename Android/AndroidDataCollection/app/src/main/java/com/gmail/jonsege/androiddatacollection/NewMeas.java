@@ -98,13 +98,7 @@ public class NewMeas extends NewRecord {
     protected void returnFromListPicker(String mode, List<String> values) {
 
         // Construct a string from the ArrayList to put in the text view.
-        StringBuilder sb = new StringBuilder();
-        String delimiter = "";
-        for (String v : values) {
-            sb.append(delimiter).append(v);
-            delimiter = ", ";
-        }
-        String displayString = sb.toString();
+        String displayString = arrayToStringForView(values);
 
         // Set the appropriate array to the list picker result and add text to the
         // appropriate text view.
@@ -210,13 +204,13 @@ public class NewMeas extends NewRecord {
             mGPSAccField.setText(getString(R.string.gps_acc_starter, String.valueOf(gpsAcc)));
         } else if (mode.equals("old")) {
             mNameTextField.setText(record.props.get("name").toString());
-            mAccessTextField.setText(record.props.get("access").toString());
+            mAccessTextField.setText(arrayToStringForView((List<String>) record.props.get("access")));
             mMeasTextField.setText(record.props.get("species").toString());
             mValTextField.setText(record.props.get("value").toString());
             mUnitsTextField.setText(record.props.get("units").toString());
             mNoteTextField.setText(record.props.get("text").toString());
-            mTagTextField.setText(record.props.get("tags").toString());
-            mGPSAccField.setText(getString(R.string.gps_acc_starter, record.props.get("accuracy").toString()));
+            mTagTextField.setText(arrayToStringForView((List<String>) record.props.get("tags")));
+            mGPSAccField.setVisibility(View.GONE);
 
             try {
                 dateTime = df.parse(record.props.get("datetime").toString());
@@ -293,6 +287,26 @@ public class NewMeas extends NewRecord {
 
         outArray.add(viewText);
         return outArray;
+    }
+
+    /**
+     * Creates a single string from an ArrayList
+     * @param values ArrayList
+     * @return String
+     */
+    private String arrayToStringForView(List<String> values) {
+
+        // Construct a string from the ArrayList to put in the text view.
+        StringBuilder sb = new StringBuilder();
+
+        String delimiter = "";
+        for (String v : values) {
+            sb.append(delimiter).append(v);
+            delimiter = ", ";
+        }
+        String displayString = sb.toString();
+
+        return displayString;
     }
 
     //endregion

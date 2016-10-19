@@ -44,7 +44,7 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
     private static final int LOCATION_REQUEST_INTERVAL = 10000;
     private static final int LOCATION_REQUEST_FASTEST_INTERVAL = 5000;
     private static final int LOCATION_REQUEST_PRIORITY = LocationRequest.PRIORITY_HIGH_ACCURACY;
-    private boolean mRequestingLocationUpdates = true;
+    private boolean mRequestingLocationUpdates = false;
 
     /**
      * Location objects
@@ -257,7 +257,6 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
      */
     void stopLocationUpdates() {
         if (mRequestingLocationUpdates) {
-
             // Log that location updates are stopping, then stop tracking the user's location.
             Log.i(context.TAG,context.getString(R.string.location_updates_stop));
             mRequestingLocationUpdates = false;
@@ -280,6 +279,14 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
 
         // Update the calling context's text field showing the current accuracy
         context.updateGPSField();
+    }
+
+    //endregion
+
+    //region Getters and Setters
+
+    void setRequestingLocation(boolean request) {
+        this.mRequestingLocationUpdates = request;
     }
 
     //endregion

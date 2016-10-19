@@ -84,6 +84,8 @@
     <string name="note_name_tag">note</string>
     <string name="photo_name_tag">photo</string>
 
+    <string name="start_old_record">Starting activity to edit %1$s record</string>
+
     <!--Strings related to list pickers-->
     <string name="available_label">Available</string>
     <string name="selected_label">Selected</string>
@@ -116,6 +118,7 @@
     <string name="new_meas">New Measurement</string>
     <string name="new_note">New Note</string>
     <string name="new_photo">New Photo</string>
+    <string name="sync_string">Sync</string>
 
     <string name="parse_failure">Failed to parse date: %1$s</string>
 

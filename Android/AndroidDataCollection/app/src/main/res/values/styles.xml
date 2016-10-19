@@ -6,6 +6,8 @@
         <item name="colorPrimary">@color/darkBlue</item>
         <item name="colorPrimaryDark">@color/darkBlue</item>
         <item name="colorAccent">@color/darkBlue</item>
+        <item name="actionOverflowMenuStyle">@style/MyOverflowStyle</item>
+        <item name="android:actionOverflowButtonStyle">@style/MyOverflowButtonStyle</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -19,6 +21,21 @@
 
     <style name="MyTitleStyle" parent="TextAppearance.AppCompat.Title">
         <item name="android:textColor">@color/off_white</item>
+    </style>
+
+    <style name="MyOverflowStyle" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:textColor">@color/white</item>
+        <item name="overlapAnchor">false</item>
+        <item name="android:dropDownVerticalOffset">-4.0dip</item>
+        <item name="android:itemTextAppearance">@style/MyOverflowTextStyle</item>
+    </style>
+
+    <style name="MyOverflowTextStyle" parent="android:Theme.Holo.Light">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="MyOverflowButtonStyle" parent="android:Widget.Holo.ActionButton.Overflow">
+        <item name="android:color">@color/white</item>
     </style>
 
     <style name="MyTheme" parent="android:Theme.Holo.Light">

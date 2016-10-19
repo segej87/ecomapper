@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/new_meas"
+        android:title="@string/new_meas"
+        android:icon="@mipmap/meas_image" />
+
+    <item android:id="@+id/new_note"
+        android:title="@string/new_note"
+        android:icon="@mipmap/note_image"/>
+
+    <item android:id="@+id/new_photo"
+        android:title="@string/new_photo"
+        />
+
+    <item android:id="@+id/sync"
+        android:title="@string/sync_string" />
+
+    <item android:id="@+id/logout"
+        android:title="@string/logout_flag" />
+
+</menu>

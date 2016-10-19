@@ -7,14 +7,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Notebook extends AppCompatActivity {
 
@@ -35,6 +39,11 @@ public class Notebook extends AppCompatActivity {
      */
     private ListView listView;
 
+    /**
+     * The adapter for the list view.
+     */
+    NotebookArrayAdapter adapter;
+
     //endregion
 
     //region Initialization
@@ -48,38 +57,16 @@ public class Notebook extends AppCompatActivity {
         app = (MyApplication) this.getApplicationContext();
 
         //Set up the toolbar.
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.login_toolbar);
-        getLayoutInflater().inflate(R.layout.action_bar_notebook, myToolbar);
-        myToolbar.setTitle("");
-        setSupportActionBar(myToolbar);
+        setUpToolbar();
 
-        // Set the logged in text.
-        TextView loggedInText = (TextView) findViewById(R.id.action_bar_title);
-        loggedInText.setText(getString(R.string.logged_in_text_string,UserVars.UName));
-
-        // Set up the log out button.
-        Button mLogoutButton = (Button) findViewById(R.id.action_bar_logout);
-        mLogoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logoutButtonHandler();
-            }
-        });
-
-        // Set up the add new button.
-        Button mAddButton = (Button) findViewById(R.id.action_bar_add);
-        mAddButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                addButtonHandler();
-            }
-        });
-
+        // Set the list view from the layout.
         listView = (ListView) findViewById(R.id.recordsList);
 
         // Load saved records for this user. If any exist, load them into the app context.
         LoadRecordsTask loadRecordsTask = new LoadRecordsTask(this);
         loadRecordsTask.execute((Void) null);
+
+        setUpListViewListeners();
     }
 
     @Override
@@ -87,7 +74,137 @@ public class Notebook extends AppCompatActivity {
         super.onResume();
 
         // Set the list view's adapter to the custom adapter for displaying records.
-        setListAdapter();
+        setUpListViewAdapter();
+    }
+
+    //endregion
+
+    //region Menu Methods
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_notebook, menu);
+        return true;
+    }
+
+    /**
+     * Handles calls from the options menu
+     * @param item option
+     * @return result
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.new_meas:
+                goToNew("meas");
+                return true;
+            case R.id.new_note:
+                goToNew("note");
+                return true;
+            case R.id.new_photo:
+                goToNew("photo");
+                return true;
+            case R.id.logout:
+                logoutButtonHandler();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    //endregion
+
+    //region ListView Methods
+
+    /**
+     * Sets the adapter for the list view using the application's records list.
+     */
+    private void setUpListViewAdapter() {
+        adapter = new NotebookArrayAdapter(this, app.getRecords());
+        listView.setAdapter(adapter);
+    }
+
+    private void setUpListViewListeners() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Class outClass;
+
+                Record selected = (Record) parent.getAdapter().getItem(position);
+
+                Map<String, Object> props = selected.props;
+
+                String dt = (String) props.get("datatype");
+
+                Log.i(TAG,getString(R.string.start_old_record,dt));
+
+                switch (dt) {
+                    case "meas":
+                        outClass = NewMeas.class;
+                        break;
+                    case "note":
+                        outClass = NewNote.class;
+                        break;
+                    case "photo":
+                        outClass = NewPhoto.class;
+                        break;
+                    default:
+                        outClass = null;
+                        break;
+                }
+
+                goToOld(position, outClass);
+            }
+        });
+    }
+
+    //endregion
+
+    //region Navigation
+
+    /**
+     * Starts an activity to add a new record
+     * @param type datatype
+     */
+    private void goToNew(String type) {
+        Intent intent = new Intent();
+
+        switch(type) {
+            case "meas":
+                intent = new Intent(Notebook.this, NewMeas.class);
+                break;
+            case "photo":
+                intent = new Intent(Notebook.this, NewPhoto.class);
+                break;
+            case "note":
+                intent = new Intent(Notebook.this, NewNote.class);
+                break;
+        }
+
+        intent.putExtra("MODE", "new");
+
+        Log.i(TAG,getString(R.string.start_new_record,type));
+        startActivity(intent);
+    }
+
+    private void goToOld(int position, Class dest) {
+        if (dest != null) {
+            Intent intent = new Intent(Notebook.this, dest);
+            intent.putExtra("MODE", "old");
+            intent.putExtra("INDEX", position);
+            startActivity(intent);
+        }
+    }
+
+    /**
+     * A method to log out of the current user state and return to the login page.
+     */
+    private void logoutButtonHandler() {
+        LogOutTask saveLogin = new LogOutTask(this);
+        saveLogin.execute((Void) null);
     }
 
     //endregion
@@ -113,11 +230,11 @@ public class Notebook extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<Record> records) {
             if (records.size() > 0) {
-                app.addRecords(records);
+                app.replaceRecords(records);
             }
 
             // Set the list view's adapter to the custom adapter for displaying records.
-            setListAdapter();
+            setUpListViewAdapter();
         }
     }
 
@@ -126,27 +243,17 @@ public class Notebook extends AppCompatActivity {
     //region Helper Methods
 
     /**
-     * Sets the adapter for the list view using the application's records list.
+     * Sets up the activity's toolbar
      */
-    private void setListAdapter() {
-        NotebookArrayAdapter adapter = new NotebookArrayAdapter(this, app.getRecords());
-        listView.setAdapter(adapter);
-    }
+    private void setUpToolbar() {
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.login_toolbar);
+        getLayoutInflater().inflate(R.layout.action_bar_notebook, myToolbar);
+        myToolbar.setTitle("");
+        setSupportActionBar(myToolbar);
 
-    /**
-     * Handles calls to the add new button.
-     */
-    private void addButtonHandler(){
-        Intent intent = new Intent(Notebook.this, AddNew.class);
-        startActivity(intent);
-    }
-
-    /**
-     * A method to log out of the current user state and return to the login page.
-     */
-    private void logoutButtonHandler() {
-        LogOutTask saveLogin = new LogOutTask(this);
-        saveLogin.execute((Void) null);
+        // Set the logged in text.
+        TextView loggedInText = (TextView) findViewById(R.id.action_bar_title);
+        loggedInText.setText(getString(R.string.logged_in_text_string,UserVars.UName));
     }
 
     /**
@@ -200,7 +307,7 @@ public class Notebook extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            app.addRecords(new ArrayList<Record>());
+            app.replaceRecords(new ArrayList<Record>());
 
             ClearRecords clearRecords = new ClearRecords(context);
             clearRecords.execute((Void) null);
@@ -219,7 +326,7 @@ public class Notebook extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Void...params) {
-            return app.addRecords(new ArrayList<Record>());
+            return app.replaceRecords(new ArrayList<Record>());
         }
 
         @Override

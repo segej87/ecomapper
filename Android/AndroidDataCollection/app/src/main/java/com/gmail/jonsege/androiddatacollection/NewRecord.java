@@ -60,6 +60,11 @@ public abstract class NewRecord extends AppCompatActivity {
      */
     protected Record record;
 
+    /**
+     * The index of the record in the app's record list (for old records only
+     */
+    int recordIndex = -1;
+
     //endregion
 
     //region Initialization
@@ -85,12 +90,15 @@ public abstract class NewRecord extends AppCompatActivity {
                 // TODO: allow user to update datetime
                 dateTime = new Date();
 
+                // Tell the User Location class to get the user's location.
+                userLocation.setRequestingLocation(true);
+
                 // Build a Google API Client to connect to Play Services.
                 userLocation.buildGoogleApiClient();
                 break;
             case "old":
                 // Get the index of the record to load
-                int recordIndex = intent.getIntExtra("INDEX",-1);
+                recordIndex = intent.getIntExtra("INDEX",-1);
 
                 // If the index is -1, return an error. Otherwise, load the record.
                 if (recordIndex == -1) {
@@ -98,6 +106,10 @@ public abstract class NewRecord extends AppCompatActivity {
                 } else {
                     record = app.getRecord(recordIndex);
                 }
+
+                // Tell the User Location class not to get the user's location.
+                userLocation.setRequestingLocation(false);
+
                 break;
         }
     }
@@ -257,8 +269,13 @@ public abstract class NewRecord extends AppCompatActivity {
             // If success, add the record to the list, save the list, and finish the activity.
             if (result) {
 
-                // Add the new record to the application's list.
-                app.addRecord(record);
+                if (recordIndex == -1) {
+                    // Add the new record to the application's list.
+                    app.addRecord(record);
+                } else {
+                    // Replace the existing record with the edited one.
+                    app.replaceRecord(recordIndex, record);
+                }
 
                 // Save the application's list to device storage and log.
                 String saveResult = DataIO.saveRecords(this.context, app.getRecords());

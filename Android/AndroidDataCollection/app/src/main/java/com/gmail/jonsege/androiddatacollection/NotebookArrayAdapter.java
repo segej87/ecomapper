@@ -47,16 +47,26 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
     // Get and populate the adapter's list view row.
     @Override
     @NonNull public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        View rowView;
+
+        ViewHolderItem viewHolder;
 
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             // Use the custom notebook row layout.
-            rowView = inflater.inflate(R.layout.notebook_row, parent, false);
+            convertView = inflater.inflate(R.layout.notebook_row, parent, false);
+
+            // Set up the view holder
+            viewHolder = new ViewHolderItem();
+            viewHolder.imageView = (ImageView) convertView.findViewById(R.id.icon);
+            viewHolder.titleView = (TextView) convertView.findViewById(R.id.firstLine);
+            viewHolder.dateLine = (TextView) convertView.findViewById(R.id.secondLine);
+            viewHolder.thirdLine = (TextView) convertView.findViewById(R.id.thirdLine);
+
+            convertView.setTag(viewHolder);
         } else {
-            rowView = convertView;
+            viewHolder = (ViewHolderItem) convertView.getTag();
         }
 
         // Get properties from the data source.
@@ -65,9 +75,6 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
         // Get the current record type from the data source.
         String dt = props.get("datatype").toString();
 
-        // Fill the image view with the record's photo or with defaults.
-        ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
-
         // If the photo path is not null or blank, get it at attempt to set the image view.
         String photoPath = records.get(position).photoPath;
         if (photoPath != null && !photoPath.equals("")) {
@@ -75,7 +82,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
 
             if (imgFile.exists()) {
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                imageView.setImageBitmap(myBitmap);
+                viewHolder.imageView.setImageBitmap(myBitmap);
             }
         } else {
             int resource = 0;
@@ -89,31 +96,42 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
                     break;
             }
 
-            imageView.setImageResource(resource);
+            viewHolder.imageView.setImageResource(resource);
         }
 
         // Fill the first line with the record's name.
-        TextView titleView = (TextView) rowView.findViewById(R.id.firstLine);
-        titleView.setText(props.get("name").toString());
+        viewHolder.titleView.setText(props.get("name").toString());
 
         // fill the second line with the record's datetime
-        TextView dateLine = (TextView) rowView.findViewById(R.id.secondLine);
-        dateLine.setText(props.get("datetime").toString());
+        viewHolder.dateLine.setText(props.get("datetime").toString());
 
         // fill the third line
-        TextView thirdLine = (TextView) rowView.findViewById(R.id.thirdLine);
         if (dt.equals("meas")) {
             String spec = props.get("species").toString();
             String val = props.get("value").toString();
             String uni = props.get("units").toString();
-            thirdLine.setText(spec + ": " + val + " " + uni);
+            viewHolder.thirdLine.setText(spec + ": " + val + " " + uni);
         } else {
             @SuppressWarnings("unchecked") List<String> tagsList = (List<String>) props.get("tags");
-            thirdLine.setText(TextUtils.join(", ", tagsList));
+            viewHolder.thirdLine.setText(TextUtils.join(", ", tagsList));
         }
 
-        return rowView;
+        return convertView;
     }
 
     //endregion
+
+    //region View Holder
+
+    /**
+     * Caches the views in each row
+     */
+    static class ViewHolderItem {
+        ImageView imageView;
+        TextView titleView;
+        TextView dateLine;
+        TextView thirdLine;
+    }
+
+    //
 }
