@@ -9,6 +9,9 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+
+        // Enabling multidex support.
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -31,7 +34,7 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.android.support:design:23.2.1'
-    compile 'jdbc:jdbc:2.0'
     compile 'com.google.android.gms:play-services:9.6.1'
+    compile 'com.android.support:multidex:1.0.1'
+    compile 'org.jetbrains:annotations-java5:15.0'
 }

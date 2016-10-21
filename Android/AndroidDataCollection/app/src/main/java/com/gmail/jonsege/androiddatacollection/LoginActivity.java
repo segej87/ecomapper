@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.graphics.Color;
-import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
@@ -12,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -50,8 +51,8 @@ public class LoginActivity extends AppCompatActivity {
     /**
      * UI references.
      */
-    private TextInputEditText mUsernameView;
-    private TextInputEditText mPasswordView;
+    private EditText mUsernameView;
+    private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -70,9 +71,9 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
         // Set up the login form.
-        mUsernameView = (TextInputEditText) findViewById(R.id.username);
+        mUsernameView = (EditText) findViewById(R.id.username);
 
-        mPasswordView = (TextInputEditText) findViewById(R.id.password);
+        mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -264,8 +265,8 @@ public class LoginActivity extends AppCompatActivity {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
                     mPasswordView.requestFocus();
                 } else if (result.contains(getString(R.string.server_username_error))) {
-                    mPasswordView.setError(getString(R.string.error_username_not_found));
-                    mPasswordView.requestFocus();
+                    mUsernameView.setError(getString(R.string.error_username_not_found));
+                    mUsernameView.requestFocus();
                 }
 
             }
@@ -299,22 +300,23 @@ public class LoginActivity extends AppCompatActivity {
             mAuthTask = null;
             showProgress(false);
 
-            boolean setListResult = DataIO.setLists(LoginActivity.this, result);
+            boolean meshListResult = DataIO.meshUserVars(LoginActivity.this, result);
 
-            if (setListResult && !(result.startsWith(getString(R.string.server_error_string)))) {
+            if (meshListResult && !(result.startsWith(getString(R.string.server_error_string)))) {
                 //TODO: Move to background thread
                 String loginResult = saveLogin(uuid);
 
                 if (loginResult.contains(getString(R.string.io_success))) {
                     Log.i(TAG,getString(R.string.new_login_log,uuid));
+                    String userVarsResult = DataIO.saveUserVars(LoginActivity.this);
                     moveToNotebook();
                 } else {
                     showError(loginResult);
                 }
-            } else if (!setListResult) {
+            } else if (!meshListResult) {
                 showError(getString(R.string.save_user_vars_failure));
             }else {
-                if (setListResult && result.contains(getString(R.string.server_connection_error))) {
+                if (meshListResult && result.contains(getString(R.string.server_connection_error))) {
                     showError(getString(R.string.internet_failure_title));
                 }
                 //TODO: Add possible returned errors.
@@ -368,6 +370,9 @@ public class LoginActivity extends AppCompatActivity {
         } else if (title.contains(getString(R.string.load_login_failure))) {
             showTitle = getString(R.string.load_login_failure);
             message = title;
+        } else if (title.contains(getString(R.string.save_user_vars_failure))) {
+            showTitle = getString(R.string.general_error_title);
+            message = getString(R.string.save_user_vars_failure);
         }
 
         AlertDialog.Builder intAlert = new AlertDialog.Builder(this);

@@ -17,6 +17,7 @@
         <TextView
             android:id="@+id/action_bar_title"
             style="@style/ActionBarButtonWhite"
+            android:textSize="@dimen/text_size_smallest"
             android:text="@string/logged_in_text_string"
             android:layout_weight="1"
             />

@@ -13,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:title=""
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
@@ -24,8 +23,7 @@
         android:layout_below="@id/new_toolbar"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin">
+        android:layout_marginEnd="@dimen/activity_horizontal_margin">
 
         <LinearLayout
             android:id="@+id/meas_linear_layout"
@@ -37,6 +35,7 @@
                 android:id="@+id/nameTextField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="10dp"
                 android:textSize="@dimen/font_default_size"
                 android:gravity="center_horizontal|center_vertical"
                 android:hint="@string/enter_name_hint"
@@ -46,7 +45,8 @@
             <Button
                 android:id="@+id/defaultNameButton"
                 android:layout_width="wrap_content"
-                android:layout_height="35dp"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
                 android:layout_gravity="center_horizontal"
                 android:textSize="@dimen/font_default_size"
                 android:text="@string/default_name_button"/>
@@ -63,13 +63,14 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:gravity="end|center">
 
                 <TextView
                     android:id="@+id/accessTextField"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
+                    android:padding="5dp"
                     android:gravity="center_horizontal|center_vertical"
                     android:textSize="@dimen/font_default_size"
                     android:text="@string/access_hint"
@@ -78,15 +79,16 @@
 
                 <Button
                     android:id="@+id/accessPickerButton"
+                    android:textSize="@dimen/text_size_medium"
                     android:text="@string/add_button_string"
-                    android:layout_width="23dp"
-                    android:layout_height="30dp"
+                    android:layout_width="30dp"
+                    android:layout_height="36dp"
+                    android:textAlignment="center"
                     style="@style/Widget.AppCompat.Button.Small"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:padding="0dp"
                     android:layout_weight="0.01" />
             </LinearLayout>
-
 
             <TextView
                 android:layout_width="match_parent"
@@ -95,12 +97,13 @@
                 android:gravity="center_horizontal|center_vertical"
                 android:textSize="@dimen/font_header_size"
                 android:textColor="@color/darkBlue"
-                android:text="@string/note_header"/>
+                android:text="@string/note_header_required"/>
 
             <EditText
                 android:id="@+id/notesTextField"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
+                android:padding="10dp"
                 android:textSize="@dimen/font_default_size"
                 android:gravity="start|top"
                 android:background="?attr/actionModeBackground"
@@ -111,20 +114,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
                 android:gravity="center_horizontal|center_vertical"
-                android:textSize="@dimen/font_header_size"
+                android:textSize="@dimen/text_size_medium"
                 android:textColor="@color/darkBlue"
                 android:text="@string/tags_header"/>
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:gravity="end|center">
 
                 <TextView
                     android:id="@+id/tagTextField"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
+                    android:padding="5dp"
                     android:gravity="center_horizontal|center_vertical"
                     android:textSize="@dimen/font_default_size"
                     android:text="@string/tags_hint"
@@ -133,9 +137,10 @@
 
                 <Button
                     android:id="@+id/tagPickerButton"
+                    android:textSize="@dimen/text_size_medium"
                     android:text="@string/add_button_string"
-                    android:layout_width="23dp"
-                    android:layout_height="30dp"
+                    android:layout_width="30dp"
+                    android:layout_height="36dp"
                     style="@style/Widget.AppCompat.Button.Small"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:padding="0dp"
@@ -149,7 +154,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="25dp"
                 android:gravity="center_horizontal|center_vertical"
-                android:textSize="@dimen/font_default_size"
+                android:textSize="@dimen/text_size_small"
                 android:text="@string/gps_acc_starter" />
         </LinearLayout>
     </ScrollView>

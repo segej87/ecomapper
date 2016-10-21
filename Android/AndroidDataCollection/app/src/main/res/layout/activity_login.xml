@@ -38,11 +38,7 @@
             android:background="@mipmap/login_image"
             android:paddingBottom="91dp">
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <android.support.design.widget.TextInputEditText
+                <EditText
                     android:id="@+id/username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -51,18 +47,15 @@
                     android:inputType="textNoSuggestions"
                     android:background="?attr/actionModeBackground"
                     android:alpha="0.75"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:layout_marginLeft="25dp"
                     android:layout_marginRight="25dp"
+                    android:textSize="@dimen/text_size_medium"
                     android:textAlignment="center"
-                    android:gravity="center_vertical|center_horizontal" />
+                    android:gravity="center_vertical|center_horizontal"
+                    android:singleLine="true" />
 
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <android.support.design.widget.TextInputEditText
+                <EditText
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -74,12 +67,12 @@
                     android:maxLines="1"
                     android:background="?attr/actionModeBackground"
                     android:alpha="0.75"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:layout_marginLeft="25dp"
                     android:layout_marginRight="25dp"
+                    android:textSize="@dimen/text_size_medium"
                     android:textAlignment="center"
                     android:gravity="center_vertical|center_horizontal" />
-
-            </android.support.design.widget.TextInputLayout>
 
             <Button
                 android:id="@+id/email_sign_in_button"

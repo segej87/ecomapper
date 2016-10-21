@@ -3,15 +3,18 @@ package com.gmail.jonsege.androiddatacollection;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -44,6 +47,11 @@ public class Notebook extends AppCompatActivity {
      */
     NotebookArrayAdapter adapter;
 
+    /**
+     * For using a context menu to delete a record.
+     */
+    Record choppingBlock;
+
     //endregion
 
     //region Initialization
@@ -67,6 +75,9 @@ public class Notebook extends AppCompatActivity {
         loadRecordsTask.execute((Void) null);
 
         setUpListViewListeners();
+
+        // Register the list view for context menu.
+        registerForContextMenu(listView);
     }
 
     @Override
@@ -109,9 +120,40 @@ public class Notebook extends AppCompatActivity {
             case R.id.logout:
                 logoutButtonHandler();
                 return true;
+            case R.id.sync:
+                AttemptSync syncTask = new AttemptSync();
+                syncTask.execute();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.recordsList) {
+            ListView lv = (ListView) v;
+            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            choppingBlock = (Record) lv.getItemAtPosition(acmi.position);
+
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.context_menu_notebook,menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        if (choppingBlock != null) {
+            boolean deleted = DataIO.deleteRecord(this, choppingBlock);
+            if (deleted) {
+                adapter.notifyDataSetChanged();
+                choppingBlock = null;
+            }
+        }
+
+        return false;
     }
 
     //endregion
@@ -335,6 +377,24 @@ public class Notebook extends AppCompatActivity {
         }
     }
 
+    public class AttemptSync extends AsyncTask<Void, Void, Boolean> {
+        AttemptSync() {
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void...params) {
+            return DataIO.attemptSync(Notebook.this);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                Log.i(TAG, "Records successfully synced");
+            }
+        }
+    }
+
     /**
     *A method to delete the saved records file. Should be deleted after testing.
      */
@@ -345,6 +405,14 @@ public class Notebook extends AppCompatActivity {
             Log.i(TAG, getString(R.string.file_deleted_success,deleteFile.getAbsolutePath()));
         } else {
             Log.i(TAG, getString(R.string.file_deleted_failure,deleteFile.getAbsolutePath()));
+        }
+
+        File deleteFile2 = new File(this.getFilesDir(), UserVars.UserVarsSaveFileName);
+        boolean deleted2 = deleteFile2.delete();
+        if (deleted2) {
+            Log.i(TAG, getString(R.string.file_deleted_success,deleteFile2.getAbsolutePath()));
+        } else {
+            Log.i(TAG, getString(R.string.file_deleted_failure,deleteFile2.getAbsolutePath()));
         }
     }
 

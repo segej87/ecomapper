@@ -28,7 +28,7 @@ public class NewPhoto extends NewRecord {
      * Finishes the NewPhoto activity
      */
     @Override
-    void moveToAddNew() {
+    void moveToNotebook() {
         super.finish();
         this.finish();
     }
@@ -41,6 +41,14 @@ public class NewPhoto extends NewRecord {
     //endregion
 
     //region UI Methods
+
+    /**
+     * Sets up the UI fields in the activity
+     */
+    @Override
+    @SuppressWarnings("unchecked") void setUpFields () {
+
+    }
 
     /**
      * Changes the accuracy text field to show the current location accuracy
@@ -66,12 +74,9 @@ public class NewPhoto extends NewRecord {
 
     //region Helper Methods
 
-    /**
-     * Sets up the UI fields in the activity
-     */
     @Override
-    @SuppressWarnings("unchecked") void setUpFields () {
-
+    boolean checkRequiredData() {
+        return false;
     }
 
     //endregion

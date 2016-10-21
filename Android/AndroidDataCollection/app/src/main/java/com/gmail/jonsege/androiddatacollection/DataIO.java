@@ -10,11 +10,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -118,6 +122,59 @@ final class DataIO {
 
     //region User Variables
 
+    static boolean meshUserVars(Context context, String result) {
+        try {
+
+            // First, try to load saved user variables, if they exist.
+            String loadResult = loadUserVars(context);
+
+            // If a saved UserVars file could not be loaded, pass the context and
+            // json result directly to the set list method.
+            if (!loadResult.contains(context.getString(R.string.io_success))) {
+                setLists(context, result);
+                return true;
+            }
+
+            // Try to decode the list server's response as a JSON string.
+            JSONObject jObject = new JSONObject(result);
+
+            // Add access levels to User Variables only if they aren't already there.
+            JSONArray accessArray = jObject.getJSONArray("institutions");
+            for (int i = 0; i < accessArray.length(); i++) {
+                if (!UserVars.AccessLevels.contains(accessArray.getString(i))) {
+                    UserVars.AccessLevels.add(accessArray.getString(i));
+                }
+            }
+
+            // For lists pulled from the server, tag each as server and 0 count.
+            Object[] addArray = createUserVarAddArray("Server");
+
+            // Put values from each JSON Array into the appropriate maps.
+            JSONArray tagsArray = jObject.getJSONArray("tags");
+            for (int i = 0; i < tagsArray.length(); i++) {
+                UserVars.Tags.put(tagsArray.getString(i),addArray);
+            }
+
+            JSONArray specArray = jObject.getJSONArray("species");
+            for (int i = 0; i < specArray.length(); i++) {
+                UserVars.Species.put(specArray.getString(i),addArray);
+            }
+
+            JSONArray unitArray = jObject.getJSONArray("units");
+            for (int i = 0; i < unitArray.length(); i++) {
+                UserVars.Units.put(unitArray.getString(i),addArray);
+            }
+
+            return true;
+        } catch (JSONException e) {
+
+            // Log the error.
+            Log.i(TAG,context.getString(R.string.json_decode_error,e.getLocalizedMessage()));
+        }
+
+        return false;
+    }
+
     /**
      * Saves the user variables to a shared preferences file
      * @param context context
@@ -154,13 +211,14 @@ final class DataIO {
 
         // Write the JSON object to the output file
         try {
-
             // Open the output stream and write the object's data.
             os = context.openFileOutput(UserVars.UserVarsSaveFileName,Context.MODE_PRIVATE);
             os.write(jsonObject.toString().getBytes());
 
             // Close the output stream
             os.close();
+
+            Log.i(TAG,context.getString(R.string.user_vars_save_success,jsonObject.toString(),UserVars.UserVarsSaveFileName));
 
             // Return a report.
             return context.getString(R.string.io_success) + ": " + UserVars.UserVarsSaveFileName;
@@ -238,6 +296,185 @@ final class DataIO {
 
         // Return a report.
         return context.getString(R.string.load_user_vars_failure, errorString);
+    }
+
+    /**
+     * Updates and save user variables when a new record is added, or a record is modified
+     * @param context
+     *      The calling context
+     * @param record
+     *      The record to check for user variable updates
+     * @return
+     *      Returns true if the user variables were updated successfully
+     */
+    @SuppressWarnings("unchecked") static boolean addUserVars(Context context, Record record) {
+        Map<String, Object> props = record.props;
+
+        String dt = props.get("datatype").toString();
+
+        Object[] addArray = createUserVarAddArray("Local");
+
+        try {
+            List<String> newTags = (List<String>) props.get("tags");
+
+            for (String t : newTags) {
+                if (!UserVars.Tags.keySet().contains(t)) {
+                    UserVars.Tags.put(t, addArray);
+                    Log.i(TAG, context.getString(R.string.add_new_user_var_entry, "tag", t));
+                } else {
+                    String tagFlag = UserVars.Tags.get(t)[0].toString();
+                    if (tagFlag.equals("Local")) {
+                        int oldCount = (int) UserVars.Tags.get(t)[1];
+                        int newCount = oldCount + 1;
+
+                        Object[] setArray = new Object[2];
+                        setArray[0] = "Local";
+                        setArray[1] = newCount;
+
+                        UserVars.Tags.put(t, setArray);
+                    }
+                }
+            }
+
+            if (dt.equals("meas")) {
+                String newSpec = props.get("species").toString();
+
+                if (!UserVars.Species.keySet().contains(newSpec)) {
+                    UserVars.Species.put(newSpec, addArray);
+                    Log.i(TAG, context.getString(R.string.add_new_user_var_entry, "species", newSpec));
+                } else {
+                    String specFlag = UserVars.Species.get(newSpec)[0].toString();
+                    if (specFlag.equals("Local")) {
+                        int oldCount2 = (int) UserVars.Species.get(newSpec)[1];
+                        int newCount2 = oldCount2 + 1;
+
+                        Object[] setArray2 = new Object[2];
+                        setArray2[0] = "Local";
+                        setArray2[1] = newCount2;
+
+                        UserVars.Species.put(newSpec, setArray2);
+                    }
+                }
+
+                String newUnit = props.get("units").toString();
+
+                if (!UserVars.Units.keySet().contains(newUnit)) {
+                    UserVars.Units.put(newUnit, addArray);
+                    Log.i(TAG, context.getString(R.string.add_new_user_var_entry, "units", newUnit));
+                } else {
+                    String unitFlag = UserVars.Units.get(newUnit)[0].toString();
+                    if (unitFlag.equals("Local")) {
+                        int oldCount3 = (int) UserVars.Units.get(newUnit)[1];
+                        int newCount3 = oldCount3 + 1;
+
+                        Object[] setArray3 = new Object[2];
+                        setArray3[0] = "Local";
+                        setArray3[1] = newCount3;
+
+                        UserVars.Units.put(newUnit, setArray3);
+                    }
+                }
+            }
+
+            saveUserVars(context);
+            return true;
+        } catch (Exception e) {
+            Log.i(TAG, context.getString(R.string.general_error_prefix, e.getLocalizedMessage()));
+        }
+
+        return false;
+    }
+
+    /**
+     * Updates and save user variables when a record is removed
+     * @param context
+     *      The calling context
+     * @param record
+     *      The record that is being removed
+     * @return
+     *      Returns true if the user variables were updated successfully
+     */
+    @SuppressWarnings("unchecked") static boolean removeUserVars(Context context, Record record) {
+
+        Map<String, Object> props = record.props;
+
+        String dt = props.get("datatype").toString();
+
+        try {
+            List<String> newTags = (List<String>) props.get("tags");
+
+            for (String t : newTags) {
+                if (!UserVars.Tags.keySet().contains(t)) {
+                    Log.i(TAG, context.getString(R.string.general_error_report));
+                } else {
+                    if (UserVars.Tags.get(t)[0].toString().equals("Local")) {
+                        int oldCount = (int) UserVars.Tags.get(t)[1];
+                        if (oldCount == 1) {
+                            UserVars.Tags.remove(t);
+                        } else {
+                            int newCount = oldCount - 1;
+
+                            Object[] newArray = new Object[2];
+                            newArray[0] = "Local";
+                            newArray[1] = newCount;
+
+                            UserVars.Tags.put(t, newArray);
+                        }
+                    }
+                }
+            }
+
+            if (dt.equals("meas")) {
+                String newSpec = props.get("species").toString();
+
+                if (!UserVars.Species.keySet().contains(newSpec)) {
+                    Log.i(TAG, context.getString(R.string.general_error_report));
+                } else {
+                    if (UserVars.Species.get(newSpec)[0].toString().equals("Local")) {
+                        int oldCount2 = (int) UserVars.Species.get(newSpec)[1];
+                        if (oldCount2 == 1) {
+                            UserVars.Species.remove(newSpec);
+                        } else {
+                            int newCount2 = oldCount2 - 1;
+
+                            Object[] newArray2 = new Object[2];
+                            newArray2[0] = "Local";
+                            newArray2[1] = newCount2;
+
+                            UserVars.Species.put(newSpec, newArray2);
+                        }
+                    }
+                }
+
+                String newUnit = props.get("units").toString();
+
+                if (!UserVars.Units.keySet().contains(newUnit)) {
+                    Log.i(TAG, context.getString(R.string.general_error_report));
+                } else {
+                    if (UserVars.Units.get(newUnit)[0].toString().equals("Local")) {
+                        int oldCount3 = (int) UserVars.Units.get(newUnit)[1];
+                        if (oldCount3 == 1) {
+                            UserVars.Units.remove(newUnit);
+                        } else {
+                            int newCount3 = oldCount3 - 1;
+
+                            Object[] newArray3 = new Object[2];
+                            newArray3[0] = "Local";
+                            newArray3[1] = newCount3;
+
+                            UserVars.Units.put(newUnit, newArray3);
+                        }
+                    }
+                }
+            }
+
+            saveUserVars(context);
+            return true;
+        } catch (Exception e) {
+            Log.i(TAG, context.getString(R.string.general_error_prefix, e.getLocalizedMessage()));
+        }
+
+        return false;
     }
 
     /**
@@ -321,24 +558,15 @@ final class DataIO {
         return result;
     }
 
-    /**
-     * Loads records from JSON data from af ile in the application's data folder
-     * @param context context
-     * @return records
-     */
-    static List<Record> loadRecords(Context context) {
-
-        // The list to hold records to return.
-        List<Record> recordsOut = new ArrayList<>();
-
-        // A string to read data from the file.
-        StringBuilder dataString = new StringBuilder();
-
+    static JSONObject loadFullRecordsFile(Context context) {
         // A JSON Object to decode data from the file.
-        JSONObject jResult;
+        JSONObject jResult = null;
 
         // The file containing the record data.
         File recFile = new File(context.getFilesDir(),UserVars.RecordsSaveFileName);
+
+        // A string to read data from the file.
+        StringBuilder dataString = new StringBuilder();
 
         try {
 
@@ -356,70 +584,117 @@ final class DataIO {
             // Decode the result string using a JSON Object.
             jResult = new JSONObject(dataString.toString());
 
-            // Read the records from the JSON Object as a JSON Array.
-            JSONArray recJArray = (JSONArray) jResult.get("features");
-
-            // Log that n records are being loaded
-            Log.i(TAG,context.getString(R.string.load_record_report,recJArray.length()));
-
-            // Loop through the records in the features array.
-            for (int i=0; i<recJArray.length(); i++) {
-                JSONObject rec = (JSONObject) recJArray.get(i);
-
-                // Read the geometry key from the record.
-                JSONObject geom = (JSONObject) rec.get("geometry");
-
-                // Get the record type.
-                String type = geom.get("type").toString();
-
-                // Read the coordinates from the geometry object and add to the coordinates array.
-                JSONArray coords = (JSONArray) geom.get("coordinates");
-                Double[] coordsOut = new Double[coords.length()];
-                for (int j=0; j<coords.length(); j++) {
-                    coordsOut[j] = Double.valueOf(coords.get(j).toString());
-                }
-
-                // Read the properties of the record as a JSON Object.
-                JSONObject props = (JSONObject) rec.get("properties");
-
-                // Iterate over the JSON Object's keyset
-                Iterator<String> iter = props.keys();
-                Map<String, Object> propsOut = new HashMap<>();
-                while (iter.hasNext()) {
-                    String k = iter.next();
-
-                    // Get the property using the current keyset value.
-                    Object prop = props.get(k);
-
-                    if (prop instanceof JSONArray) {
-
-                        // If the property is a JSON array, put the property into a List.
-                        List<String> propArray = new ArrayList<>();
-                        for (int l=0; l<((JSONArray) prop).length(); l++) {
-                            propArray.add(((JSONArray) prop).get(l).toString());
-                        }
-                        propsOut.put(k, propArray);
-                    } else {
-
-                        // If the property is not a JSON array, read it as a string.
-                        propsOut.put(k, prop);
-                    }
-                }
-
-                // Finish the iteration
-                iter.remove();
-
-                // Add the decoded record to the list to return.
-                recordsOut.add(new Record(context, type, coordsOut, null, propsOut));
-            }
+            return jResult;
         } catch (Exception e) {
 
             // Log an error.
             Log.i(TAG,context.getString(R.string.load_record_failure,e.getLocalizedMessage()));
         }
 
+        return jResult;
+    }
+
+    /**
+     * Loads records from JSON data from af ile in the application's data folder
+     * @param context context
+     * @return records
+     */
+    static List<Record> loadRecords(Context context) {
+
+        // The list to hold records to return.
+        List<Record> recordsOut = new ArrayList<>();
+
+        // Try to load the records from the save file.
+        JSONObject jResult = loadFullRecordsFile(context);
+
+        if (jResult != null) {
+            try {
+
+                // Read the records from the JSON Object as a JSON Array.
+                JSONArray recJArray = (JSONArray) jResult.get("features");
+
+                // Log that n records are being loaded
+                Log.i(TAG, context.getString(R.string.load_record_report, recJArray.length()));
+
+                // Loop through the records in the features array.
+                for (int i = 0; i < recJArray.length(); i++) {
+                    JSONObject rec = (JSONObject) recJArray.get(i);
+
+                    // Read the geometry key from the record.
+                    JSONObject geom = (JSONObject) rec.get("geometry");
+
+                    // Get the record type.
+                    String type = geom.get("type").toString();
+
+                    // Read the coordinates from the geometry object and add to the coordinates array.
+                    JSONArray coords = (JSONArray) geom.get("coordinates");
+                    Double[] coordsOut = new Double[coords.length()];
+                    for (int j = 0; j < coords.length(); j++) {
+                        coordsOut[j] = Double.valueOf(coords.get(j).toString());
+                    }
+
+                    // Read the properties of the record as a JSON Object.
+                    JSONObject props = (JSONObject) rec.get("properties");
+
+                    // Iterate over the JSON Object's keyset
+                    Iterator<String> iter = props.keys();
+                    Map<String, Object> propsOut = new HashMap<>();
+                    while (iter.hasNext()) {
+                        String k = iter.next();
+
+                        // Get the property using the current keyset value.
+                        Object prop = props.get(k);
+
+                        if (prop instanceof JSONArray) {
+
+                            // If the property is a JSON array, put the property into a List.
+                            List<String> propArray = new ArrayList<>();
+                            for (int l = 0; l < ((JSONArray) prop).length(); l++) {
+                                propArray.add(((JSONArray) prop).get(l).toString());
+                            }
+                            propsOut.put(k, propArray);
+                        } else {
+
+                            // If the property is not a JSON array, read it as a string.
+                            propsOut.put(k, prop);
+                        }
+                    }
+
+                    // Finish the iteration
+                    iter.remove();
+
+                    // Add the decoded record to the list to return.
+                    recordsOut.add(new Record(context, type, coordsOut, null, propsOut));
+                }
+            } catch (Exception e) {
+
+                // Log an error.
+                Log.i(TAG, context.getString(R.string.load_record_failure, e.getLocalizedMessage()));
+            }
+        }
+
         // Return the records list.
         return recordsOut;
+    }
+
+    static boolean deleteRecord(Context context, Record record) {
+        MyApplication app = (MyApplication) context.getApplicationContext();
+
+        boolean deleted = app.deleteRecord(record);
+
+        if (deleted) {
+            boolean updated = removeUserVars(context, record);
+
+            if (updated) {
+                String saveResult = saveRecords(context, app.getRecords());
+
+                if (saveResult.contains(context.getString(R.string.io_success))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     //endregion
@@ -503,6 +778,18 @@ final class DataIO {
 
         // Return the Map (or null if an error occurred).
         return outMap;
+    }
+
+    @org.jetbrains.annotations.Contract(pure = true)
+    private static Object[] createUserVarAddArray(String mode) {
+        Object[] addArray = new Object[2];
+        addArray[0] = mode;
+        if (mode.equals("Server")) {
+            addArray[1] = 0;
+        } else if (mode.equals("Local")) {
+            addArray[1] = 1;
+        }
+        return addArray;
     }
 
     //endregion
@@ -600,9 +887,7 @@ final class DataIO {
             }
 
             // For lists pulled from the server, tag each as server and 0 count.
-            Object[] addArray = new Object[2];
-            addArray[0] = "Server";
-            addArray[1] = 0;
+            Object[] addArray = createUserVarAddArray("Server");
 
             // Put values from each JSON Array into the appropriate maps.
             JSONArray tagsArray = jObject.getJSONArray("tags");
@@ -628,6 +913,76 @@ final class DataIO {
         }
 
         return false;
+    }
+
+    static boolean attemptSync(Context context) {
+        String response;
+
+        // The URL for the PHP script to retrieve lists from the server.
+        final String addURL = context.getString(R.string.php_server_root) + context.getString(R.string.php_add_records);
+
+        JSONObject jsonObject = loadFullRecordsFile(context);
+
+        // Parameters for the server request.
+        Map<String,Object> pars = new LinkedHashMap<>();
+        pars.put("GUID", UserVars.UUID);
+        pars.put("geojson", jsonObject.toString());
+
+        try {
+            StringBuilder postData = new StringBuilder();
+
+            // Loop through the server request parameters.
+            for (Map.Entry<String,Object> par : pars.entrySet()) {
+
+                // Append & before adding another parameter if necessary
+                if (postData.length() != 0) postData.append('&');
+
+                // Append the parameter name and set it equal to the parameter value.
+                postData.append(URLEncoder.encode(par.getKey(), "UTF-8"));
+                postData.append('=');
+                postData.append(URLEncoder.encode(String.valueOf(par.getValue()), "UTF-8"));
+            }
+
+            Log.i(TAG,postData.toString());
+
+            // Create a data array of the request string.
+            byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+
+            //TODO: Check for internet connection. If not return error.
+
+            // Create a connection to the list retrieve URL.
+            URL url = new URL(addURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            // Set up the request to the connection.
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty( "Content-Length", String.valueOf(postDataBytes.length));
+            conn.setDoOutput(true);
+            conn.getOutputStream().write(postDataBytes);
+
+            // Get the input stream from the server response.
+            Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+            // Read the server's response into a string builder.
+            StringBuilder sb = new StringBuilder();
+            for (int c; (c = in.read()) >= 0;)
+                sb.append((char)c);
+            response = sb.toString();
+
+            // Disconnect.
+            conn.disconnect();
+
+        } catch (Exception e) {
+
+            // Fill the response string with the error message.
+            response = context.getString(R.string.server_connection_error, e.getLocalizedMessage());
+        }
+
+        // Log the server's response.
+        Log.i(TAG,context.getString(R.string.list_server_response,response));
+
+        return response.contains("Success!");
     }
 
     //endregion

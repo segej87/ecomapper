@@ -259,7 +259,6 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
         if (mRequestingLocationUpdates) {
             // Log that location updates are stopping, then stop tracking the user's location.
             Log.i(context.TAG,context.getString(R.string.location_updates_stop));
-            mRequestingLocationUpdates = false;
             LocationServices.FusedLocationApi.removeLocationUpdates(
                     mGoogleApiClient, this);
         }
@@ -270,8 +269,8 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
         //TODO: warn user if location changes by more than accuracy
 
         // Set the calling context's location array using the new location
-        context.userLoc[0] = location.getLongitude();
-        context.userLoc[1] = location.getLatitude();
+        context.userLoc[0] = location.getLatitude();
+        context.userLoc[1] = location.getLongitude();
         context.userLoc[2] = location.getAltitude();
 
         // Set the calling context's accuracy variable using the new location

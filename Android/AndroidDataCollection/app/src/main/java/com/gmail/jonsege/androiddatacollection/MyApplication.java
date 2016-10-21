@@ -1,6 +1,8 @@
 package com.gmail.jonsege.androiddatacollection;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -25,6 +27,12 @@ public class MyApplication extends Application {
     private List<Record> records = new ArrayList<>();
 
     //endregion
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
+    }
 
     //region Getters and Setters
 
@@ -86,6 +94,17 @@ public class MyApplication extends Application {
      */
     public void replaceRecord(int index, Record record) {
         this.records.set(index, record);
+    }
+
+    public boolean deleteRecord(Record record) {
+        try {
+            this.records.remove(record);
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG,getString(R.string.general_error_prefix,e.getLocalizedMessage()));
+        }
+
+        return false;
     }
 
     //endregion

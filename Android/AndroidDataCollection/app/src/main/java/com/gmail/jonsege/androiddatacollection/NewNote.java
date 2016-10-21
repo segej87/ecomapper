@@ -46,12 +46,20 @@ public class NewNote extends NewRecord {
         // Initialize the text fields and set hints if necessary.
         setUpFields();
 
+        // Set up the picker buttons
+        setUpPickerButtons();
+
         // Set up the default name button
         Button mDefaultNameButton = (Button) findViewById(R.id.defaultNameButton);
         mDefaultNameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mNameTextField.getError() != null) {
+                    mNameTextField.setError(null);
+                }
+
                 mNameTextField.setText(setDefaultName("Note"));
+                mNameTextField.clearFocus();
             }
         });
 
@@ -69,7 +77,7 @@ public class NewNote extends NewRecord {
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moveToAddNew();
+                moveToNotebook();
             }
         });
     }
@@ -82,7 +90,7 @@ public class NewNote extends NewRecord {
      * Finishes the NewNote activity
      */
     @Override
-    void moveToAddNew() {
+    void moveToNotebook() {
         super.finish();
         this.finish();
     }
@@ -105,15 +113,98 @@ public class NewNote extends NewRecord {
 
         switch(mode) {
             case "access":
+                accessArray = values;
                 mAccessTextField.setText(displayString);
+                break;
             case "tags":
+                tagArray = values;
                 mTagTextField.setText(displayString);
+                break;
         }
     }
 
     //endregion
 
     //region UI Methods
+
+    /**
+     * Sets up the activity's toolbar
+     */
+    private void setUpToolbar () {
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.new_toolbar);
+        getLayoutInflater().inflate(R.layout.action_bar_new_record, myToolbar);
+        myToolbar.setTitle("");
+        setSupportActionBar(myToolbar);
+
+        // Set the logged in text
+        TextView loggedInText = (TextView) findViewById(R.id.action_bar_title);
+        loggedInText.setText(String.format(getString(R.string.logged_in_text_string),UserVars.UName));
+    }
+
+    /**
+     * Sets up the UI fields in the activity
+     */
+    @Override
+    @SuppressWarnings("unchecked") void setUpFields () {
+        mNameTextField = (EditText) findViewById(R.id.nameTextField);
+        mAccessTextField = (TextView) findViewById(R.id.accessTextField);
+        mNoteTextField = (EditText) findViewById(R.id.notesTextField);
+        mTagTextField = (TextView) findViewById(R.id.tagTextField);
+        mGPSAccField = (TextView) findViewById(R.id.gpsAccView);
+        mNameTextField.setHint(getString(R.string.enter_name_hint,getString(R.string.note_name_tag)));
+
+        if (mode.equals("new")) {
+            mGPSAccField.setText(getString(R.string.gps_acc_starter, String.valueOf(gpsAcc)));
+        } else if (mode.equals("old")) {
+            mNameTextField.setText(record.props.get("name").toString());
+            mAccessTextField.setText(arrayToStringForView((List<String>) record.props.get("access")));
+            mNoteTextField.setText(record.props.get("text").toString());
+            mTagTextField.setText(arrayToStringForView((List<String>) record.props.get("tags")));
+            mGPSAccField.setVisibility(View.GONE);
+
+            try {
+                dateTime = df.parse(record.props.get("datetime").toString());
+            } catch (Exception e) {
+                Log.i(TAG,getString(R.string.parse_failure,
+                        "date",
+                        e.getLocalizedMessage()));
+            }
+
+            try {
+                tagArray = (ArrayList<String>) record.props.get("tags");
+                accessArray = (ArrayList<String>) record.props.get("access");
+            } catch (ClassCastException e) {
+                Log.i(TAG,e.getLocalizedMessage());
+            }
+            userLoc = record.coords;
+            try {
+                gpsAcc = Double.valueOf(record.props.get("accuracy").toString());
+            } catch (Exception e) {
+                Log.i(TAG,getString(R.string.parse_failure,
+                        "accuracy",
+                        e.getLocalizedMessage()));
+            }
+        }
+    }
+
+    private void setUpPickerButtons() {
+        // Set up the tag picker button
+        Button mAccessPickerButton = (Button) findViewById(R.id.accessPickerButton);
+        mAccessPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToListPicker(mAccessTextField, "access", accessArray);
+            }
+        });
+
+        Button mTagsPickerButton = (Button) findViewById(R.id.tagPickerButton);
+        mTagsPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToListPicker(mTagTextField, "tags", tagArray);
+            }
+        });
+    }
 
     /**
      * Changes the accuracy text field to show the current location accuracy
@@ -149,60 +240,59 @@ public class NewNote extends NewRecord {
 
     //region Helper Methods
 
-    /**
-     * Sets up the activity's toolbar
-     */
-    private void setUpToolbar () {
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.new_toolbar);
-        getLayoutInflater().inflate(R.layout.action_bar_new_record, myToolbar);
-        myToolbar.setTitle("");
-        setSupportActionBar(myToolbar);
-
-        // Set the logged in text
-        TextView loggedInText = (TextView) findViewById(R.id.action_bar_title);
-        loggedInText.setText(String.format(getString(R.string.logged_in_text_string),UserVars.UName));
-    }
-
-    /**
-     * Sets up the UI fields in the activity
-     */
     @Override
-    @SuppressWarnings("unchecked") void setUpFields () {
-        mNameTextField = (EditText) findViewById(R.id.nameTextField);
-        mAccessTextField = (TextView) findViewById(R.id.accessTextField);
-        mNoteTextField = (EditText) findViewById(R.id.notesTextField);
-        mTagTextField = (TextView) findViewById(R.id.tagTextField);
-        mGPSAccField = (TextView) findViewById(R.id.gpsAccView);
-        mNameTextField.setHint(getString(R.string.enter_name_hint,getString(R.string.note_name_tag)));
+    boolean checkRequiredData() {
 
-        if (mode.equals("new")) {
-            mGPSAccField.setText(getString(R.string.gps_acc_starter, String.valueOf(gpsAcc)));
-        } else if (mode.equals("old")) {
-            mNameTextField.setText(record.props.get("name").toString());
-            mAccessTextField.setText(record.props.get("access").toString());
-            mNoteTextField.setText(record.props.get("text").toString());
-            mTagTextField.setText(record.props.get("tags").toString());
-            mGPSAccField.setText(getString(R.string.gps_acc_starter, record.props.get("accuracy").toString()));
+        String firstError = "none";
+        View errorView = new View(this);
 
-            try {
-                dateTime = df.parse(record.props.get("datetime").toString());
-            } catch (Exception e) {
-                Log.i(TAG,getString(R.string.parse_failure, e.getLocalizedMessage()));
-            }
+        boolean dateCheck = dateTime != null;
 
-            try {
-                tagArray = (ArrayList<String>) record.props.get("tags");
-                accessArray = (ArrayList<String>) record.props.get("access");
-            } catch (ClassCastException e) {
-                Log.i(TAG,e.getLocalizedMessage());
-            }
-            userLoc = record.coords;
-            try {
-                gpsAcc = Double.valueOf(record.props.get("accuracy").toString());
-            } catch (Exception e) {
-                Log.i(TAG,getString(R.string.parse_failure, e.getLocalizedMessage()));
-            }
+        if (!(mNameTextField.getText() != null &&
+                !mNameTextField.getText().toString().equals(""))) {
+            firstError = "name";
+            errorView = mNameTextField;
+        } else if (!(accessArray.size() > 0)) {
+            firstError = "access";
+            errorView = mAccessTextField;
+        } else if (!(mNoteTextField.getText() != null &&
+                !mNoteTextField.getText().toString().equals(""))) {
+            firstError = "note";
+            errorView = mNoteTextField;
+        } else if (!(tagArray.size() > 0)) {
+            firstError = "tags";
+            errorView = mTagTextField;
         }
+
+        String errorString;
+        switch(firstError) {
+            case "name":
+                errorString = getString(R.string.name_field_string);
+                break;
+            case "access":
+                errorString = getString(R.string.access_field_string);
+                break;
+            case "note":
+                errorString = getString(R.string.note_field_string);
+                break;
+            case "tags":
+                errorString = getString(R.string.tag_field_string);
+                break;
+            default:
+                errorString = getString(R.string.field_required,"");
+        }
+
+        errorString = getString(R.string.field_required,errorString);
+
+        if (errorView instanceof EditText) {
+            ((EditText) errorView).setError(errorString);
+        } else if (errorView instanceof TextView) {
+            ((TextView) errorView).setError(errorString);
+        }
+
+        errorView.requestFocus();
+
+        return (firstError.equals("none") && dateCheck);
     }
 
     //endregion

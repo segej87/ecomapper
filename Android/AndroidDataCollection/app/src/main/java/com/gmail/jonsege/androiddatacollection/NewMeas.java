@@ -53,7 +53,12 @@ public class NewMeas extends NewRecord {
         mDefaultNameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mNameTextField.getError() != null) {
+                    mNameTextField.setError(null);
+                }
+
                 mNameTextField.setText(setDefaultName("Meas"));
+                mNameTextField.clearFocus();
             }
         });
 
@@ -71,7 +76,7 @@ public class NewMeas extends NewRecord {
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moveToAddNew();
+                moveToNotebook();
             }
         });
     }
@@ -84,7 +89,7 @@ public class NewMeas extends NewRecord {
      * Finishes the NewMeas activity
      */
     @Override
-    void moveToAddNew() {
+    void moveToNotebook() {
         super.finish();
         this.finish();
     }
@@ -123,53 +128,6 @@ public class NewMeas extends NewRecord {
     //endregion
 
     //region UI Methods
-
-    /**
-     * Changes the accuracy text field to show the current location accuracy
-     */
-    @Override
-    void updateGPSField() {
-        mGPSAccField.setText(getString(R.string.gps_acc_starter,String.valueOf(gpsAcc)));
-    }
-
-    //endregion
-
-    //region Data I/O
-
-    /**
-     * Fills the properties map to add to the Record object
-     */
-    @Override
-    void setItemsOut() {
-        itemsOut.put("datatype", "meas");
-        itemsOut.put("name", mNameTextField.getText().toString());
-        itemsOut.put("tags", tagArray);
-
-        String dateOut = df.format(dateTime);
-        itemsOut.put("datetime", dateOut);
-
-        itemsOut.put("access", accessArray);
-        itemsOut.put("accuracy", gpsAcc);
-
-        itemsOut.put("text", mNoteTextField.getText().toString());
-
-        String value = mValTextField.getText().toString();
-        double valueOut;
-        try {
-            valueOut = Double.parseDouble(value);
-            itemsOut.put("value", valueOut);
-        } catch (Exception e) {
-            //TODO: present error to user and prevent leaving without fixing double issue
-            Log.i(TAG,getString(R.string.general_error_prefix, e.getLocalizedMessage()));
-        }
-
-        itemsOut.put("species", mMeasTextField.getText().toString());
-        itemsOut.put("units", mUnitsTextField.getText().toString());
-    }
-
-    //endregion
-
-    //region Helper Methods
 
     /**
      * Sets up the activity's toolbar
@@ -215,7 +173,9 @@ public class NewMeas extends NewRecord {
             try {
                 dateTime = df.parse(record.props.get("datetime").toString());
             } catch (Exception e) {
-                Log.i(TAG,getString(R.string.parse_failure, e.getLocalizedMessage()));
+                Log.i(TAG,getString(R.string.parse_failure,
+                        "date",
+                        e.getLocalizedMessage()));
             }
 
             try {
@@ -228,7 +188,9 @@ public class NewMeas extends NewRecord {
             try {
                 gpsAcc = Double.valueOf(record.props.get("accuracy").toString());
             } catch (Exception e) {
-                Log.i(TAG,getString(R.string.parse_failure, e.getLocalizedMessage()));
+                Log.i(TAG,getString(R.string.parse_failure,
+                        "accuracy",
+                        e.getLocalizedMessage()));
             }
         }
     }
@@ -239,7 +201,7 @@ public class NewMeas extends NewRecord {
         mAccessPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToListPicker("access", accessArray);
+                goToListPicker(mAccessTextField, "access", accessArray);
             }
         });
 
@@ -247,7 +209,7 @@ public class NewMeas extends NewRecord {
         mSpeciesPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToListPicker("species", stringFromViewToArray(mMeasTextField));
+                goToListPicker(mMeasTextField, "species", stringFromViewToArray(mMeasTextField));
             }
         });
 
@@ -255,7 +217,7 @@ public class NewMeas extends NewRecord {
         mUnitsPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToListPicker("units", stringFromViewToArray(mUnitsTextField));
+                goToListPicker(mUnitsTextField, "units", stringFromViewToArray(mUnitsTextField));
             }
         });
 
@@ -263,50 +225,136 @@ public class NewMeas extends NewRecord {
         mTagsPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToListPicker("tags", tagArray);
+                goToListPicker(mTagTextField, "tags", tagArray);
             }
         });
     }
 
     /**
-     * Adds a single string to an ArrayList for use by the list picker
-     * @param inView TextView
-     * @return ArrayList
+     * Changes the accuracy text field to show the current location accuracy
      */
-    private List<String> stringFromViewToArray(TextView inView) {
-
-        // The array to return.
-        List<String> outArray = new ArrayList<>();
-
-        // Text in the text view.
-        String viewText = inView.getText().toString();
-
-        if (viewText.equals("")) {
-            return outArray;
-        }
-
-        outArray.add(viewText);
-        return outArray;
+    @Override
+    void updateGPSField() {
+        mGPSAccField.setText(getString(R.string.gps_acc_starter,String.format("%.2f",gpsAcc)));
     }
 
+    //endregion
+
+    //region Data I/O
+
     /**
-     * Creates a single string from an ArrayList
-     * @param values ArrayList
-     * @return String
+     * Fills the properties map to add to the Record object
      */
-    private String arrayToStringForView(List<String> values) {
+    @Override
+    void setItemsOut() {
+        itemsOut.put("datatype", "meas");
+        itemsOut.put("name", mNameTextField.getText().toString());
+        itemsOut.put("tags", tagArray);
 
-        // Construct a string from the ArrayList to put in the text view.
-        StringBuilder sb = new StringBuilder();
+        String dateOut = df.format(dateTime);
+        itemsOut.put("datetime", dateOut);
 
-        String delimiter = "";
-        for (String v : values) {
-            sb.append(delimiter).append(v);
-            delimiter = ", ";
+        itemsOut.put("access", accessArray);
+        itemsOut.put("accuracy", gpsAcc);
+
+        itemsOut.put("text", mNoteTextField.getText().toString());
+
+        String value = mValTextField.getText().toString();
+        double valueOut;
+        try {
+            valueOut = Double.parseDouble(value);
+            itemsOut.put("value", valueOut);
+        } catch (Exception e) {
+            Log.i(TAG,getString(R.string.general_error_prefix, e.getLocalizedMessage()));
         }
-        String displayString = sb.toString();
 
-        return displayString;
+        itemsOut.put("species", mMeasTextField.getText().toString());
+        itemsOut.put("units", mUnitsTextField.getText().toString());
+    }
+
+    //endregion
+
+    //region Helper Methods
+
+    @Override
+    boolean checkRequiredData() {
+        String firstError = "none";
+        View errorView = new View(this);
+
+        boolean dateCheck = dateTime != null;
+
+        boolean valCheck;
+        try {
+            Double.parseDouble(mValTextField.getText().toString());
+            valCheck = true;
+        } catch (NumberFormatException e) {
+            Log.i(TAG,getString(R.string.parse_failure,
+                    getString(R.string.value_header).toLowerCase(),
+                    e.getLocalizedMessage()));
+            valCheck = false;
+        }
+
+        if (!(mNameTextField.getText() != null &&
+                !mNameTextField.getText().toString().equals(""))) {
+            firstError = "name";
+            errorView = mNameTextField;
+        } else if (!(accessArray.size() > 0)) {
+            firstError = "access";
+            errorView = mAccessTextField;
+        } else if (!(mMeasTextField.getText() != null &&
+                !mMeasTextField.getText().toString().equals(""))) {
+            firstError = "species";
+            errorView = mMeasTextField;
+        } else if (!valCheck) {
+            firstError = "value";
+            errorView = mValTextField;
+        } else if (!(mUnitsTextField.getText() != null &&
+                !mUnitsTextField.getText().toString().equals(""))) {
+            firstError = "units";
+            errorView = mUnitsTextField;
+        } else if (!(tagArray.size() > 0)) {
+            firstError = "tags";
+            errorView = mTagTextField;
+        }
+
+        String errorString;
+        switch(firstError) {
+            case "name":
+                errorString = getString(R.string.name_field_string);
+                break;
+            case "access":
+                errorString = getString(R.string.access_field_string);
+                break;
+            case "species":
+                errorString = getString(R.string.spec_field_string);
+                break;
+            case "value":
+                errorString = getString(R.string.wrong_number_format);
+                break;
+            case "units":
+                errorString = getString(R.string.unit_field_string);
+                break;
+            case "tags":
+                errorString = getString(R.string.tag_field_string);
+                break;
+            default:
+                errorString = getString(R.string.field_required,"");
+        }
+
+        if (!errorString.equals(getString(R.string.wrong_number_format))) {
+            errorString = getString(R.string.field_required,errorString);
+        }
+
+        if (errorView instanceof EditText) {
+            ((EditText) errorView).setError(errorString);
+        } else if (errorView instanceof TextView) {
+            ((TextView) errorView).setError(errorString);
+        }
+
+        errorView.requestFocus();
+
+        return (firstError.equals("none") && dateCheck);
+
     }
 
     //endregion

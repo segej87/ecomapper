@@ -123,6 +123,12 @@ public class ListPickerActivity extends AppCompatActivity {
 
                 String selected = (String) parent.getAdapter().getItem(position);
 
+                if (mode.equals("species") || mode.equals("units")) {
+                    List<String> oldSelected = selectedList;
+                    fullList.addAll(oldSelected);
+                    selectedList.removeAll(oldSelected);
+                }
+
                 fullList.remove(selected);
 
                 selectedList.add(selected);
@@ -184,6 +190,105 @@ public class ListPickerActivity extends AppCompatActivity {
     //endregion
 
     //region UI Methods
+
+    /**
+     * Set up the toolbar
+     */
+    private void setUpToolbar() {
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.new_toolbar);
+        getLayoutInflater().inflate(R.layout.action_bar_list_picker, myToolbar);
+        myToolbar.setTitle("");
+        setSupportActionBar(myToolbar);
+
+        // Set up the save and cancel buttons.
+        Button mSaveButton = (Button) findViewById(R.id.action_bar_save);
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                moveToNewRecord();
+            }
+        });
+
+        Button mCancelButton = (Button) findViewById(R.id.action_bar_cancel);
+        mCancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ListPickerActivity.this.finish();
+            }
+        });
+    }
+
+    /**
+     * Sets up the UI elements.
+     */
+    private void setUpFields() {
+        mAvailableView = (ListView) findViewById(R.id.availableList);
+        mSelectedView = (ListView) findViewById(R.id.selectedList);
+
+        mSearchView = (SearchView) findViewById(R.id.searchView);
+        mAddNew = (EditText) findViewById(R.id.addNewText);
+
+        String modeTypeString;
+        switch(mode) {
+            case "access":
+                modeTypeString = getString(R.string.access_string);
+                mAddNew.setVisibility(View.GONE);
+                break;
+            case "species":
+                modeTypeString = getString(R.string.species_string);
+                break;
+            case "units":
+                modeTypeString = getString(R.string.units_string);
+                break;
+            case "tags":
+                modeTypeString = getString(R.string.tags_string);
+                break;
+            default:
+                modeTypeString = getString(R.string.generic_string);
+        }
+
+        mSearchView.setQueryHint(getString(R.string.search_hint,modeTypeString));
+        mAddNew.setHint(getString(R.string.add_new,modeTypeString));
+
+        mAddButton = (Button) findViewById(R.id.addNewButton);
+        mAddNew.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    if (!mSearchView.getQuery().equals("")) {
+                        clearSearchView();
+                    }
+                    mAddButton.setVisibility(View.VISIBLE);
+                } else {
+                    mAddButton.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        mAddButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newItem = mAddNew.getText().toString();
+
+                if (newItem.equals("") || selectedList.contains(newItem)) {
+
+                } else if (fullList.contains(newItem)) {
+                    mAvailableView.performItemClick(v, fullList.indexOf(newItem), 0);
+                } else if (!fullList.contains(newItem) && !selectedList.contains(newItem)) {
+                    if (mode.equals("species") || mode.equals("units")) {
+                        List<String> oldSelected = selectedList;
+                        fullList.addAll(oldSelected);
+                        selectedList.removeAll(oldSelected);
+                    }
+
+                    selectedList.add(newItem);
+                }
+
+                mAddNew.setText(null);
+                clearTextFocus();
+            }
+        });
+    }
 
     private void clearTextFocus() {
         if (mSearchView.hasFocus()) {
@@ -250,99 +355,6 @@ public class ListPickerActivity extends AppCompatActivity {
     //endregion
 
     //region Helper Methods
-
-    /**
-     * Set up the toolbar
-     */
-    private void setUpToolbar() {
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.new_toolbar);
-        getLayoutInflater().inflate(R.layout.action_bar_list_picker, myToolbar);
-        myToolbar.setTitle("");
-        setSupportActionBar(myToolbar);
-
-        // Set up the save and cancel buttons.
-        Button mSaveButton = (Button) findViewById(R.id.action_bar_save);
-        mSaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                moveToNewRecord();
-            }
-        });
-
-        Button mCancelButton = (Button) findViewById(R.id.action_bar_cancel);
-        mCancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ListPickerActivity.this.finish();
-            }
-        });
-    }
-
-    /**
-     * Sets up the UI elements.
-     */
-    private void setUpFields() {
-        mAvailableView = (ListView) findViewById(R.id.availableList);
-        mSelectedView = (ListView) findViewById(R.id.selectedList);
-
-        mSearchView = (SearchView) findViewById(R.id.searchView);
-        mAddNew = (EditText) findViewById(R.id.addNewText);
-
-        String modeTypeString;
-        switch(mode) {
-            case "access":
-                modeTypeString = getString(R.string.access_string);
-                break;
-            case "species":
-                modeTypeString = getString(R.string.species_string);
-                break;
-            case "units":
-                modeTypeString = getString(R.string.units_string);
-                break;
-            case "tags":
-                modeTypeString = getString(R.string.tags_string);
-                break;
-            default:
-                modeTypeString = getString(R.string.generic_string);
-        }
-
-        mSearchView.setQueryHint(getString(R.string.search_hint,modeTypeString));
-        mAddNew.setHint(getString(R.string.add_new,modeTypeString));
-
-        mAddButton = (Button) findViewById(R.id.addNewButton);
-
-        mAddNew.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    if (!mSearchView.getQuery().equals("")) {
-                        clearSearchView();
-                    }
-                    mAddButton.setVisibility(View.VISIBLE);
-                } else {
-                    mAddButton.setVisibility(View.INVISIBLE);
-                }
-            }
-        });
-
-        mAddButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String newItem = mAddNew.getText().toString();
-
-                if (newItem.equals("") || selectedList.contains(newItem)) {
-
-                } else if (fullList.contains(newItem)) {
-                    mAvailableView.performItemClick(v, fullList.indexOf(newItem), 0);
-                } else if (!fullList.contains(newItem) && !selectedList.contains(newItem)) {
-                    selectedList.add(newItem);
-                }
-
-                mAddNew.setText(null);
-                clearTextFocus();
-            }
-        });
-    }
 
     /**
      * Loads data into the full list and filtered list depending on the list picker mode.

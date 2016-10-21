@@ -6,6 +6,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -156,12 +159,17 @@ public abstract class NewRecord extends AppCompatActivity {
     /**
      * Finishes the activity
      */
-    abstract void moveToAddNew();
+    abstract void moveToNotebook();
 
     /**
      * Changes the accuracy text field to show the current location accuracy
      */
     abstract void updateGPSField();
+
+    /**
+     * Checks that required data has been provided
+     */
+    abstract boolean checkRequiredData();
 
     //endregion
 
@@ -173,7 +181,15 @@ public abstract class NewRecord extends AppCompatActivity {
      * @param mode type
      * @param previous existing
      */
-    protected void goToListPicker(String mode, List<String> previous) {
+    protected void goToListPicker(View v, String mode, List<String> previous) {
+
+        if (v instanceof TextView && ((TextView) v).getError() != null) {
+            ((TextView) v).setError(null);
+        }
+
+        if (v instanceof EditText && ((EditText) v).getError() != null) {
+            ((EditText) v).setError(null);
+        }
 
         Intent intent = new Intent(NewRecord.this, ListPickerActivity.class);
         intent.putExtra("MODE", mode);
@@ -228,14 +244,22 @@ public abstract class NewRecord extends AppCompatActivity {
      * Creates and executes an asynchronous task to save the new record.
      */
     protected void saveRecord () {
-        SaveRecord saveRecord = new SaveRecord(this);
-        saveRecord.execute();
+        if (getCurrentFocus() != null) {
+            getCurrentFocus().clearFocus();
+        }
+
+        if (checkRequiredData()) {
+            SaveRecord saveRecord = new SaveRecord(this);
+            saveRecord.execute();
+        } else {
+            Log.i(TAG,getString(R.string.record_missing_data));
+        }
     }
 
     /**
      * An asynchronous task to save the new record.
      */
-    public class SaveRecord extends AsyncTask<NewMeas, Void, Boolean> {
+    private class SaveRecord extends AsyncTask<NewMeas, Void, Boolean> {
         final NewRecord context;
 
         SaveRecord(NewRecord context) {
@@ -281,8 +305,8 @@ public abstract class NewRecord extends AppCompatActivity {
                 String saveResult = DataIO.saveRecords(this.context, app.getRecords());
                 Log.i(TAG,saveResult);
 
-                // Finish the activity
-                moveToAddNew();
+                UpdateUserVars mUpdateUserVars = new UpdateUserVars();
+                mUpdateUserVars.execute();
             } else {
 
                 // Log an error.
@@ -294,6 +318,72 @@ public abstract class NewRecord extends AppCompatActivity {
         protected void onCancelled() {
             //TODO: warn user about losing data.
         }
+    }
+
+    private class UpdateUserVars extends AsyncTask<Void, Void, Boolean> {
+
+        UpdateUserVars() {
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void...params) {
+            return DataIO.addUserVars(NewRecord.this, record);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                // Finish the activity
+                moveToNotebook();
+            }
+        }
+
+    }
+
+    //endregion
+
+    //region Helper Methods
+
+    /**
+     * Adds a single string to an ArrayList for use by the list picker
+     * @param inView TextView
+     * @return ArrayList
+     */
+    protected List<String> stringFromViewToArray(TextView inView) {
+
+        // The array to return.
+        List<String> outArray = new ArrayList<>();
+
+        // Text in the text view.
+        String viewText = inView.getText().toString();
+
+        if (viewText.equals("")) {
+            return outArray;
+        }
+
+        outArray.add(viewText);
+        return outArray;
+    }
+
+    /**
+     * Creates a single string from an ArrayList
+     * @param values ArrayList
+     * @return String
+     */
+    protected String arrayToStringForView(List<String> values) {
+
+        // Construct a string from the ArrayList to put in the text view.
+        StringBuilder sb = new StringBuilder();
+
+        String delimiter = "";
+        for (String v : values) {
+            sb.append(delimiter).append(v);
+            delimiter = ", ";
+        }
+        String displayString = sb.toString();
+
+        return displayString;
     }
 
     //endregion
