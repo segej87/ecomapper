@@ -3,6 +3,9 @@ package com.gmail.jonsege.androiddatacollection;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -61,24 +64,36 @@ public class NewMeas extends NewRecord {
                 mNameTextField.clearFocus();
             }
         });
+    }
 
-        // Set up the save button
-        Button mSaveButton = (Button) findViewById(R.id.action_bar_save);
-        mSaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+    //endregion
+
+    //region Menu Methods
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu_record, menu);
+        return true;
+    }
+
+    /**
+     * Handles calls from the options menu
+     * @param item option
+     * @return result
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save_record:
                 saveRecord();
-            }
-        });
-
-        // Set up the cancel button
-        Button mCancelButton = (Button) findViewById(R.id.action_bar_cancel);
-        mCancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                return true;
+            case R.id.cancel_record:
                 moveToNotebook();
-            }
-        });
+                return true;
+            default:
+                return false;
+        }
     }
 
     //endregion
@@ -138,8 +153,25 @@ public class NewMeas extends NewRecord {
         myToolbar.setTitle("");
         setSupportActionBar(myToolbar);
 
+        // Set the title
+        String titleType;
+        switch (mode) {
+            case "new":
+                titleType = getString(R.string.title_constructor_new);
+                break;
+            case "old":
+                titleType = getString(R.string.title_constructor_editing);
+                break;
+            default:
+                titleType = "";
+        }
+        TextView title = (TextView) findViewById(R.id.action_bar_title);
+        title.setText(getString(R.string.title_constructor,
+                titleType,
+                getString(R.string.measurement_name_tag)));
+
         // Set the logged in text
-        TextView loggedInText = (TextView) findViewById(R.id.action_bar_title);
+        TextView loggedInText = (TextView) findViewById(R.id.action_bar_logged_in);
         loggedInText.setText(String.format(getString(R.string.logged_in_text_string),UserVars.UName));
     }
 
@@ -159,6 +191,10 @@ public class NewMeas extends NewRecord {
         mNameTextField.setHint(getString(R.string.enter_name_hint,getString(R.string.measurement_name_tag)));
 
         if (mode.equals("new")) {
+            mAccessTextField.setText(arrayToStringForView(UserVars.AccessDefaults));
+            mTagTextField.setText(arrayToStringForView(UserVars.TagsDefaults));
+            mMeasTextField.setText(UserVars.SpecDefault);
+            mUnitsTextField.setText(UserVars.UnitsDefault);
             mGPSAccField.setText(getString(R.string.gps_acc_starter, String.valueOf(gpsAcc)));
         } else if (mode.equals("old")) {
             mNameTextField.setText(record.props.get("name").toString());
@@ -283,6 +319,8 @@ public class NewMeas extends NewRecord {
 
         boolean dateCheck = dateTime != null;
 
+        boolean locCheck = mode.equals("old") || (userOverrideStale || !checkLocationStale());
+
         boolean valCheck;
         try {
             Double.parseDouble(mValTextField.getText().toString());
@@ -353,8 +391,7 @@ public class NewMeas extends NewRecord {
 
         errorView.requestFocus();
 
-        return (firstError.equals("none") && dateCheck);
-
+        return (firstError.equals("none") && dateCheck && locCheck);
     }
 
     //endregion

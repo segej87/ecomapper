@@ -9,7 +9,7 @@
     tools:context="com.gmail.jonsege.androiddatacollection.LoginActivity">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/login_toolbar"
+        android:id="@+id/notebook_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -52,8 +52,7 @@
                     android:layout_marginRight="25dp"
                     android:textSize="@dimen/text_size_medium"
                     android:textAlignment="center"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:singleLine="true" />
+                    android:gravity="center_vertical|center_horizontal" />
 
                 <EditText
                     android:id="@+id/password"

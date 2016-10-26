@@ -6,15 +6,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +72,12 @@ public class ListPickerActivity extends AppCompatActivity {
      */
     private final static boolean CLEAR_SEARCH = false;
 
+    /**
+     * A string to add to the defaults list
+     */
+    String changeDefault = null;
+
+
     //endregion
 
     //region Initialization
@@ -102,6 +110,110 @@ public class ListPickerActivity extends AppCompatActivity {
 
         // Set up the search view.
         setUpSearchView();
+
+        // Register the selected list view for context menu.
+        registerForContextMenu(mSelectedView);
+    }
+
+    //endregion
+
+    //region Menu Methods
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.selectedList) {
+            ListView lv = (ListView) v;
+            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+
+            List<String> compareArray = new ArrayList<>();
+
+            switch (mode) {
+                case "access":
+                    compareArray = UserVars.AccessDefaults;
+                    break;
+                case "species":
+                    compareArray.add(UserVars.SpecDefault);
+                    break;
+                case "units":
+                    compareArray.add(UserVars.UnitsDefault);
+                    break;
+                case "tags":
+                    compareArray = UserVars.TagsDefaults;
+                    break;
+                default:
+                    compareArray = new ArrayList<>();
+            }
+
+            changeDefault = (String) lv.getItemAtPosition(acmi.position);
+            System.out.println(compareArray.contains(changeDefault));
+
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.context_menu_list_picker,menu);
+
+            if (compareArray.contains(changeDefault)) {
+                menu.setGroupVisible(R.id.removeGroup, true);
+            } else {
+                menu.setGroupVisible(R.id.addGroup, true);
+            }
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        if (changeDefault != null) {
+            if (item.getTitle().equals(getString(R.string.add_default_string))) {
+                switch (mode) {
+                    case "access":
+                        if (!UserVars.AccessDefaults.contains(changeDefault))
+                            UserVars.AccessDefaults.add(changeDefault);
+                        break;
+                    case "species":
+                        if (UserVars.SpecDefault == null ||
+                                (UserVars.SpecDefault != null &&
+                                !UserVars.SpecDefault.equals(changeDefault)))
+                            UserVars.SpecDefault = changeDefault;
+                        break;
+                    case "units":
+                        if (UserVars.UnitsDefault == null ||
+                                (UserVars.UnitsDefault != null &&
+                                !UserVars.UnitsDefault.equals(changeDefault)))
+                            UserVars.UnitsDefault = changeDefault;
+                        break;
+                    case "tags":
+                        if (!UserVars.TagsDefaults.contains(changeDefault))
+                            UserVars.TagsDefaults.add(changeDefault);
+                        break;
+                    default:
+                        break;
+                }
+            } else if (item.getTitle().equals(getString(R.string.remove_default_string))) {
+                switch(mode) {
+                    case "access":
+                        if (UserVars.AccessDefaults.contains(changeDefault))
+                            UserVars.AccessDefaults.remove(changeDefault);
+                        break;
+                    case "species":
+                        if (UserVars.SpecDefault.equals(changeDefault))
+                            UserVars.SpecDefault = null;
+                        break;
+                    case "units":
+                        if (UserVars.UnitsDefault.equals(changeDefault))
+                            UserVars.UnitsDefault = null;
+                        break;
+                    case "tags":
+                        if (UserVars.TagsDefaults.contains(changeDefault))
+                            UserVars.TagsDefaults.remove(changeDefault);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return true;
+        }
+
+        return false;
     }
 
     //endregion
@@ -156,6 +268,10 @@ public class ListPickerActivity extends AppCompatActivity {
                 String selected = (String) parent.getAdapter().getItem(position);
                 int posInSelectedArray = selectedList.indexOf(selected);
 
+                // Remove the item if it's queued to add to defaults
+                if (changeDefault != null &&
+                        changeDefault.equals(selectedList.get(posInSelectedArray)))
+                    changeDefault = null;
                 selectedList.remove(posInSelectedArray);
 
                 fullList.add(selected);
@@ -239,6 +355,7 @@ public class ListPickerActivity extends AppCompatActivity {
                 break;
             case "units":
                 modeTypeString = getString(R.string.units_string);
+                mAddNew.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
                 break;
             case "tags":
                 modeTypeString = getString(R.string.tags_string);
@@ -260,7 +377,7 @@ public class ListPickerActivity extends AppCompatActivity {
                     }
                     mAddButton.setVisibility(View.VISIBLE);
                 } else {
-                    mAddButton.setVisibility(View.INVISIBLE);
+                    mAddButton.setVisibility(View.GONE);
                 }
             }
         });

@@ -2,8 +2,10 @@ package com.gmail.jonsege.androiddatacollection;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -21,7 +23,8 @@ import java.util.Map;
  * Created by jonse on 10/15/2016.
  */
 
-public abstract class NewRecord extends AppCompatActivity {
+public abstract class NewRecord extends AppCompatActivity
+        implements LocationOverrideFragment.LocationOverrideListener {
 
     //region Class Variables
 
@@ -44,10 +47,12 @@ public abstract class NewRecord extends AppCompatActivity {
      * Data to construct the record
      */
     protected String type;
-    protected final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+    //TODO: Figure out how to specify time zone
+    protected final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     protected Date dateTime;
-    protected List<String> tagArray = new ArrayList<>();
-    protected List<String> accessArray = new ArrayList<>();
+    protected List<String> tagArray = UserVars.TagsDefaults;
+    protected List<String> accessArray = UserVars.AccessDefaults;
+    protected Location latestLoc;
     protected Double[] userLoc = new Double[3];
     protected double gpsAcc = 0.0;
     protected Map<String, Object> itemsOut = new HashMap<>();
@@ -57,6 +62,11 @@ public abstract class NewRecord extends AppCompatActivity {
      * The location object
      */
     private UserLocation userLocation;
+
+    /**
+     * Record whether the user has overridden the stale location warning
+     */
+    boolean userOverrideStale = false;
 
     /**
      * The record created or loaded by the user
@@ -139,7 +149,7 @@ public abstract class NewRecord extends AppCompatActivity {
         super.onPause();
 
         // Stop tracking the user's location;
-        userLocation.stopLocationUpdates();
+//        userLocation.stopLocationUpdates();
     }
 
     //endregion
@@ -273,11 +283,15 @@ public abstract class NewRecord extends AppCompatActivity {
             setItemsOut();
 
             // If the user's location was not found, set to default (null island).
-            if (userLoc[0] == null) {
+            if (latestLoc == null) {
                 Log.i(TAG,getString(R.string.no_user_location_found));
                 userLoc[0] = 0.0;
                 userLoc[1] = 0.0;
                 userLoc[2] = 0.0;
+            } else {
+                userLoc[0] = latestLoc.getLongitude();
+                userLoc[1] = latestLoc.getLatitude();
+                userLoc[2] = latestLoc.getAltitude();
             }
 
             // Set the activity's record object to the newly created record.
@@ -384,6 +398,50 @@ public abstract class NewRecord extends AppCompatActivity {
         String displayString = sb.toString();
 
         return displayString;
+    }
+
+    boolean checkLocationStale() {
+        boolean staleLoc;
+
+        //TODO: Warn user of location failure!
+        if (latestLoc == null) {
+            return false;
+        }
+
+        Long elapsedTime = ((new Date()).getTime() - latestLoc.getTime()) / 60000;
+        String numMin = String.valueOf((elapsedTime.intValue()));
+
+        if (elapsedTime > 1) {
+            staleLoc = true;
+            showNoticeDialog(numMin);
+        } else {
+            staleLoc = false;
+        }
+
+        return staleLoc;
+    }
+
+    public void showNoticeDialog(String numMin) {
+        Bundle b = new Bundle();
+        b.putString("NUMMIN", numMin);
+
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new LocationOverrideFragment();
+        dialog.setArguments(b);
+        dialog.show(getSupportFragmentManager(), "LocationOverrideFragment");
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        // User touched the dialog's positive button
+        this.userOverrideStale = true;
+        saveRecord();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        // User touched the dialog's negative button
+        this.userOverrideStale = false;
     }
 
     //endregion

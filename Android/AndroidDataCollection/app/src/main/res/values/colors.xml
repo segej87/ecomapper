@@ -7,4 +7,9 @@
     <color name="light">#ffffdd</color>
     <color name="white">#ffffffff</color>
     <color name="off_white">#99ffffff</color>
+    <color name="backgroundLight">#E5E5E5</color>
+    <color name="backgroundLightGreen">#F3FAB6</color>
+    <color name="backgroundLightBlue">#C2E6F2</color>
+    <color name="buttonOrange">#FFB38C</color>
+    <color name="buttonGrey">#262626</color>
 </resources>

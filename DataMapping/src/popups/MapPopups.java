@@ -1,5 +1,12 @@
 package popups;
 
+import java.awt.List;
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.marker.Marker;
 import processing.core.PApplet;
@@ -60,8 +67,24 @@ public abstract class MapPopups extends PApplet{
 	}
 	
 	//getter of marker properties (no setter)
-	public String getProp(String p){
+	public String getStringProp(String p){
 		return mark.getProperty(p).toString();
+	}
+	
+	//getter of marker properties
+	public String[] getStringArrayProp(String p){
+		JSONArray read = (JSONArray) mark.getProperty(p);
+		
+		String[] arrayOut = new String[read.length()];
+		for (int i = 0; i < read.length(); i++) {
+			try {
+				arrayOut[i] = read.get(i).toString();
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return arrayOut;
 	}
 	
 	//setters and getters for interface x and y coordinates
@@ -101,9 +124,9 @@ public abstract class MapPopups extends PApplet{
 	
 	//setters and getters for color
 	public void setColor(){
-		if (getProp("datatype").equals("photo")){
+		if (getStringProp("datatype").equals("photo")){
 			this.color = p.color(255,100,100);
-		} else if (getProp("datatype").equals("note")){
+		} else if (getStringProp("datatype").equals("note")){
 			this.color = p.color(100, 100, 255);
 		}
 	}

@@ -58,17 +58,17 @@ public class MapMeas extends MapPopups {
 		p.fill(25, 25, 25);
 		p.textSize(fontSize);
 		float textLine = getIntX() + getIntWidth() - 10;
-		float valWidth = p.textWidth(getProp("value") + " " + getProp("units"));
+		float valWidth = p.textWidth(getStringProp("value") + " " + getStringProp("units"));
 		float textY = getIntY() + getIntHeight()/3;
 		if (getQuadrant()[1]){
 			textY = getIntY() + getIntHeight()*2/3 + fontSize;
 		}
 		p.textAlign(RIGHT,BASELINE);
-		p.text(getProp("value") + " " + getProp("units"), textLine, textY);
+		p.text(getStringProp("value") + " " + getStringProp("units"), textLine, textY);
 		
 		p.textSize(fontSize - 3);
 		p.textAlign(LEFT,BASELINE);
-		p.text(getProp("species") + ": ", textLine - valWidth - p.textWidth(getProp("species") + ":  "), textY);
+		p.text(getStringProp("species") + ": ", textLine - valWidth - p.textWidth(getStringProp("species") + ":  "), textY);
 	}
 	
 	public float getFontSize(){

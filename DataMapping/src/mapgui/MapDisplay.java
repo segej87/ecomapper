@@ -61,10 +61,10 @@ public class MapDisplay extends PApplet {
 	
 	public void setup(){
 		//get the current graphics device, get its size, and size the map at full screen
-//		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-//		int screenWidth = gd.getDisplayMode().getWidth();
-//		int screenHeight = gd.getDisplayMode().getHeight();
-		size(1366, 768, OPENGL);
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		int screenWidth = gd.getDisplayMode().getWidth();
+		int screenHeight = gd.getDisplayMode().getHeight();
+		size(screenWidth, screenHeight, OPENGL);
 		
 		//set up toolbars
 		ttb = new TopToolbar(this, 0, 0, this.width, 50, 250);
@@ -104,13 +104,10 @@ public class MapDisplay extends PApplet {
 		}
 		
 		//read in point data from geoJSON
-		//SQLReader sqr = new SQLReader("segej87", "J5e14s87!");
+//		SQLReader sqr = new SQLReader("segej87", "J5e14s87!");
 		SQLReader sqr = new SQLReader("mruth", "M@rty9!");
 		//SQLReader sqr = new SQLReader("ctsege", "ctsege85");
 		List<Feature> personFeats = GeoJSONReader.loadDataFromJSON(this, sqr.jsonString);
-		//List<Feature> personFeats = GeoJSONReader.loadData(this, "c:/users/jon sege/dropbox/kumpi mayu/mapdev/geojson/personal.json");
-		//List<Feature> institFeats = GeoJSONReader.loadData(this, institJsonPath);
-		//List<Feature> publicFeats = GeoJSONReader.loadData(this, personJsonPath);
 		
 		//loop through features and find which country they're in by comparing to countryMarkers
 		//TODO: write this info to json file, then only do for data that doesn't have this prop
@@ -365,11 +362,11 @@ public class MapDisplay extends PApplet {
 		pops.add(new MapTags(map, this, pops.get(pops.size()-1)));
 		
 		//If this is moved above the other popup objects, the order will be changed
-		if (mapKey.getProp("datatype").equals("photo")){
+		if (mapKey.getStringProp("datatype").equals("photo")){
 			pops.add(new MapPhoto(map, this, pops.get(pops.size()-1)));
-		} else if (mapKey.getProp("datatype").equals("note")){
+		} else if (mapKey.getStringProp("datatype").equals("note")){
 			pops.add(new MapNote(map, this, pops.get(pops.size()-1)));
-		} else if (mapKey.getProp("datatype").equals("meas")){
+		} else if (mapKey.getStringProp("datatype").equals("meas")){
 			pops.add(new MapMeas(map, this, pops.get(pops.size()-1)));
 		}
 	}

@@ -15,7 +15,7 @@
         android:paddingRight="8dip">
 
         <TextView
-            android:id="@+id/action_bar_title"
+            android:id="@+id/action_bar_logged_in"
             style="@style/ActionBarButtonWhite"
             android:textSize="@dimen/text_size_smallest"
             android:text="@string/logged_in_text_string"

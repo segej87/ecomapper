@@ -56,12 +56,12 @@ public class MapKey extends MapPopups {
 		p.textSize(fontSize);
 		
 		//TODO: After tag-wrapping functionality added, remove tags from this calculation
-		String[] tagArray = getProp("tags").split(";");
+		String[] tagArray = getStringProp("tags").split(";");
 		String[] str = new String[info.size() + 1];
 		str[0] = "Tags: " + String.join("  ", tagArray);
 		int counter = 1;
 		for (String key : info.keySet()){
-			str[counter] = key + ": " + getProp(info.get(key));
+			str[counter] = key + ": " + getStringProp(info.get(key));
 			counter = counter + 1;
 		}
 		
@@ -116,7 +116,7 @@ public class MapKey extends MapPopups {
 		
 		String[] keyArray = info.keySet().toArray(new String[0]);
 		for (int i = 0; i < keyArray.length; i++){
-			p.text(keyArray[i] + ": " + getProp(info.get(keyArray[i])), textLine, (float) (getIntY() + fontSize * (0.5 + (1.25 * i))));
+			p.text(keyArray[i] + ": " + getStringProp(info.get(keyArray[i])), textLine, (float) (getIntY() + fontSize * (0.5 + (1.25 * i))));
 		}
 	}
 	

@@ -45,8 +45,8 @@ public class MapPhoto extends MapPopups{
 	
 	public void setImage(){
 		try {
-			String ext = getProp("filepath").split("\\.")[5].toString().toLowerCase();
-			this.img = loadImage(getProp("filepath"), ext);
+			String ext = getStringProp("filepath").split("\\.")[5].toString().toLowerCase();
+			this.img = loadImage(getStringProp("filepath"), ext);
 			this.img.resize(getImageDims()[0], getImageDims()[1]);
 		} catch (Exception e) {
 			this.img = loadImage("defaultPhoto.png", "png");

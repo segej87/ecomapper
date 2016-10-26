@@ -63,6 +63,19 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
 
     //region Google API Methods
 
+    /**
+     * Helper method to build the Google API client
+     */
+    synchronized void buildGoogleApiClient() {
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(context)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+    }
+
     @Override
     public void onConnected(Bundle bundle) {
 
@@ -109,19 +122,6 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
     //endregion
 
     //region Location Methods
-
-    /**
-     * Helper method to build the Google API client
-     */
-    synchronized void buildGoogleApiClient() {
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(context)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-    }
 
     /**
      * Checks the user's location settings and requests an update if necessary
@@ -175,6 +175,9 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
                         Log.i(context.TAG,context.getString(R.string.settings_change_error, "Location"));
                         mRequestingLocationUpdates =false;
                         break;
+                    default:
+                        mRequestingLocationUpdates = false;
+                        break;
                 }
             }
         });
@@ -200,9 +203,7 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
 
         // If the last location is not null, update the calling context's location array.
         if (mLastLocation != null) {
-            context.userLoc[0] = mLastLocation.getLongitude();
-            context.userLoc[1] = mLastLocation.getLatitude();
-            context.userLoc[2] = mLastLocation.getAltitude();
+            context.latestLoc = mLastLocation;
         } else {
 
             // Log an error if the last location is null.
@@ -269,9 +270,7 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
         //TODO: warn user if location changes by more than accuracy
 
         // Set the calling context's location array using the new location
-        context.userLoc[0] = location.getLatitude();
-        context.userLoc[1] = location.getLongitude();
-        context.userLoc[2] = location.getAltitude();
+        context.latestLoc = location;
 
         // Set the calling context's accuracy variable using the new location
         context.gpsAcc = location.getAccuracy();
@@ -289,5 +288,4 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
     }
 
     //endregion
-
 }

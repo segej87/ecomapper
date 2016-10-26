@@ -68,7 +68,7 @@
     <string name="notebook_context_name">NOTEBOOK</string>
     <string name="enter_name_hint">Enter a name for this %1$s</string>
     <string name="default_name_button">Use default name</string>
-    <string name="access_header">Access level</string>
+    <string name="access_header">Access levels</string>
     <string name="access_hint">Selected access levels</string>
     <string name="measured_header">Measured item</string>
     <string name="measured_hint">Selected measured item</string>
@@ -132,7 +132,21 @@
     <string name="new_note">New Note</string>
     <string name="new_photo">New Photo</string>
     <string name="sync_string">Sync</string>
-    <string name="delete_string">Delete</string>
+    <string name="delete_string">Delete record</string>
+    <string name="add_default_string">Set as default</string>
+    <string name="remove_default_string">Remove from defaults</string>
+    <string name="title_constructor">%1$s %2$s</string>
+    <string name="title_constructor_new">New</string>
+    <string name="title_constructor_editing">Edit</string>
+    <string name="manage_defaults_string">Manage Defaults</string>
+
+    <string name="old_location_error_title">Warning: old location</string>
+    <string name="old_location_error_message">The location has not been updated in %1$s minutes.
+        Please check the GPS Accuracy to make sure it is not 0.0. If you ignore this message the
+        location of this record may not be accurate.</string>
+    <string name="old_location_wait_option">Wait</string>
+    <string name="old_location_use_option">Ignore</string>
+
 
     <string name="parse_failure">Failed to parse %1$s: %2$s</string>
 

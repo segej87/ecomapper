@@ -3,7 +3,6 @@ package com.gmail.jonsege.androiddatacollection;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -14,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -36,6 +34,11 @@ public class Notebook extends AppCompatActivity {
      * The activity's application context.
      */
     private MyApplication app;
+
+    /**
+     * The context menu
+     */
+    private Menu optionsMenu;
 
     /**
      * The list view to display records.
@@ -95,7 +98,8 @@ public class Notebook extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_notebook, menu);
+        inflater.inflate(R.menu.options_menu_notebook, menu);
+        optionsMenu = menu;
         return true;
     }
 
@@ -121,7 +125,9 @@ public class Notebook extends AppCompatActivity {
                 logoutButtonHandler();
                 return true;
             case R.id.sync:
+                Log.i(TAG,"Syncing records");
                 AttemptSync syncTask = new AttemptSync();
+                optionsMenu.setGroupEnabled(R.id.opMenuGroup,false);
                 syncTask.execute();
                 return true;
             default:
@@ -249,6 +255,12 @@ public class Notebook extends AppCompatActivity {
         saveLogin.execute((Void) null);
     }
 
+    private void moveToLogin() {
+        Intent intent = new Intent(Notebook.this, LoginActivity.class);
+        startActivity(intent);
+        this.finish();
+    }
+
     //endregion
 
     //region Data I/O
@@ -288,13 +300,13 @@ public class Notebook extends AppCompatActivity {
      * Sets up the activity's toolbar
      */
     private void setUpToolbar() {
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.login_toolbar);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.notebook_toolbar);
         getLayoutInflater().inflate(R.layout.action_bar_notebook, myToolbar);
         myToolbar.setTitle("");
         setSupportActionBar(myToolbar);
 
         // Set the logged in text.
-        TextView loggedInText = (TextView) findViewById(R.id.action_bar_title);
+        TextView loggedInText = (TextView) findViewById(R.id.action_bar_logged_in);
         loggedInText.setText(getString(R.string.logged_in_text_string,UserVars.UName));
     }
 
@@ -373,7 +385,7 @@ public class Notebook extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            finish();
+            moveToLogin();
         }
     }
 
@@ -384,13 +396,42 @@ public class Notebook extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void...params) {
-            return DataIO.attemptSync(Notebook.this);
+            return app.getRecords().size() > 0 && DataIO.attemptSync(Notebook.this);
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
             if (result) {
-                Log.i(TAG, "Records successfully synced");
+                app.deleteRecords();
+                DataIO.saveRecords(Notebook.this, app.getRecords());
+                adapter.notifyDataSetChanged();
+            }
+            SetListsTask slt = new SetListsTask();
+            slt.execute((Void) null);
+            optionsMenu.setGroupEnabled(R.id.opMenuGroup,true);
+        }
+    }
+
+    class SetListsTask extends AsyncTask<Void, Void, String>{
+
+        SetListsTask() {
+
+        }
+
+        protected String doInBackground(Void...Params) {
+            return DataIO.retrieveLists(Notebook.this, UserVars.UUID);
+        }
+
+        protected void onPostExecute(String result) {
+            boolean success = false;
+            if (!result.contains(getString(R.string.server_error_string))) {
+                success = DataIO.setLists(Notebook.this, result);
+            }
+
+            if (success) {
+                DataIO.saveUserVars(Notebook.this);
+            } else {
+                Log.i(TAG,result);
             }
         }
     }

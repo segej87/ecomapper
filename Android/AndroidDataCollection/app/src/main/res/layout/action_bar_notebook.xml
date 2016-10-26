@@ -6,7 +6,8 @@
     android:enabled="false"
     android:paddingStart="8dip"
     android:paddingEnd="8dip"
-    android:layout_gravity="start"
+    android:layout_gravity="start|bottom"
+    android:gravity="center_vertical"
     >
 
     <TextView
@@ -17,10 +18,10 @@
         android:textSize="@dimen/text_size_large"/>
 
     <TextView
-        android:id="@+id/action_bar_title"
+        android:id="@+id/action_bar_logged_in"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/text_size_small"
+        android:textSize="@dimen/text_size_smallest"
         style="@style/ActionBarButtonWhite"
         android:text="@string/logged_in_text_string"
         />

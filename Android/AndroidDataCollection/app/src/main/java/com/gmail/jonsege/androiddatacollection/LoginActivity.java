@@ -11,7 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -66,12 +66,13 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // Set up the toolbar
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.login_toolbar);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.notebook_toolbar);
         myToolbar.setTitleTextColor(Color.LTGRAY);
         setSupportActionBar(myToolbar);
 
         // Set up the login form.
         mUsernameView = (EditText) findViewById(R.id.username);
+        mUsernameView.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -95,22 +96,6 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-
-        // Check for saved uuid and go to notebook if there is one
-        String savedLogin = DataIO.loadLogin(this);
-        if (savedLogin.contains(getString(R.string.io_success))){
-            String savedUUID = savedLogin.replace(getString(R.string.io_success) + ": ","");
-            if (!savedUUID.equals("")) {
-                Log.i(TAG,getString(R.string.saved_login_log, savedUUID));
-                UserVars.UUID = savedUUID;
-                UserVars.UserVarsSaveFileName = getString(R.string.user_vars_file_prefix) + savedUUID;
-                String userVarsResult = DataIO.loadUserVars(this);
-                Log.i(TAG,getString(R.string.load_user_vars_report,userVarsResult));
-                moveToNotebook();
-            }
-        } else if (savedLogin.contains(getString(R.string.load_login_failure))){
-            showError(savedLogin);
-        }
     }
 
     //endregion
@@ -410,6 +395,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Intent intent = new Intent(LoginActivity.this, Notebook.class);
         startActivity(intent);
+        this.finish();
     }
 
     //endregion

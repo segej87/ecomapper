@@ -1,0 +1,10 @@
+#NOTE: This is an Aether internal implementation file, its format can be changed without prior notice.
+#Fri Sep 30 16:52:44 EDT 2016
+file\:C\:\\ecomapper\\DataMappingCopy\\DataMapping/repo/.lastUpdated=1475188236129
+file\:C\:\\ecomapper\\DataMapping\\Project/repo/.lastUpdated=1475268589340
+file\:C\:\\ecomapper\\DataMapping/repo/.error=
+file\:C\:\\ecomapper\\DataMappingCopy\\DataMapping/repo/.error=
+@default-central-https\://repo.maven.apache.org/maven2/.lastUpdated=1475188236141
+file\:C\:\\ecomapper\\DataMapping/repo/.lastUpdated=1475268764265
+https\://repo.maven.apache.org/maven2/.error=Could not transfer artifact org.eclipse.jetty\:jetty-runner\:pom\:9.4.0.M0 from/to central (https\://repo.maven.apache.org/maven2)\: repo.maven.apache.org
+file\:C\:\\ecomapper\\DataMapping\\Project/repo/.error=

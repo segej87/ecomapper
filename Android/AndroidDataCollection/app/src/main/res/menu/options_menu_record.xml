@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group
+        android:id="@+id/opRecordGroup"
+        >
+
+        <item android:id="@+id/cancel_record"
+            android:title="@string/cancel_button_string"
+            android:icon="@android:drawable/ic_menu_close_clear_cancel"
+            app:showAsAction="ifRoom" />
+
+        <item android:id="@+id/save_record"
+            android:title="@string/save_button_string"
+            android:icon="@android:drawable/ic_menu_save"
+            app:showAsAction="ifRoom"/>
+
+    </group>
+
+</menu>

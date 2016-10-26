@@ -70,8 +70,8 @@ class Record {
 
             // Create a JSON object with the record's coordinates
             JSONArray coordsJsonOut = new JSONArray();
-            for (double c : coords) {
-                coordsJsonOut.put(c);
+            for (int c = 0; c < coords.length; c++) {
+                coordsJsonOut.put(c,coords[c]);
             }
 
             // Add coordinates to the geometry

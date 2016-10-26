@@ -6,6 +6,7 @@ import android.support.multidex.MultiDex;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ public class MyApplication extends Application {
     /**
      * The records list for the application
      */
-    private List<Record> records = new ArrayList<>();
+    private final List<Record> records = new ArrayList<>();
 
     //endregion
 
@@ -40,7 +41,7 @@ public class MyApplication extends Application {
      * Returns the list of records being used by the application.
      * @return records
      */
-    public List<Record> getRecords() {
+    public synchronized List<Record> getRecords() {
         return records;
     }
 
@@ -49,7 +50,7 @@ public class MyApplication extends Application {
      * @param i index
      * @return record
      */
-    public Record getRecord(int i) {
+    public synchronized Record getRecord(int i) {
         return records.get(i);
     }
 
@@ -58,7 +59,7 @@ public class MyApplication extends Application {
      * @param record
      *      the record to add to the list
      */
-    public void addRecord(Record record) {
+    public synchronized void addRecord(Record record) {
         this.records.add(record);
 
         Log.i(TAG,getString(R.string.adding_record));
@@ -69,7 +70,7 @@ public class MyApplication extends Application {
      * @param records
      *      An array list of records to add to the list
      */
-    public void addRecords(List<Record> records) {
+    public synchronized void addRecords(List<Record> records) {
         this.records.addAll(records);
     }
 
@@ -80,8 +81,9 @@ public class MyApplication extends Application {
      * @return
      *      A report of success or failure
      */
-    public String replaceRecords(List<Record> records) {
-        this.records = records;
+    public synchronized String replaceRecords(List<Record> records) {
+        deleteRecords();
+        this.records.addAll(records);
         return getString(R.string.io_success);
     }
 
@@ -92,11 +94,11 @@ public class MyApplication extends Application {
      * @param record
      *      The new record to put at the specified index
      */
-    public void replaceRecord(int index, Record record) {
+    public synchronized void replaceRecord(int index, Record record) {
         this.records.set(index, record);
     }
 
-    public boolean deleteRecord(Record record) {
+    public synchronized boolean deleteRecord(Record record) {
         try {
             this.records.remove(record);
             return true;
@@ -105,6 +107,15 @@ public class MyApplication extends Application {
         }
 
         return false;
+    }
+
+    public synchronized void deleteRecords() {
+        for (Iterator<Record> r = this.records.iterator(); r.hasNext();) {
+            Record record= r.next();
+            if (record != null) {
+                r.remove();
+            }
+        }
     }
 
     //endregion

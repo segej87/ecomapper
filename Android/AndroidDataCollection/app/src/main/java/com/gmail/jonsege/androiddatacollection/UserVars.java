@@ -58,4 +58,12 @@ class UserVars {
      */
     static Map<String, Object[]> Units = new HashMap<>();
 
+    /**
+     * Defaults
+     */
+    static List<String> AccessDefaults = new ArrayList<>();
+    static List<String> TagsDefaults = new ArrayList<>();
+    static String SpecDefault = null;
+    static String UnitsDefault = null;
+
 }

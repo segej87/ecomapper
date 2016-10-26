@@ -3,45 +3,27 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:enabled="false"
+    android:paddingStart="8dip"
+    android:paddingEnd="8dip"
+    android:layout_gravity="start|bottom"
+    android:gravity="center_vertical"
     >
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/action_bar_title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:enabled="false"
-        android:orientation="horizontal"
-        android:paddingStart="8dip"
-        android:paddingEnd="8dip"
-        android:paddingRight="8dip">
+        style="@style/ActionBarButtonWhite"
+        android:textSize="@dimen/text_size_large"/>
 
-        <TextView
-            android:id="@+id/action_bar_title"
-            style="@style/ActionBarButtonWhite"
-            android:text="@string/logged_in_text_string"
-            android:layout_weight="1"
-            />
-
-        <Button
-            android:id="@+id/action_bar_cancel"
-            android:layout_width="wrap_content"
-            style="@style/ActionBarButtonOffWhite"
-            android:textSize="@dimen/text_size_small"
-            android:text="@string/cancel_button_string"
-            android:layout_marginEnd="10dip"
-            android:layout_marginRight="10dip"
-            android:layout_weight="0.01"
-            />
-
-        <Button
-            android:id="@+id/action_bar_save"
-            style="@style/ActionBarButtonOffWhite"
-            android:textSize="@dimen/text_size_small"
-            android:text="@string/save_button_string"
-            android:layout_marginEnd="10dip"
-            android:layout_marginRight="10dip"
-            android:layout_weight="0.01"
-            />
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/action_bar_logged_in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size_smallest"
+        style="@style/ActionBarButtonWhite"
+        android:text="@string/logged_in_text_string"
+        />
 
 </LinearLayout>

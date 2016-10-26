@@ -10,15 +10,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -197,8 +193,12 @@ final class DataIO {
             jsonObject.put("RecordsSaveFileName",UserVars.RecordsSaveFileName);
             jsonObject.put("MediasSaveFileName",UserVars.MediasSaveFileName);
             jsonObject.put("AccessLevels",new JSONArray(UserVars.AccessLevels));
+            jsonObject.put("AccessDefaults",new JSONArray(UserVars.AccessDefaults));
+            jsonObject.put("TagsDefaults",new JSONArray(UserVars.TagsDefaults));
+            jsonObject.put("SpecDefault",UserVars.SpecDefault);
+            jsonObject.put("UnitsDefault",UserVars.UnitsDefault);
 
-            // For lists, loop to encode each
+            // For maps, loop to encode each
             JSONObject jTags = encodeJavaMaps(context, UserVars.Tags);
             jsonObject.put("Tags",jTags);
             JSONObject jSpec = encodeJavaMaps(context, UserVars.Species);
@@ -287,6 +287,20 @@ final class DataIO {
 
             JSONObject unitIn = (JSONObject) jResult.get("Units");
             UserVars.Units = decodeJsonLists(context, unitIn);
+
+            // Set the defaults.
+            JSONArray aldJArray = (JSONArray) jResult.get("AccessDefaults");
+            for (int i=0; i < aldJArray.length(); i++) {
+                UserVars.AccessDefaults.add(aldJArray.getString(i));
+            }
+
+            JSONArray tdJArray = (JSONArray) jResult.get("TagsDefaults");
+            for (int i=0; i < tdJArray.length(); i++) {
+                UserVars.TagsDefaults.add(tdJArray.getString(i));
+            }
+
+            UserVars.SpecDefault = jResult.getString("SpecDefault");
+            UserVars.UnitsDefault = jResult.getString("UnitsDefault");
 
             // Return a report.
             return context.getString(R.string.io_success);
@@ -496,6 +510,10 @@ final class DataIO {
         UserVars.Tags = new HashMap<>();
         UserVars.Species = new HashMap<>();
         UserVars.Units = new HashMap<>();
+        UserVars.AccessDefaults = new ArrayList<>();
+        UserVars.TagsDefaults = new ArrayList<>();
+        UserVars.SpecDefault = null;
+        UserVars.UnitsDefault = null;
 
         // Return a report.
         return context.getString(R.string.io_success);
@@ -583,8 +601,6 @@ final class DataIO {
 
             // Decode the result string using a JSON Object.
             jResult = new JSONObject(dataString.toString());
-
-            return jResult;
         } catch (Exception e) {
 
             // Log an error.
@@ -655,7 +671,6 @@ final class DataIO {
                             propsOut.put(k, propArray);
                         } else {
 
-                            // If the property is not a JSON array, read it as a string.
                             propsOut.put(k, prop);
                         }
                     }
@@ -883,7 +898,9 @@ final class DataIO {
             // Add access level's to the default values in the User Variables
             JSONArray accessArray = jObject.getJSONArray("institutions");
             for (int i = 0; i < accessArray.length(); i++) {
-                UserVars.AccessLevels.add(accessArray.getString(i));
+                if (!UserVars.AccessLevels.contains(accessArray.getString(i))) {
+                    UserVars.AccessLevels.add(accessArray.getString(i));
+                }
             }
 
             // For lists pulled from the server, tag each as server and 0 count.
@@ -926,7 +943,8 @@ final class DataIO {
         // Parameters for the server request.
         Map<String,Object> pars = new LinkedHashMap<>();
         pars.put("GUID", UserVars.UUID);
-        pars.put("geojson", jsonObject.toString());
+        pars.put("geojson", jsonObject.toString().replace("\\/","/"));
+        System.out.println("Using json string: " + pars.get("geojson"));
 
         try {
             StringBuilder postData = new StringBuilder();
@@ -942,8 +960,6 @@ final class DataIO {
                 postData.append('=');
                 postData.append(URLEncoder.encode(String.valueOf(par.getValue()), "UTF-8"));
             }
-
-            Log.i(TAG,postData.toString());
 
             // Create a data array of the request string.
             byte[] postDataBytes = postData.toString().getBytes("UTF-8");

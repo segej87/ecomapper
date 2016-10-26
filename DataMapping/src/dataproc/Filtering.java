@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import de.fhpotsdam.unfolding.marker.Marker;
 import markers.MeasMarker;
 import markers.PointMarker;
@@ -79,7 +82,15 @@ public class Filtering {
 		availTags = new ArrayList<String>();
 		
 		for (Marker m : filteredMarkers){
-			String[] ts = m.getProperty("tags").toString().split(";");
+			JSONArray read = (JSONArray) m.getProperty("tags");
+			String[] ts = new String[read.length()];
+			for (int i = 0; i < read.length(); i++) {
+				try {
+					ts[i] = read.get(i).toString();
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
 			if (!availDT.contains(m.getProperty("datatype").toString())){
 				availDT.add(m.getProperty("datatype").toString());
 			}

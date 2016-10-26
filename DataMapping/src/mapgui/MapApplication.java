@@ -9,7 +9,7 @@ public class MapApplication {
 	
 	public static void main(String[] args) {
 		//create a frame for the application
-        final JFrame frame = new JFrame("Data Mapping");
+        final JFrame frame = new JFrame("KoraMap");
         //make sure to shut down the application, when the frame is closed
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -29,10 +29,10 @@ public class MapApplication {
         
         //assign a size for the frame
         //reading the size from the applet
-//		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-//		int screenWidth = gd.getDisplayMode().getWidth();
-//		int screenHeight = gd.getDisplayMode().getHeight();
-        frame.setSize(1366, 768);
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		int screenWidth = gd.getDisplayMode().getWidth();
+		int screenHeight = gd.getDisplayMode().getHeight();
+        frame.setSize(screenWidth, screenHeight);
         
         //display the frame
         frame.setVisible(true);
