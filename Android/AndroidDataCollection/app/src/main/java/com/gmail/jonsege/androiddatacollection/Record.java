@@ -25,11 +25,6 @@ class Record {
     private final static String TAG = "record";
 
     /**
-     * Context creating the record
-     */
-    private final Context context;
-
-    /**
      * Variables for the record
      */
     final String type;
@@ -41,8 +36,7 @@ class Record {
 
     //region Initialization
 
-    Record(Context context, String type, Double[] coords, String photo, Map<String, Object> props){
-        this.context = context;
+    Record(String type, Double[] coords, String photo, Map<String, Object> props){
         this.type = type;
         this.coords = coords;
         this.props = props;
@@ -90,6 +84,11 @@ class Record {
                 }
             }
 
+            // If the record is a photo, add the local filepath.
+            if (props.get("datatype").equals("photo")) {
+                propsJsonOut.put("filepath",photoPath);
+            }
+
             // Add the keys to the feature array
             recordJsonOut.put("geometry", geomJsonOut);
             recordJsonOut.put("type", "Feature");
@@ -97,7 +96,7 @@ class Record {
 
             return recordJsonOut;
         } catch (JSONException e) {
-            Log.i(TAG,context.getString(R.string.json_encode_error,e.getLocalizedMessage()));
+            e.printStackTrace();
         }
 
         return recordJsonOut;

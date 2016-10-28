@@ -2,7 +2,9 @@ package com.gmail.jonsege.androiddatacollection;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -54,6 +56,11 @@ public class Notebook extends AppCompatActivity {
      * For using a context menu to delete a record.
      */
     Record choppingBlock;
+
+//    /**
+//     * A LruCache for images in the list view
+//     */
+//    LruCache<String, Bitmap> mMemoryCache;
 
     //endregion
 
@@ -233,6 +240,7 @@ public class Notebook extends AppCompatActivity {
         }
 
         intent.putExtra("MODE", "new");
+        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 
         Log.i(TAG,getString(R.string.start_new_record,type));
         startActivity(intent);
@@ -243,6 +251,7 @@ public class Notebook extends AppCompatActivity {
             Intent intent = new Intent(Notebook.this, dest);
             intent.putExtra("MODE", "old");
             intent.putExtra("INDEX", position);
+            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         }
     }
@@ -291,6 +300,20 @@ public class Notebook extends AppCompatActivity {
             setUpListViewAdapter();
         }
     }
+
+    //endregion
+
+    //region Memory Cache
+
+//    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+//        if (getBitmapFromMemCache(key) == null) {
+//            app.mMemoryCache.put(key, bitmap);
+//        }
+//    }
+//
+//    public Bitmap getBitmapFromMemCache(String key) {
+//        return app.mMemoryCache.get(key);
+//    }
 
     //endregion
 

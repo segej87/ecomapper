@@ -195,8 +195,17 @@ final class DataIO {
             jsonObject.put("AccessLevels",new JSONArray(UserVars.AccessLevels));
             jsonObject.put("AccessDefaults",new JSONArray(UserVars.AccessDefaults));
             jsonObject.put("TagsDefaults",new JSONArray(UserVars.TagsDefaults));
-            jsonObject.put("SpecDefault",UserVars.SpecDefault);
-            jsonObject.put("UnitsDefault",UserVars.UnitsDefault);
+            if (UserVars.SpecDefault == null) {
+                jsonObject.put("SpecDefault", "");
+            } else {
+                jsonObject.put("SpecDefault", UserVars.SpecDefault);
+            }
+
+            if (UserVars.UnitsDefault == null) {
+                jsonObject.put("UnitsDefault", "");
+            } else {
+                jsonObject.put("UnitsDefault", UserVars.UnitsDefault);
+            }
 
             // For maps, loop to encode each
             JSONObject jTags = encodeJavaMaps(context, UserVars.Tags);
@@ -291,16 +300,21 @@ final class DataIO {
             // Set the defaults.
             JSONArray aldJArray = (JSONArray) jResult.get("AccessDefaults");
             for (int i=0; i < aldJArray.length(); i++) {
-                UserVars.AccessDefaults.add(aldJArray.getString(i));
+                if (!UserVars.AccessDefaults.contains(aldJArray.getString(i)))
+                    UserVars.AccessDefaults.add(aldJArray.getString(i));
             }
 
             JSONArray tdJArray = (JSONArray) jResult.get("TagsDefaults");
             for (int i=0; i < tdJArray.length(); i++) {
-                UserVars.TagsDefaults.add(tdJArray.getString(i));
+                if (!UserVars.TagsDefaults.contains(tdJArray.getString(i)))
+                    UserVars.TagsDefaults.add(tdJArray.getString(i));
             }
 
             UserVars.SpecDefault = jResult.getString("SpecDefault");
+            if (UserVars.SpecDefault.equals("")) UserVars.SpecDefault = null;
+
             UserVars.UnitsDefault = jResult.getString("UnitsDefault");
+            if (UserVars.UnitsDefault.equals("")) UserVars.UnitsDefault = null;
 
             // Return a report.
             return context.getString(R.string.io_success);
@@ -678,8 +692,14 @@ final class DataIO {
                     // Finish the iteration
                     iter.remove();
 
+                    String photoPath = null;
+                    // Get the photo filepath (if the datatype is photo).
+                    if (propsOut.get("datatype").equals("photo")) {
+                        photoPath = propsOut.get("filepath").toString();
+                    }
+
                     // Add the decoded record to the list to return.
-                    recordsOut.add(new Record(context, type, coordsOut, null, propsOut));
+                    recordsOut.add(new Record(type, coordsOut, photoPath, propsOut));
                 }
             } catch (Exception e) {
 

@@ -146,7 +146,6 @@ public class ListPickerActivity extends AppCompatActivity {
             }
 
             changeDefault = (String) lv.getItemAtPosition(acmi.position);
-            System.out.println(compareArray.contains(changeDefault));
 
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.context_menu_list_picker,menu);

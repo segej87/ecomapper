@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
 
     <application
         android:name=".MyApplication"
@@ -18,6 +20,17 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <provider
+            android:name = "android.support.v4.content.FileProvider"
+            android:authorities="org.koramap.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths">
+
+            </meta-data>
+        </provider>
         <activity
             android:name=".StartScreen"
             android:label="@string/app_name">
@@ -33,6 +46,7 @@
         <activity android:name=".NewNote" />
         <activity android:name=".Notebook" />
         <activity android:name=".ListPickerActivity" />
+        <activity android:name=".CameraActivity" />
     </application>
 
 </manifest>

@@ -94,7 +94,9 @@
     <string name="spec_field_string">Measured item</string>
     <string name="unit_field_string">Units</string>
     <string name="note_field_string">Note</string>
+    <string name="photo_field_string">Photo</string>
     <string name="wrong_number_format">Please enter a valid number</string>
+    <string name="photo_button_description">Choose a photo from the gallery, or take a new one.</string>
 
     <string name="start_old_record">Starting activity to edit %1$s record</string>
 

@@ -26,7 +26,8 @@
             android:icon="@android:drawable/ic_popup_sync" />
 
         <item android:id="@+id/defaults"
-            android:title="@string/manage_defaults_string" />
+            android:title="@string/manage_defaults_string"
+            android:enabled="false" />
 
         <item android:id="@+id/logout"
             android:title="@string/logout_flag"

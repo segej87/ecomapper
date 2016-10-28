@@ -3,6 +3,7 @@ package com.gmail.jonsege.androiddatacollection;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -24,7 +25,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
     //region Class Variables
 
     // The context for the adapter.
-    private final Context context;
+    private final Notebook context;
 
     // The data source for the adapter.
     private final List<Record> records;
@@ -34,7 +35,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
     //region Initialization
 
     // Adapter's constructor.
-    NotebookArrayAdapter(Context context, List<Record> values) {
+    NotebookArrayAdapter(Notebook context, List<Record> values) {
         super(context, -1, values);
         this.context = context;
         this.records = values;
@@ -81,8 +82,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
             File imgFile = new File(records.get(position).photoPath);
 
             if (imgFile.exists()) {
-                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                viewHolder.imageView.setImageBitmap(myBitmap);
+                setImageView(viewHolder.imageView, imgFile.getAbsolutePath());
             }
         } else {
             int resource = 0;
@@ -94,6 +94,11 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
                 case "note":
                     resource = R.mipmap.note_image;
                     break;
+                case "photo":
+                    resource = R.mipmap.photo_image;
+                    break;
+                default:
+                    resource = R.drawable.ic_menu_camera;
             }
 
             viewHolder.imageView.setImageResource(resource);
@@ -133,5 +138,70 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
         TextView thirdLine;
     }
 
-    //
+    //endregion
+
+    //region Helper Methods
+
+    /**
+     * Sets the image of the photo button
+     */
+    private void setImageView(ImageView imageView, String path) {
+        String cacheKey = path.substring(path.lastIndexOf('/') + 1).
+                replaceAll(".jpg","").
+                replaceAll("_","");
+
+        // First check the Bitmap cache
+        final Bitmap cachedBitmap = ((MyApplication) context.getApplicationContext())
+                .getBitmapFromMemCache(cacheKey);
+
+        if (cachedBitmap != null) {
+            imageView.setImageBitmap(cachedBitmap);
+        } else {
+            // First decode to check image dimensions
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(path, options);
+
+            // Calculate inSampleSize
+            options.inSampleSize = calculateInSampleSize(options,
+                    89,
+                    89);
+
+            // Decode bitmap with inSampleSize set
+            options.inJustDecodeBounds = false;
+            Bitmap loadedBitmap = BitmapFactory.decodeFile(path, options);
+            ((MyApplication) context.getApplicationContext())
+                    .addBitmapToMemoryCache(cacheKey, loadedBitmap);
+
+            if (loadedBitmap == null) {
+                imageView.setImageResource(R.mipmap.photo_image);
+            } else {
+                imageView.setImageBitmap(loadedBitmap);
+            }
+
+        }
+    }
+
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 3;
+            final int halfWidth = width / 3;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize;
+    }
+
+    //endregion
 }

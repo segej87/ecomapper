@@ -54,6 +54,7 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
             $num_new_feats = count($new_feats);
             
             // check if any of the new features are already in the sql database
+			//TODO: Replace with SQL logic
             $samesArray = array();
             if ($num_new_feats > 0) {
                 for ($j = 0; $j < $num_new_feats; $j++) {
@@ -97,12 +98,13 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
                     $cols_array['geometry_elev'] = $f['geometry']['coordinates'][2];
                 }
                 
+				//TODO: REPLACE str_replace with other logic to prevent security issues.
                 $property_array = $f['properties'];
                 $props_out = array();
                 for ($j = 0; $j < count(array_keys($property_array)); $j++) {
                     $property_name = 'property_' . array_keys($property_array)[$j];
                     $property_val = $property_array[array_keys($property_array)[$j]];
-                    $props_out[$property_name] = $property_val;
+                    $props_out[$property_name] = str_replace("'","''",$property_val);
                 }
                 
                 $add_cols = array_merge($cols_array, $props_out);
@@ -116,11 +118,13 @@ if (isset($_POST['GUID']) && isset($_POST['geojson']))
                 
                 // TODO: prevent SQL injection
                 $add_col_keys = '(' . implode(', ',array_keys($add_cols)) . ')';
-                $add_col_vals = "('" . implode("', '",$add_cols) . "')";
+				$add_col_vals = '(' . str_repeat('?, ', count($add_cols) - 1) . '?)';
 
                 // Insert the new features as rows in the records table
                 $tsql_insert = "INSERT INTO records " . $add_col_keys . " OUTPUT Inserted.FUID VALUES " . $add_col_vals;
-                $result_insert = sqlsrv_query($conn, $tsql_insert);
+				$params_insert = array_values($add_cols);
+				
+                $result_insert = sqlsrv_query($conn, $tsql_insert, $params_insert);
                 $result_fetch = sqlsrv_fetch_array($result_insert);
                 
                 if ($result_insert === false ) {

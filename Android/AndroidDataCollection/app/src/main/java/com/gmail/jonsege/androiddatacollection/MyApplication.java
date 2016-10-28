@@ -2,7 +2,9 @@ package com.gmail.jonsege.androiddatacollection;
 
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.multidex.MultiDex;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -26,6 +28,11 @@ public class MyApplication extends Application {
      * The records list for the application
      */
     private final List<Record> records = new ArrayList<>();
+
+    /**
+     * A LruCache for images in the list view
+     */
+    LruCache<String, Bitmap> mMemoryCache;
 
     //endregion
 
@@ -116,6 +123,43 @@ public class MyApplication extends Application {
                 r.remove();
             }
         }
+    }
+
+    //endregion
+
+    //region Memory Cache
+
+    public void setUpMemoryCache() {
+        // Get max available VM memory, exceeding this amount will throw an
+        // OutOfMemory exception. Stored in kilobytes as LruCache takes an
+        // int in its constructor.
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+
+        // Use 1/8th of the available memory for this memory cache.
+        final int cacheSize = maxMemory / 8;
+
+        mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap bitmap) {
+                // The cache size will be measured in kilobytes rather than
+                // number of items.
+                return bitmap.getByteCount() / 1024;
+            }
+        };
+    }
+
+    public synchronized void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+        if (mMemoryCache == null) {
+            setUpMemoryCache();
+        }
+
+        if (getBitmapFromMemCache(key) == null) {
+            mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    public synchronized Bitmap getBitmapFromMemCache(String key) {
+        return mMemoryCache.get(key);
     }
 
     //endregion

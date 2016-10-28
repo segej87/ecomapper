@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +78,11 @@ public abstract class NewRecord extends AppCompatActivity
      * The index of the record in the app's record list (for old records only
      */
     int recordIndex = -1;
+
+    /**
+     * A request code for list picker activities
+     */
+    protected final int LIST_PICKER_REQUEST_CODE = 100;
 
     //endregion
 
@@ -204,7 +210,7 @@ public abstract class NewRecord extends AppCompatActivity
         Intent intent = new Intent(NewRecord.this, ListPickerActivity.class);
         intent.putExtra("MODE", mode);
         intent.putStringArrayListExtra("PREVIOUS", (ArrayList<String>) previous);
-        startActivityForResult(intent, 100);
+        startActivityForResult(intent, LIST_PICKER_REQUEST_CODE);
     }
 
     /**
@@ -218,7 +224,7 @@ public abstract class NewRecord extends AppCompatActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch(requestCode) {
-            case (100) : {
+            case (LIST_PICKER_REQUEST_CODE) : {
                 if (resultCode == Activity.RESULT_OK) {
                     String mode = data.getStringExtra("MODE");
                     List<String> result = data.getStringArrayListExtra("RESULT");
@@ -295,7 +301,7 @@ public abstract class NewRecord extends AppCompatActivity
             }
 
             // Set the activity's record object to the newly created record.
-            context.record = new Record(this.context, type, userLoc, mPhoto, itemsOut);
+            context.record = new Record(type, userLoc, mPhoto, itemsOut);
 
             // Return whether the record's name equals the name selected by the user.
             return context.record.props.get("name").equals(itemsOut.get("name").toString());
@@ -391,9 +397,12 @@ public abstract class NewRecord extends AppCompatActivity
         StringBuilder sb = new StringBuilder();
 
         String delimiter = "";
-        for (String v : values) {
-            sb.append(delimiter).append(v);
-            delimiter = ", ";
+        for (Iterator<String> s = values.iterator(); s.hasNext();) {
+            String appString = s.next();
+            if (!sb.toString().contains(appString)) {
+                sb.append(delimiter).append(appString);
+                delimiter = ", ";
+            }
         }
         String displayString = sb.toString();
 

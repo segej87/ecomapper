@@ -117,14 +117,7 @@ public class NewNote extends NewRecord {
      */
     @Override
     protected void returnFromListPicker(String mode, List<String> values) {
-        StringBuilder sb = new StringBuilder();
-        String delimiter = "";
-        for (String v : values) {
-            sb.append(delimiter).append(v);
-            delimiter = ", ";
-        }
-
-        String displayString = sb.toString();
+        String displayString = arrayToStringForView(values);
 
         switch(mode) {
             case "access":

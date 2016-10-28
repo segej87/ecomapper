@@ -82,11 +82,20 @@ public class Filtering {
 		availTags = new ArrayList<String>();
 		
 		for (Marker m : filteredMarkers){
-			JSONArray read = (JSONArray) m.getProperty("tags");
-			String[] ts = new String[read.length()];
-			for (int i = 0; i < read.length(); i++) {
+			JSONArray readTags = (JSONArray) m.getProperty("tags");
+			String[] ts = new String[readTags.length()];
+			for (int i = 0; i < readTags.length(); i++) {
 				try {
-					ts[i] = read.get(i).toString();
+					ts[i] = readTags.get(i).toString();
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+			JSONArray readAccess = (JSONArray) m.getProperty("access");
+			String[] al = new String[readAccess.length()];
+			for (int i = 0; i < readAccess.length(); i++) {
+				try {
+					al[i] = readAccess.get(i).toString();
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -98,9 +107,6 @@ public class Filtering {
 				if (!availSpec.contains(m.getProperty("species".toString()))){
 					availSpec.add(m.getProperty("species").toString());
 				}
-			}
-			if (!availAL.contains(m.getProperty("access").toString())){
-				availAL.add(m.getProperty("access").toString());
 			}
 			if (m.getProperties().containsKey("country") && !availGeo.contains("country")){
 				if (!m.getProperty("country").toString().equals("none")){
@@ -116,6 +122,13 @@ public class Filtering {
 				for (String t : ts){
 					if (!availTags.contains(t)){
 						availTags.add(t);
+					}
+				}
+			}
+			if (al.length > 0) {
+				for (String a : al) {
+					if (!availAL.contains(a)) {
+						availAL.add(a);
 					}
 				}
 			}

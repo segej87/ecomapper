@@ -13,8 +13,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_marginEnd="6dip"
-        android:contentDescription="@string/icon_description"
-        android:src="@drawable/ic_menu_camera" />
+        android:contentDescription="@string/icon_description" />
 
     <TextView
         android:id="@+id/firstLine"
