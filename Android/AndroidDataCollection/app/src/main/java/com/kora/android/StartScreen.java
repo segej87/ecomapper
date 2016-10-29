@@ -1,4 +1,4 @@
-package com.gmail.jonsege.androiddatacollection;
+package com.kora.android;
 
 import android.content.Intent;
 import android.os.Bundle;

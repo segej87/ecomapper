@@ -1,4 +1,4 @@
-package com.gmail.jonsege.androiddatacollection;
+package com.kora.android;
 
 import java.util.ArrayList;
 import java.util.List;

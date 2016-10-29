@@ -1,4 +1,4 @@
-package com.gmail.jonsege.androiddatacollection;
+package com.kora.android;
 
 import android.app.Application;
 import android.content.Context;
@@ -102,8 +102,10 @@ public class KoraApplication extends Application {
      *      The new record to put at the specified index
      */
     public synchronized void replaceRecord(int index, Record record) {
-        if (!this.records.get(index).photoPath.equals(record.photoPath)) {
-            DataIO.deleteFile(this.records.get(index).photoPath);
+        if (this.records.get(index).props.get("datatype").equals("photo")) {
+            if (!this.records.get(index).photoPath.equals(record.photoPath)) {
+                DataIO.deleteFile(this.records.get(index).photoPath);
+            }
         }
         this.records.set(index, record);
     }

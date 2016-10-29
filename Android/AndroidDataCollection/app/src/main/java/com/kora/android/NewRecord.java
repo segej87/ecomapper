@@ -1,4 +1,4 @@
-package com.gmail.jonsege.androiddatacollection;
+package com.kora.android;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -271,16 +272,22 @@ public abstract class NewRecord extends AppCompatActivity
             // Create the properties map using the helper method.
             setItemsOut();
 
-            // If the user's location was not found, set to default (null island).
-            if (latestLoc == null) {
-                Log.i(TAG,getString(R.string.no_user_location_found));
-                userLoc[0] = 0.0;
-                userLoc[1] = 0.0;
-                userLoc[2] = 0.0;
-            } else {
-                userLoc[0] = latestLoc.getLongitude();
-                userLoc[1] = latestLoc.getLatitude();
-                userLoc[2] = latestLoc.getAltitude();
+            if (mode.equals("new")) {
+                // If the user's location was not found, set to default (null island).
+                if (latestLoc == null) {
+                    Log.i(TAG, getString(R.string.no_user_location_found));
+                    Toast.makeText(NewRecord.this,
+                            getString(R.string.no_user_location_found),
+                            Toast.LENGTH_SHORT)
+                            .show();
+                    userLoc[0] = 0.0;
+                    userLoc[1] = 0.0;
+                    userLoc[2] = 0.0;
+                } else {
+                    userLoc[0] = latestLoc.getLongitude();
+                    userLoc[1] = latestLoc.getLatitude();
+                    userLoc[2] = latestLoc.getAltitude();
+                }
             }
 
             // Set the activity's record object to the newly created record.
@@ -292,7 +299,6 @@ public abstract class NewRecord extends AppCompatActivity
 
         @Override
         protected void onPostExecute(Boolean result) {
-
             // If success, add the record to the list, save the list, and finish the activity.
             if (result) {
 
@@ -397,7 +403,8 @@ public abstract class NewRecord extends AppCompatActivity
 
         //TODO: Warn user of location failure!
         if (latestLoc == null) {
-            return false;
+            Toast.makeText(NewRecord.this, getString(R.string.no_user_location_found), Toast.LENGTH_SHORT);
+            return true;
         }
 
         Long elapsedTime = ((new Date()).getTime() - latestLoc.getTime()) / 60000;

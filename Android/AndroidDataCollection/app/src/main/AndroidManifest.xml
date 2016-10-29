@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.gmail.jonsege.androiddatacollection">
+    package="com.kora.android">
 
     <!-- Permissions for internet access, location services, camera use, and writing to storage -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -10,7 +10,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="true" />
 
     <application
-        android:name=".KoraApplication"
+        android:name="com.kora.android.KoraApplication"
         android:allowBackup="true"
         android:icon="@mipmap/kora_logo"
         android:label="@string/app_name"
@@ -32,7 +32,7 @@
             </meta-data>
         </provider>
         <activity
-            android:name=".StartScreen"
+            android:name="com.kora.android.StartScreen"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,13 +40,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NewMeas" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".NewPhoto" />
-        <activity android:name=".NewNote" />
-        <activity android:name=".Notebook" />
-        <activity android:name=".ListPickerActivity" />
-        <activity android:name=".CameraActivity" />
+        <activity android:name="com.kora.android.NewMeas" />
+        <activity android:name="com.kora.android.LoginActivity" />
+        <activity android:name="com.kora.android.NewPhoto" />
+        <activity android:name="com.kora.android.NewNote" />
+        <activity android:name="com.kora.android.Notebook" />
+        <activity android:name="com.kora.android.ListPickerActivity" />
+        <activity android:name="com.kora.android.CameraActivity" />
     </application>
 
 </manifest>

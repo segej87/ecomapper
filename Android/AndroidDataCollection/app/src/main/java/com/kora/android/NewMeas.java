@@ -1,4 +1,4 @@
-package com.gmail.jonsege.androiddatacollection;
+package com.kora.android;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;

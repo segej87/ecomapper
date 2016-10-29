@@ -5,7 +5,7 @@
     android:id="@+id/activity_new_note"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.gmail.jonsege.androiddatacollection.NewNote" >
+    tools:context="com.gmail.jonsege.android.NewNote" >
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/new_toolbar"

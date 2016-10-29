@@ -1,5 +1,9 @@
-package com.gmail.jonsege.androiddatacollection;
+package com.kora.android;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -9,28 +13,43 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.Contract;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewNote extends NewRecord {
+public class NewPhoto extends NewRecord {
 
     //region Class Variables
 
     /**
      * Tag for this activity
      */
-    private final String TAG = "new_note";
+    private final String TAG = "new_photo";
 
     /**
      * UI elements
      */
     private EditText mNameTextField;
     private TextView mAccessTextField;
+    private ImageButton mPhotoButton;
     private EditText mNoteTextField;
     private TextView mTagTextField;
     private TextView mGPSAccField;
+
+    /**
+     * Request code for taking a new photo
+     */
+    private final int CAMERA_IDENTIFIER = 199;
+
+    /**
+     * Make sure that only one camera is open
+     */
+    private boolean alreadyInCamera = false;
 
     //endregion
 
@@ -41,7 +60,7 @@ public class NewNote extends NewRecord {
         super.onCreate(savedInstanceState);
         super.TAG = this.TAG;
         super.type = "Point";
-        setContentView(R.layout.activity_new_note);
+        setContentView(R.layout.activity_new_photo);
 
         //Set up the toolbar.
         setUpToolbar();
@@ -61,10 +80,29 @@ public class NewNote extends NewRecord {
                     mNameTextField.setError(null);
                 }
 
-                mNameTextField.setText(setDefaultName("Note"));
+                mNameTextField.setText(setDefaultName("Photo"));
                 mNameTextField.clearFocus();
             }
         });
+
+        // Set up the photo button
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!alreadyInCamera) {
+                    Intent camera = new Intent(NewPhoto.this, CameraActivity.class);
+                    camera.putExtra("DATE", df.format(dateTime));
+
+                    alreadyInCamera = true;
+                    startActivityForResult(camera, CAMERA_IDENTIFIER);
+                }
+            }
+        });
+    }
+
+    protected void onStart() {
+        super.onStart();
+        alreadyInCamera = false;
     }
 
     //endregion
@@ -90,6 +128,8 @@ public class NewNote extends NewRecord {
                 saveRecord();
                 return true;
             case R.id.cancel_record:
+                if (mode.equals("new"))
+                    DataIO.deleteFile(mPhoto);
                 moveToNotebook();
                 return true;
             default:
@@ -102,7 +142,7 @@ public class NewNote extends NewRecord {
     //region Navigation
 
     /**
-     * Finishes the NewNote activity
+     * Finishes the NewPhoto activity
      */
     @Override
     void moveToNotebook() {
@@ -110,11 +150,6 @@ public class NewNote extends NewRecord {
         this.finish();
     }
 
-    /**
-     * Handles values supplied to the NewMeas activity by a ListPickerActivity
-     * @param mode mode
-     * @param values values
-     */
     @Override
     protected void returnFromListPicker(String mode, List<String> values) {
         String displayString = arrayToStringForView(values);
@@ -128,6 +163,25 @@ public class NewNote extends NewRecord {
                 tagArray = values;
                 mTagTextField.setText(displayString);
                 break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case LIST_PICKER_REQUEST_CODE:
+                    String mode = data.getStringExtra("MODE");
+                    List<String> result = data.getStringArrayListExtra("RESULT");
+                    returnFromListPicker(mode, result);
+                    break;
+                case CAMERA_IDENTIFIER:
+                    mPhoto = data.getStringExtra("PATH");
+                    setImageButton();
+                    break;
+            }
         }
     }
 
@@ -159,7 +213,7 @@ public class NewNote extends NewRecord {
         TextView title = (TextView) findViewById(R.id.action_bar_title);
         title.setText(getString(R.string.title_constructor,
                 titleType,
-                getString(R.string.note_name_tag)));
+                getString(R.string.photo_name_tag)));
 
         // Set the logged in text
         TextView loggedInText = (TextView) findViewById(R.id.action_bar_logged_in);
@@ -172,10 +226,11 @@ public class NewNote extends NewRecord {
     @SuppressWarnings("unchecked") void setUpFields () {
         mNameTextField = (EditText) findViewById(R.id.nameTextField);
         mAccessTextField = (TextView) findViewById(R.id.accessTextField);
+        mPhotoButton = (ImageButton) findViewById(R.id.photoButton);
         mNoteTextField = (EditText) findViewById(R.id.notesTextField);
         mTagTextField = (TextView) findViewById(R.id.tagTextField);
         mGPSAccField = (TextView) findViewById(R.id.gpsAccView);
-        mNameTextField.setHint(getString(R.string.enter_name_hint,getString(R.string.note_name_tag)));
+        mNameTextField.setHint(getString(R.string.enter_name_hint,getString(R.string.photo_name_tag)));
 
         if (mode.equals("new")) {
             mAccessTextField.setText(arrayToStringForView(UserVars.AccessDefaults));
@@ -184,6 +239,9 @@ public class NewNote extends NewRecord {
         } else if (mode.equals("old")) {
             mNameTextField.setText(record.props.get("name").toString());
             mAccessTextField.setText(arrayToStringForView((List<String>) record.props.get("access")));
+            mPhoto = record.photoPath;
+            setImageButton();
+            mPhotoButton.setEnabled(false);
             mNoteTextField.setText(record.props.get("text").toString());
             mTagTextField.setText(arrayToStringForView((List<String>) record.props.get("tags")));
             mGPSAccField.setVisibility(View.GONE);
@@ -249,32 +307,97 @@ public class NewNote extends NewRecord {
      */
     @Override
     void setItemsOut() {
-        itemsOut.put("datatype", "note");
-        itemsOut.put("name", mNameTextField.getText().toString());
-        itemsOut.put("tags", tagArray);
+        itemsOut.put("datatype", "photo");
 
         String dateOut = df.format(dateTime);
         itemsOut.put("datetime", dateOut);
 
+        itemsOut.put("name", mNameTextField.getText().toString());
+
         itemsOut.put("access", accessArray);
-        itemsOut.put("accuracy", gpsAcc);
 
         itemsOut.put("text", mNoteTextField.getText().toString());
+
+        itemsOut.put("tags", tagArray);
+
+        itemsOut.put("accuracy", gpsAcc);
+
+        // Link the photo's local and blob urls
+        String blobPath = UserVars.blobRootString +
+                UserVars.UUID + "/" +
+                mPhoto.substring(mPhoto.lastIndexOf('/') + 1);
+
+        itemsOut.put("filepath", blobPath);
+
+        UserVars.Medias.put(blobPath, mPhoto);
     }
 
     //endregion
 
     //region Helper Methods
 
+    /**
+     * Sets the image of the photo button
+     */
+    private void setImageButton() {
+        if (mPhoto != null) {
+            if ((new File(mPhoto)).exists()) {
+
+                // First decode to check image dimensions
+                final BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(mPhoto, options);
+
+                // Calculate inSampleSize
+                options.inSampleSize = calculateInSampleSize(options,
+                        200,
+                        200);
+
+                // Decode bitmap with inSampleSize set
+                options.inJustDecodeBounds = false;
+                mPhotoButton.setBackground(null);
+
+                Bitmap imageIn = BitmapFactory.decodeFile(mPhoto, options);
+
+                String cacheKey = mPhoto.substring(mPhoto.lastIndexOf('/') + 1).
+                        replaceAll(".jpg","").
+                        replaceAll("_","");
+
+                ((KoraApplication) this.getApplicationContext()).addBitmapToMemoryCache(cacheKey, imageIn);
+                mPhotoButton.setImageBitmap(BitmapFactory.decodeFile(mPhoto, options));
+            }
+        }
+    }
+
+    @Contract(pure = true)
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        final int halfHeight = height / 3;
+        final int halfWidth = width / 3;
+
+        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+        // height and width larger than the requested height and width.
+        while ((halfHeight / inSampleSize) >= reqHeight
+                && (halfWidth / inSampleSize) >= reqWidth) {
+            inSampleSize *= 2;
+        }
+
+        return inSampleSize;
+    }
+
     @Override
     boolean checkRequiredData() {
-
         String firstError = "none";
         View errorView = new View(this);
 
         boolean dateCheck = dateTime != null;
 
-        boolean locCheck = userOverrideStale || !checkLocationStale();
+
+        boolean locCheck = mode.equals("old") || userOverrideStale || !checkLocationStale();
 
         if (!(mNameTextField.getText() != null &&
                 !mNameTextField.getText().toString().equals(""))) {
@@ -283,10 +406,9 @@ public class NewNote extends NewRecord {
         } else if (!(accessArray.size() > 0)) {
             firstError = "access";
             errorView = mAccessTextField;
-        } else if (!(mNoteTextField.getText() != null &&
-                !mNoteTextField.getText().toString().equals(""))) {
-            firstError = "note";
-            errorView = mNoteTextField;
+        } else if (mPhoto == null || !(new File(mPhoto)).exists()) {
+            firstError = "photo";
+            errorView = mPhotoButton;
         } else if (!(tagArray.size() > 0)) {
             firstError = "tags";
             errorView = mTagTextField;
@@ -300,8 +422,8 @@ public class NewNote extends NewRecord {
             case "access":
                 errorString = getString(R.string.access_field_string);
                 break;
-            case "note":
-                errorString = getString(R.string.note_field_string);
+            case "photo":
+                errorString = getString(R.string.photo_field_string);
                 break;
             case "tags":
                 errorString = getString(R.string.tag_field_string);
@@ -316,6 +438,8 @@ public class NewNote extends NewRecord {
             ((EditText) errorView).setError(errorString);
         } else if (errorView instanceof TextView) {
             ((TextView) errorView).setError(errorString);
+        } else if (errorView instanceof ImageButton) {
+            errorView.setBackgroundColor(Color.RED);
         }
 
         errorView.requestFocus();

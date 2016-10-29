@@ -6,7 +6,7 @@
     android:gravity="center_horizontal"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.gmail.jonsege.androiddatacollection.LoginActivity">
+    tools:context="com.gmail.jonsege.android.LoginActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/notebook_toolbar"

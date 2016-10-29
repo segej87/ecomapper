@@ -1,4 +1,4 @@
-package com.gmail.jonsege.androiddatacollection;
+package com.gmail.jonsege.android;
 
 import org.junit.Test;
 

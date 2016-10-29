@@ -1,4 +1,4 @@
-package com.gmail.jonsege.androiddatacollection;
+package com.kora.android;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class ListPickerActivity extends AppCompatActivity {
     /**
      * The list views.
      */
+    private TextView mSelectedLabel;
     private ListView mSelectedView;
     private ListView mAvailableView;
 
@@ -338,6 +340,7 @@ public class ListPickerActivity extends AppCompatActivity {
      */
     private void setUpFields() {
         mAvailableView = (ListView) findViewById(R.id.availableList);
+        mSelectedLabel = (TextView) findViewById(R.id.selected_label);
         mSelectedView = (ListView) findViewById(R.id.selectedList);
 
         mSearchView = (SearchView) findViewById(R.id.searchView);
@@ -427,6 +430,11 @@ public class ListPickerActivity extends AppCompatActivity {
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                if (!mode.equals("access")) {
+                    mAddNew.setVisibility(View.VISIBLE);
+                }
+                mSelectedLabel.setVisibility(View.VISIBLE);
+                mSelectedView.setVisibility(View.VISIBLE);
 
                 if (!query.equals("")) {
                     ListPickerActivity.this.mFullAdapter.getFilter().filter(query);
@@ -441,12 +449,20 @@ public class ListPickerActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
                 if (!newText.equals("")) {
+                    mAddNew.setVisibility(View.GONE);
+                    mSelectedLabel.setVisibility(View.GONE);
+                    mSelectedView.setVisibility(View.GONE);
                     mFullAdapter.getFilter().filter(newText);
                     searchActive = true;
                     return true;
                 }
+
+                if (!mode.equals("access")) {
+                    mAddNew.setVisibility(View.VISIBLE);
+                }
+                mSelectedLabel.setVisibility(View.VISIBLE);
+                mSelectedView.setVisibility(View.VISIBLE);
 
                 setUpListViewAdapters();
                 searchActive = false;

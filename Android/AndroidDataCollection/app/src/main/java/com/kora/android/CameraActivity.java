@@ -1,4 +1,4 @@
-package com.gmail.jonsege.androiddatacollection;
+package com.kora.android;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -14,7 +14,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Created for the Kora project by jonse on 10/27/2016.
