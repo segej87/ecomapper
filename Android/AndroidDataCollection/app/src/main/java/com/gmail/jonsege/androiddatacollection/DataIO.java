@@ -6,12 +6,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.microsoft.azure.storage.CloudStorageAccount;
+import com.microsoft.azure.storage.blob.BlobContainerPermissions;
+import com.microsoft.azure.storage.blob.BlobContainerPublicAccessType;
+import com.microsoft.azure.storage.blob.CloudBlobClient;
+import com.microsoft.azure.storage.blob.CloudBlobContainer;
+import com.microsoft.azure.storage.blob.CloudBlockBlob;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
@@ -28,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Jon Sege on 10/1/2016.
+ * Created for the Kora project by Jon Sege on 10/1/2016.
  */
 
 final class DataIO {
@@ -39,6 +47,14 @@ final class DataIO {
      * Tag for this class
      */
     private final static String TAG = "data_io";
+
+    /**
+     * Azure blob storage connection string
+     */
+    private static final String storageConnectionString =
+            "DefaultEndpointsProtocol=https;" +
+                    "AccountName=ecomapper;" +
+                    "AccountKey=c0h6WIRF2ObRNWwAkp9arNRLb1KUa0/fZwnKohRwgZfrbVca5WXPxIqJKPeSVyK1oPdAgbIghCpPJNayrId1tw==";
 
     //endregion
 
@@ -147,23 +163,54 @@ final class DataIO {
 
             // Put values from each JSON Array into the appropriate maps.
             JSONArray tagsArray = jObject.getJSONArray("tags");
-            for (int i = 0; i < tagsArray.length(); i++) {
-                UserVars.Tags.put(tagsArray.getString(i),addArray);
+            List<String> tagCheck = new ArrayList<>();
+            for (int i=0; i<tagsArray.length(); i++) {
+                tagCheck.add(i, tagsArray.getString(i));
+                UserVars.Tags.put(tagsArray.getString(i), addArray);
             }
 
             JSONArray specArray = jObject.getJSONArray("species");
+            List<String> specCheck = new ArrayList<>();
             for (int i = 0; i < specArray.length(); i++) {
+                specCheck.add(i, specArray.getString(i));
                 UserVars.Species.put(specArray.getString(i),addArray);
             }
 
             JSONArray unitArray = jObject.getJSONArray("units");
+            List<String> unitCheck = new ArrayList<>();
             for (int i = 0; i < unitArray.length(); i++) {
+                unitCheck.add(i, unitArray.getString(i));
                 UserVars.Units.put(unitArray.getString(i),addArray);
+            }
+
+            // Remove any old server objects from User Vars
+
+            for (Iterator<String> iter = UserVars.Tags.keySet().iterator(); iter.hasNext();) {
+                String t = iter.next();
+                if (UserVars.Tags.get(t)[0].equals("Server") &&
+                        !tagCheck.contains(t)) {
+                    iter.remove();
+                }
+            }
+
+            for (Iterator<String> iter = UserVars.Species.keySet().iterator(); iter.hasNext();) {
+                String s = iter.next();
+                if (UserVars.Species.get(s)[0].equals("Server") &&
+                        !specCheck.contains(s)) {
+                    iter.remove();
+                }
+            }
+
+            for (Iterator<String> iter = UserVars.Units.keySet().iterator(); iter.hasNext();) {
+                String u = iter.next();
+                if (UserVars.Units.get(u)[0].equals("Server") &&
+                        !unitCheck.contains(u)) {
+                    iter.remove();
+                }
             }
 
             return true;
         } catch (JSONException e) {
-
             // Log the error.
             Log.i(TAG,context.getString(R.string.json_decode_error,e.getLocalizedMessage()));
         }
@@ -195,6 +242,9 @@ final class DataIO {
             jsonObject.put("AccessLevels",new JSONArray(UserVars.AccessLevels));
             jsonObject.put("AccessDefaults",new JSONArray(UserVars.AccessDefaults));
             jsonObject.put("TagsDefaults",new JSONArray(UserVars.TagsDefaults));
+            jsonObject.put("Medias", new JSONObject(UserVars.Medias));
+            jsonObject.put("MarkedMedias", new JSONArray(UserVars.MarkedMedia));
+
             if (UserVars.SpecDefault == null) {
                 jsonObject.put("SpecDefault", "");
             } else {
@@ -214,6 +264,7 @@ final class DataIO {
             jsonObject.put("Species",jSpec);
             JSONObject jUnit = encodeJavaMaps(context, UserVars.Units);
             jsonObject.put("Units",jUnit);
+
         } catch (JSONException e) {
             Log.i(TAG,context.getString(R.string.json_encode_error,e.getLocalizedMessage()));
         }
@@ -287,7 +338,7 @@ final class DataIO {
             }
             UserVars.AccessLevels = alList;
 
-            // Set the list user variables by first decoding them.
+            // Set the map user variables by first decoding them.
             JSONObject tagsIn = (JSONObject) jResult.get("Tags");
             UserVars.Tags = decodeJsonLists(context, tagsIn);
 
@@ -315,6 +366,24 @@ final class DataIO {
 
             UserVars.UnitsDefault = jResult.getString("UnitsDefault");
             if (UserVars.UnitsDefault.equals("")) UserVars.UnitsDefault = null;
+
+            //Load the medias map
+            JSONObject mediasIn = (JSONObject) jResult.get("Medias");
+            Iterator<String> it = mediasIn.keys();
+            while (it.hasNext()) {
+                String i = it.next();
+
+                if (!UserVars.Medias.keySet().contains(i)) {
+                    UserVars.Medias.put(i, mediasIn.get(i).toString());
+                }
+            }
+
+            //Load the medias marked for upload
+            JSONArray mmJArray = (JSONArray) jResult.get("MarkedMedias");
+            for (int i=0; i < mmJArray.length(); i++) {
+                if (!UserVars.MarkedMedia.contains(mmJArray.getString(i)))
+                    UserVars.MarkedMedia.add(mmJArray.getString(i));
+            }
 
             // Return a report.
             return context.getString(R.string.io_success);
@@ -422,7 +491,7 @@ final class DataIO {
      * @return
      *      Returns true if the user variables were updated successfully
      */
-    @SuppressWarnings("unchecked") static boolean removeUserVars(Context context, Record record) {
+    @SuppressWarnings("unchecked") private static boolean removeUserVars(Context context, Record record) {
 
         Map<String, Object> props = record.props;
 
@@ -493,6 +562,14 @@ final class DataIO {
                             UserVars.Units.put(newUnit, newArray3);
                         }
                     }
+                }
+            }
+
+            if (dt.equals("photo")) {
+                for (Iterator<String> iter = UserVars.Medias.keySet().iterator(); iter.hasNext(); ) {
+                    String key = iter.next();
+                    if (UserVars.Medias.get(key).equals(record.photoPath))
+                        iter.remove();
                 }
             }
 
@@ -590,7 +667,7 @@ final class DataIO {
         return result;
     }
 
-    static JSONObject loadFullRecordsFile(Context context) {
+    private static JSONObject loadFullRecordsFile(Context context) {
         // A JSON Object to decode data from the file.
         JSONObject jResult = null;
 
@@ -695,7 +772,9 @@ final class DataIO {
                     String photoPath = null;
                     // Get the photo filepath (if the datatype is photo).
                     if (propsOut.get("datatype").equals("photo")) {
-                        photoPath = propsOut.get("filepath").toString();
+                        String blobPath = propsOut.get("filepath").toString();
+
+                        photoPath = UserVars.Medias.get(blobPath);
                     }
 
                     // Add the decoded record to the list to return.
@@ -713,9 +792,9 @@ final class DataIO {
     }
 
     static boolean deleteRecord(Context context, Record record) {
-        MyApplication app = (MyApplication) context.getApplicationContext();
+        KoraApplication app = (KoraApplication) context.getApplicationContext();
 
-        boolean deleted = app.deleteRecord(record);
+        boolean deleted = app.deleteRecordAndMedia(record);
 
         if (deleted) {
             boolean updated = removeUserVars(context, record);
@@ -732,99 +811,179 @@ final class DataIO {
         return false;
     }
 
+    static boolean uploadRecords(Context context) {
+        String response;
+
+        // The URL for the PHP script to retrieve lists from the server.
+        final String addURL = context.getString(R.string.php_server_root) + context.getString(R.string.php_add_records);
+
+        JSONObject jsonObject = loadFullRecordsFile(context);
+
+        // Parameters for the server request.
+        Map<String,Object> pars = new LinkedHashMap<>();
+        pars.put("GUID", UserVars.UUID);
+        pars.put("geojson", jsonObject.toString().replace("\\/","/"));
+
+        try {
+            StringBuilder postData = new StringBuilder();
+
+            // Loop through the server request parameters.
+            for (Map.Entry<String,Object> par : pars.entrySet()) {
+
+                // Append & before adding another parameter if necessary
+                if (postData.length() != 0) postData.append('&');
+
+                // Append the parameter name and set it equal to the parameter value.
+                postData.append(URLEncoder.encode(par.getKey(), "UTF-8"));
+                postData.append('=');
+                postData.append(URLEncoder.encode(String.valueOf(par.getValue()), "UTF-8"));
+            }
+
+            // Create a data array of the request string.
+            byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+
+            //TODO: Check for internet connection. If not return error.
+
+            // Create a connection to the list retrieve URL.
+            URL url = new URL(addURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            // Set up the request to the connection.
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty( "Content-Length", String.valueOf(postDataBytes.length));
+            conn.setDoOutput(true);
+            conn.getOutputStream().write(postDataBytes);
+
+            // Get the input stream from the server response.
+            Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+
+            // Read the server's response into a string builder.
+            StringBuilder sb = new StringBuilder();
+            for (int c; (c = in.read()) >= 0;)
+                sb.append((char)c);
+            response = sb.toString();
+
+            // Disconnect.
+            conn.disconnect();
+
+        } catch (Exception e) {
+
+            // Fill the response string with the error message.
+            response = context.getString(R.string.server_connection_error, e.getLocalizedMessage());
+        }
+
+        // Log the server's response.
+        Log.i(TAG,context.getString(R.string.list_server_response,response));
+
+        return response.contains("Success!");
+    }
+
     //endregion
 
     //region Medias
 
-    //endregion
-
-    //region Helper Methods
-
     /**
-     * Encodes Java Maps as JSON Objects
-     * @param context context
-     * @param inMap map
-     * @return JSONObject
+     * Attempts to upload a file from the local file system to a blob container
+     * @param filePath
+     *      The file path on the local system to the file being uploaded
+     * @return
+     *      True if the file was uploaded, false if otherwise
      */
-    private static JSONObject encodeJavaMaps(Context context, Map<String, Object[]> inMap) {
+    static boolean uploadBlob(String filePath) {
+        try
+        {
+            // Retrieve storage account from connection-string.
+            CloudStorageAccount storageAccount = CloudStorageAccount.parse(storageConnectionString);
 
-        // Initialize the JSON Object to return.
-        JSONObject jObj = new JSONObject();
+            // Create the blob client.
+            CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
 
-        try {
-            // Loop through the keys in the map.
-            for (String k : inMap.keySet()) {
-                List<Object> varsOut = new ArrayList<>();
+            // Retrieve reference to a previously created container.
+            CloudBlobContainer container = setBlobContainer(blobClient);
 
-                // Get value for the current key as an Object array.
-                Object[] uVarsVals = inMap.get(k);
+            // Retrieve the image's name from the filepath
+            String name = filePath.substring(filePath.lastIndexOf('/') + 1);
 
-                // Add all objects from the array as a list.
-                varsOut.addAll(Arrays.asList(uVarsVals));
+            if (container != null) {
+                // Create or overwrite the "myimage.jpg" blob with contents from a local file.
+                CloudBlockBlob blob = container.getBlockBlobReference(name);
+                File source = new File(filePath);
 
-                // Put the list into a JSON Array and add it to the JSON Object to return.
-                jObj.put(k, new JSONArray(varsOut));
+                Log.i(TAG, "Uploading blob: " + filePath);
+
+                blob.upload(new FileInputStream(source), source.length());
+
+                deleteFile(filePath);
+
+                return true;
+            } else {
+                Log.e(TAG, "Error retrieving container");
             }
-        } catch (JSONException e) {
-
-            // Log an error.
-            Log.i(TAG,context.getString(R.string.json_encode_error,e.getLocalizedMessage()));
+        }
+        catch (Exception e)
+        {
+            // Output the stack trace.
+            e.printStackTrace();
         }
 
-        // Return the JSON Object (or null if there was an error).
-        return jObj;
+        return false;
     }
 
     /**
-     * Decodes JSON Objects to Java Maps
-     * @param context context
-     * @param inObj JSONObject
-     * @return Map
+     * A helper method for the uploadBlob method, which returns (and creates, if it doesn't exist)
+     * a cloud blob container
+     * @param blobClient
+     *      A blob client created from the connection string in class variables
+     * @return
+     *      A cloud blob container object for uploading the file
      */
     @Nullable
-    private static Map<String, Object[]> decodeJsonLists(Context context, JSONObject inObj) {
+    private static CloudBlobContainer setBlobContainer(CloudBlobClient blobClient) {
+        try
+        {
+            // Get a reference to a container.
+            // The container name must be lower case
+            CloudBlobContainer container = blobClient.getContainerReference(UserVars.UUID);
 
-        // Initialize the Map to return.
-        Map<String, Object[]> outMap = new HashMap<>();
+            Boolean exists = container.exists();
 
-        try {
+            // Create the container if it does not exist.
+            container.createIfNotExists();
 
-            // Iterate over the JSON Object's keyset
-            Iterator<String> iter = inObj.keys();
-            while (iter.hasNext()) {
-                String k = iter.next();
-
-                // Read the value for the current key as a JSON Array.
-                JSONArray kJArray = (JSONArray) inObj.get(k);
-
-                // Put the each value from the JSON Array into a new Object array.
-                int kJLength = kJArray.length();
-                Object[] kVal = new Object[kJLength];
-                for (int i=0; i<kJLength; i++) kVal[i] = kJArray.get(i);
-
-                // Put the object array into the map for the current key.
-                outMap.put(k,kVal);
+            if (!exists) {
+                setNewContainerPermissions(container);
             }
-        } catch (Exception e) {
 
-            // Log that an error occurred.
-            Log.i(TAG,context.getString(R.string.json_decode_error,e.getLocalizedMessage()));
+            return container;
+        }
+        catch (Exception e)
+        {
+            // Output the stack trace.
+            e.printStackTrace();
         }
 
-        // Return the Map (or null if an error occurred).
-        return outMap;
+        return null;
     }
 
-    @org.jetbrains.annotations.Contract(pure = true)
-    private static Object[] createUserVarAddArray(String mode) {
-        Object[] addArray = new Object[2];
-        addArray[0] = mode;
-        if (mode.equals("Server")) {
-            addArray[1] = 0;
-        } else if (mode.equals("Local")) {
-            addArray[1] = 1;
+    /**
+     * A helper method to set any newly created containers to public access
+     * @param container
+     *      The container created by setBlobContainer
+     */
+    private static void setNewContainerPermissions(CloudBlobContainer container) {
+        // Create a permissions object.
+        BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
+
+        // Include public access in the permissions object.
+        containerPermissions.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);
+
+        try {
+            // Set the permissions on the container.
+            container.uploadPermissions(containerPermissions);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return addArray;
     }
 
     //endregion
@@ -952,73 +1111,108 @@ final class DataIO {
         return false;
     }
 
-    static boolean attemptSync(Context context) {
-        String response;
+    //endregion
 
-        // The URL for the PHP script to retrieve lists from the server.
-        final String addURL = context.getString(R.string.php_server_root) + context.getString(R.string.php_add_records);
+    //region Helper Methods
 
-        JSONObject jsonObject = loadFullRecordsFile(context);
+    /**
+     * Encodes Java Maps as JSON Objects
+     * @param context context
+     * @param inMap map
+     * @return JSONObject
+     */
+    private static JSONObject encodeJavaMaps(Context context, Map<String, Object[]> inMap) {
 
-        // Parameters for the server request.
-        Map<String,Object> pars = new LinkedHashMap<>();
-        pars.put("GUID", UserVars.UUID);
-        pars.put("geojson", jsonObject.toString().replace("\\/","/"));
-        System.out.println("Using json string: " + pars.get("geojson"));
+        // Initialize the JSON Object to return.
+        JSONObject jObj = new JSONObject();
 
         try {
-            StringBuilder postData = new StringBuilder();
+            // Loop through the keys in the map.
+            for (String k : inMap.keySet()) {
+                List<Object> varsOut = new ArrayList<>();
 
-            // Loop through the server request parameters.
-            for (Map.Entry<String,Object> par : pars.entrySet()) {
+                // Get value for the current key as an Object array.
+                Object[] uVarsVals = inMap.get(k);
 
-                // Append & before adding another parameter if necessary
-                if (postData.length() != 0) postData.append('&');
+                // Add all objects from the array as a list.
+                varsOut.addAll(Arrays.asList(uVarsVals));
 
-                // Append the parameter name and set it equal to the parameter value.
-                postData.append(URLEncoder.encode(par.getKey(), "UTF-8"));
-                postData.append('=');
-                postData.append(URLEncoder.encode(String.valueOf(par.getValue()), "UTF-8"));
+                // Put the list into a JSON Array and add it to the JSON Object to return.
+                jObj.put(k, new JSONArray(varsOut));
             }
+        } catch (JSONException e) {
 
-            // Create a data array of the request string.
-            byte[] postDataBytes = postData.toString().getBytes("UTF-8");
-
-            //TODO: Check for internet connection. If not return error.
-
-            // Create a connection to the list retrieve URL.
-            URL url = new URL(addURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            // Set up the request to the connection.
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.setRequestProperty( "Content-Length", String.valueOf(postDataBytes.length));
-            conn.setDoOutput(true);
-            conn.getOutputStream().write(postDataBytes);
-
-            // Get the input stream from the server response.
-            Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-
-            // Read the server's response into a string builder.
-            StringBuilder sb = new StringBuilder();
-            for (int c; (c = in.read()) >= 0;)
-                sb.append((char)c);
-            response = sb.toString();
-
-            // Disconnect.
-            conn.disconnect();
-
-        } catch (Exception e) {
-
-            // Fill the response string with the error message.
-            response = context.getString(R.string.server_connection_error, e.getLocalizedMessage());
+            // Log an error.
+            Log.i(TAG,context.getString(R.string.json_encode_error,e.getLocalizedMessage()));
         }
 
-        // Log the server's response.
-        Log.i(TAG,context.getString(R.string.list_server_response,response));
+        // Return the JSON Object (or null if there was an error).
+        return jObj;
+    }
 
-        return response.contains("Success!");
+    /**
+     * Decodes JSON Objects to Java Maps
+     * @param context context
+     * @param inObj JSONObject
+     * @return Map
+     */
+    @Nullable
+    private static Map<String, Object[]> decodeJsonLists(Context context, JSONObject inObj) {
+
+        // Initialize the Map to return.
+        Map<String, Object[]> outMap = new HashMap<>();
+
+        try {
+
+            // Iterate over the JSON Object's keyset
+            Iterator<String> iter = inObj.keys();
+            while (iter.hasNext()) {
+                String k = iter.next();
+
+                // Read the value for the current key as a JSON Array.
+                JSONArray kJArray = (JSONArray) inObj.get(k);
+
+                // Put the each value from the JSON Array into a new Object array.
+                int kJLength = kJArray.length();
+                Object[] kVal = new Object[kJLength];
+                for (int i=0; i<kJLength; i++) kVal[i] = kJArray.get(i);
+
+                // Put the object array into the map for the current key.
+                outMap.put(k,kVal);
+            }
+        } catch (Exception e) {
+
+            // Log that an error occurred.
+            Log.i(TAG,context.getString(R.string.json_decode_error,e.getLocalizedMessage()));
+        }
+
+        // Return the Map (or null if an error occurred).
+        return outMap;
+    }
+
+    @org.jetbrains.annotations.Contract(pure = true)
+    private static Object[] createUserVarAddArray(String mode) {
+        Object[] addArray = new Object[2];
+        addArray[0] = mode;
+        if (mode.equals("Server")) {
+            addArray[1] = 0;
+        } else if (mode.equals("Local")) {
+            addArray[1] = 1;
+        }
+        return addArray;
+    }
+
+    static void deleteFile(String filePath) {
+
+        boolean deleted = filePath != null &&
+                (new File(filePath)).exists() &&
+                (new File(filePath)).delete();
+
+        if (!deleted) {
+            Log.e(TAG,"Could not delete photo " + filePath + " from local filepath.");
+        } else {
+            Log.i(TAG,"Photo " + filePath + " deleted.");
+        }
     }
 
     //endregion

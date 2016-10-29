@@ -2,9 +2,7 @@ package com.gmail.jonsege.androiddatacollection;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -18,8 +16,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +33,7 @@ public class Notebook extends AppCompatActivity {
     /**
      * The activity's application context.
      */
-    private MyApplication app;
+    private KoraApplication app;
 
     /**
      * The context menu
@@ -50,17 +48,12 @@ public class Notebook extends AppCompatActivity {
     /**
      * The adapter for the list view.
      */
-    NotebookArrayAdapter adapter;
+    private NotebookArrayAdapter adapter;
 
     /**
      * For using a context menu to delete a record.
      */
-    Record choppingBlock;
-
-//    /**
-//     * A LruCache for images in the list view
-//     */
-//    LruCache<String, Bitmap> mMemoryCache;
+    private Record choppingBlock;
 
     //endregion
 
@@ -72,7 +65,7 @@ public class Notebook extends AppCompatActivity {
         setContentView(R.layout.activity_notebook);
 
         // Get the current application context.
-        app = (MyApplication) this.getApplicationContext();
+        app = (KoraApplication) this.getApplicationContext();
 
         //Set up the toolbar.
         setUpToolbar();
@@ -132,10 +125,12 @@ public class Notebook extends AppCompatActivity {
                 logoutButtonHandler();
                 return true;
             case R.id.sync:
+                // Kick off an asynchronous task to upload records
                 Log.i(TAG,"Syncing records");
                 AttemptSync syncTask = new AttemptSync();
                 optionsMenu.setGroupEnabled(R.id.opMenuGroup,false);
-                syncTask.execute();
+                syncTask.execute((Void) null);
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -303,44 +298,7 @@ public class Notebook extends AppCompatActivity {
 
     //endregion
 
-    //region Memory Cache
-
-//    public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
-//        if (getBitmapFromMemCache(key) == null) {
-//            app.mMemoryCache.put(key, bitmap);
-//        }
-//    }
-//
-//    public Bitmap getBitmapFromMemCache(String key) {
-//        return app.mMemoryCache.get(key);
-//    }
-
-    //endregion
-
-    //region Helper Methods
-
-    /**
-     * Sets up the activity's toolbar
-     */
-    private void setUpToolbar() {
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.notebook_toolbar);
-        getLayoutInflater().inflate(R.layout.action_bar_notebook, myToolbar);
-        myToolbar.setTitle("");
-        setSupportActionBar(myToolbar);
-
-        // Set the logged in text.
-        TextView loggedInText = (TextView) findViewById(R.id.action_bar_logged_in);
-        loggedInText.setText(getString(R.string.logged_in_text_string,UserVars.UName));
-    }
-
-    /**
-     * Saves the current user ID to a shared preferences file. Used for logging out.
-     * @param uuid UserID
-     * @return result
-     */
-    private String saveLogin(String uuid) {
-        return DataIO.saveLogin(this, uuid);
-    }
+    //region Asynchronous Classes
 
     /**
      * An asynchronous task to log out of the current user.
@@ -386,7 +344,7 @@ public class Notebook extends AppCompatActivity {
         protected void onPostExecute(String result) {
             app.replaceRecords(new ArrayList<Record>());
 
-            ClearRecords clearRecords = new ClearRecords(context);
+            ClearRecords clearRecords = new ClearRecords();
             clearRecords.execute((Void) null);
         }
     }
@@ -394,11 +352,10 @@ public class Notebook extends AppCompatActivity {
     /**
      * An asynchronous task to clear the records list and finish the activity.
      */
-    public class ClearRecords extends AsyncTask<Void, Void, String> {
-        final Context context;
+    private class ClearRecords extends AsyncTask<Void, Void, String> {
 
-        ClearRecords(Context context) {
-            this.context = context;
+        ClearRecords() {
+
         }
 
         @Override
@@ -412,30 +369,29 @@ public class Notebook extends AppCompatActivity {
         }
     }
 
-    public class AttemptSync extends AsyncTask<Void, Void, Boolean> {
+    private class AttemptSync extends AsyncTask<Void, Void, Boolean> {
+
         AttemptSync() {
 
         }
 
         @Override
         protected Boolean doInBackground(Void...params) {
-            return app.getRecords().size() > 0 && DataIO.attemptSync(Notebook.this);
+            return app.getRecords().size() == 0 || DataIO.uploadRecords(Notebook.this);
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
             if (result) {
-                app.deleteRecords();
-                DataIO.saveRecords(Notebook.this, app.getRecords());
-                adapter.notifyDataSetChanged();
+                SetListsTask slt = new SetListsTask();
+                slt.execute((Void) null);
             }
-            SetListsTask slt = new SetListsTask();
-            slt.execute((Void) null);
+
             optionsMenu.setGroupEnabled(R.id.opMenuGroup,true);
         }
     }
 
-    class SetListsTask extends AsyncTask<Void, Void, String>{
+    private class SetListsTask extends AsyncTask<Void, Void, String>{
 
         SetListsTask() {
 
@@ -451,33 +407,108 @@ public class Notebook extends AppCompatActivity {
                 success = DataIO.setLists(Notebook.this, result);
             }
 
-            if (success) {
-                DataIO.saveUserVars(Notebook.this);
+            boolean mediaMark = markMedias();
+            DataIO.saveUserVars(Notebook.this);
+
+            if (success && mediaMark) {
+                app.deleteRecordsOnly();
+                DataIO.saveRecords(Notebook.this, app.getRecords());
+                adapter.notifyDataSetChanged();
+
+                // Kick off an asynchronous task to upload media
+                Log.i(TAG,"Syncing media");
+                UploadMediasTask umt = new UploadMediasTask();
+                umt.execute((Void) null);
             } else {
                 Log.i(TAG,result);
             }
         }
     }
 
-    /**
-    *A method to delete the saved records file. Should be deleted after testing.
-     */
-    private void deleteRecordsFile() {
-        File deleteFile = new File(this.getFilesDir(), UserVars.RecordsSaveFileName);
-        boolean deleted = deleteFile.delete();
-        if (deleted) {
-            Log.i(TAG, getString(R.string.file_deleted_success,deleteFile.getAbsolutePath()));
-        } else {
-            Log.i(TAG, getString(R.string.file_deleted_failure,deleteFile.getAbsolutePath()));
+    private class UploadMediasTask extends AsyncTask<Void, Void, Boolean> {
+
+        UploadMediasTask() {
+
         }
 
-        File deleteFile2 = new File(this.getFilesDir(), UserVars.UserVarsSaveFileName);
-        boolean deleted2 = deleteFile2.delete();
-        if (deleted2) {
-            Log.i(TAG, getString(R.string.file_deleted_success,deleteFile2.getAbsolutePath()));
-        } else {
-            Log.i(TAG, getString(R.string.file_deleted_failure,deleteFile2.getAbsolutePath()));
+        @Override
+        protected Boolean doInBackground(Void...Params) {
+            for (Iterator<String> iter = UserVars.MarkedMedia.iterator(); iter.hasNext(); ) {
+                String m = iter.next();
+                String filePath = UserVars.Medias.get(m);
+                boolean res = DataIO.uploadBlob(filePath);
+                if (res) {
+                    UserVars.Medias.remove(m);
+                    iter.remove();
+                }
+            }
+            return true;
         }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                DataIO.saveUserVars(Notebook.this);
+            }
+        }
+    }
+
+    //endregion
+
+    //region Helper Methods
+
+    /**
+     * Sets up the activity's toolbar
+     */
+    private void setUpToolbar() {
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.notebook_toolbar);
+        getLayoutInflater().inflate(R.layout.action_bar_notebook, myToolbar);
+        myToolbar.setTitle("");
+        setSupportActionBar(myToolbar);
+
+        // Set the logged in text.
+        TextView loggedInText = (TextView) findViewById(R.id.action_bar_logged_in);
+        loggedInText.setText(getString(R.string.logged_in_text_string,UserVars.UName));
+    }
+
+    /**
+     * Saves the current user ID to a shared preferences file. Used for logging out.
+     * @param uuid UserID
+     * @return result
+     */
+    private String saveLogin(String uuid) {
+        return DataIO.saveLogin(this, uuid);
+    }
+
+    private boolean markMedias() {
+        List<Record> records = app.getRecords();
+        int numPhotos = 0;
+
+        try {
+            if (records.size() > 0) {
+                for (Iterator<Record> r = records.iterator(); r.hasNext(); ) {
+                    Record record = r.next();
+                    if (record != null) {
+                        if (record.props.get("datatype").equals("photo")) {
+                            numPhotos++;
+                            String fp = record.props.get("filepath").toString();
+                            if (!UserVars.MarkedMedia.contains(fp)) {
+                                UserVars.MarkedMedia.add(fp);
+                            }
+                        }
+                    }
+                }
+
+                if (UserVars.MarkedMedia != null && UserVars.MarkedMedia.size() == numPhotos)
+                    return true;
+            } else if (records.size() == 0) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     //endregion

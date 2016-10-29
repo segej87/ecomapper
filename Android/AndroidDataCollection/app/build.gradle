@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "com.gmail.jonsege.androiddatacollection"
         minSdkVersion 19
-        targetSdkVersion 23
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
 
@@ -30,11 +30,16 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.google.android.gms:play-services:9.6.1'
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.google.android.gms:play-services:9.8.0'
     compile 'com.android.support:multidex:1.0.1'
     compile 'org.jetbrains:annotations-java5:15.0'
+    compile 'com.microsoft.azure.android:azure-storage-android:0.7.0@aar'
 }

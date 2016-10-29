@@ -3,6 +3,7 @@ package com.gmail.jonsege.androiddatacollection;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -14,6 +15,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.jetbrains.annotations.Contract;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,6 +47,11 @@ public class NewPhoto extends NewRecord {
      */
     private final int CAMERA_IDENTIFIER = 199;
 
+    /**
+     * Make sure that only one camera is open
+     */
+    private boolean alreadyInCamera = false;
+
     //endregion
 
     //region Initialization
@@ -50,7 +59,7 @@ public class NewPhoto extends NewRecord {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        super.TAG = "new_photo";
+        super.TAG = this.TAG;
         super.type = "Point";
         setContentView(R.layout.activity_new_photo);
 
@@ -81,19 +90,20 @@ public class NewPhoto extends NewRecord {
         mPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent camera = new Intent(NewPhoto.this, CameraActivity.class);
-                camera.putExtra("DATE", df.format(dateTime));
-                startActivityForResult(camera , CAMERA_IDENTIFIER);
+                if (!alreadyInCamera) {
+                    Intent camera = new Intent(NewPhoto.this, CameraActivity.class);
+                    camera.putExtra("DATE", df.format(dateTime));
+
+                    alreadyInCamera = true;
+                    startActivityForResult(camera, CAMERA_IDENTIFIER);
+                }
             }
         });
     }
 
-    protected void onPause() {
-        super.onPause();
-    }
-
-    protected void onStop() {
-        super.onStop();
+    protected void onStart() {
+        super.onStart();
+        alreadyInCamera = false;
     }
 
     //endregion
@@ -119,6 +129,8 @@ public class NewPhoto extends NewRecord {
                 saveRecord();
                 return true;
             case R.id.cancel_record:
+                if (mode.equals("new"))
+                    DataIO.deleteFile(mPhoto);
                 moveToNotebook();
                 return true;
             default:
@@ -158,6 +170,7 @@ public class NewPhoto extends NewRecord {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case LIST_PICKER_REQUEST_CODE:
@@ -211,7 +224,6 @@ public class NewPhoto extends NewRecord {
     /**
      * Sets up the UI fields in the activity
      */
-    @Override
     @SuppressWarnings("unchecked") void setUpFields () {
         mNameTextField = (EditText) findViewById(R.id.nameTextField);
         mAccessTextField = (TextView) findViewById(R.id.accessTextField);
@@ -309,6 +321,15 @@ public class NewPhoto extends NewRecord {
         itemsOut.put("tags", tagArray);
 
         itemsOut.put("accuracy", gpsAcc);
+
+        // Link the photo's local and blob urls
+        String blobPath = UserVars.blobRootString +
+                UserVars.UUID + "/" +
+                mPhoto.substring(mPhoto.lastIndexOf('/') + 1);
+
+        itemsOut.put("filepath", blobPath);
+
+        UserVars.Medias.put(blobPath, mPhoto);
     }
 
     //endregion
@@ -318,7 +339,7 @@ public class NewPhoto extends NewRecord {
     /**
      * Sets the image of the photo button
      */
-    void setImageButton() {
+    private void setImageButton() {
         if (mPhoto != null) {
             if ((new File(mPhoto)).exists()) {
 
@@ -342,13 +363,14 @@ public class NewPhoto extends NewRecord {
                         replaceAll(".jpg","").
                         replaceAll("_","");
 
-                ((MyApplication) this.getApplicationContext()).addBitmapToMemoryCache(cacheKey, imageIn);
+                ((KoraApplication) this.getApplicationContext()).addBitmapToMemoryCache(cacheKey, imageIn);
                 mPhotoButton.setImageBitmap(BitmapFactory.decodeFile(mPhoto, options));
             }
         }
     }
 
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    @Contract(pure = true)
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
@@ -383,7 +405,7 @@ public class NewPhoto extends NewRecord {
         } else if (!(accessArray.size() > 0)) {
             firstError = "access";
             errorView = mAccessTextField;
-        } else if (mPhoto != null && !(new File(mPhoto)).exists()) {
+        } else if (mPhoto == null || !(new File(mPhoto)).exists()) {
             firstError = "photo";
             errorView = mPhotoButton;
         } else if (!(tagArray.size() > 0)) {
@@ -416,7 +438,7 @@ public class NewPhoto extends NewRecord {
         } else if (errorView instanceof TextView) {
             ((TextView) errorView).setError(errorString);
         } else if (errorView instanceof ImageButton) {
-            errorView.setBackgroundColor(100);
+            errorView.setBackgroundColor(Color.RED);
         }
 
         errorView.requestFocus();

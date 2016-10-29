@@ -1,15 +1,12 @@
 package com.gmail.jonsege.androiddatacollection;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.util.LruCache;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 /**
- * Created by jonse on 10/26/2016.
+ * Created for the Kora project by jonse on 10/26/2016.
  */
 public class StartScreen extends AppCompatActivity {
 
@@ -28,7 +25,7 @@ public class StartScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ((MyApplication) this.getApplicationContext()).setUpMemoryCache();
+        ((KoraApplication) this.getApplicationContext()).setUpMemoryCache();
 
         // Check for saved uuid and go to notebook if there is one
         String savedLogin = DataIO.loadLogin(this);

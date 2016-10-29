@@ -16,12 +16,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by jonse on 10/15/2016.
+ * Created for the Kora project by jonse on 10/15/2016.
  */
 
 public abstract class NewRecord extends AppCompatActivity
@@ -32,32 +31,32 @@ public abstract class NewRecord extends AppCompatActivity
     /**
      * The application context
      */
-    private MyApplication app;
+    private KoraApplication app;
 
     /**
      * Tag for this activity. Will be replaced by child class.
      */
-    protected String TAG = "new_record";
+    String TAG = "new_record";
 
     /**
      * The current mode of record entry (new or old)
      */
-    protected String mode;
+    String mode;
 
     /**
      * Data to construct the record
      */
-    protected String type;
+    String type;
     //TODO: Figure out how to specify time zone
-    protected final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    protected Date dateTime;
-    protected List<String> tagArray = UserVars.TagsDefaults;
-    protected List<String> accessArray = UserVars.AccessDefaults;
-    protected Location latestLoc;
-    protected Double[] userLoc = new Double[3];
-    protected double gpsAcc = 0.0;
-    protected Map<String, Object> itemsOut = new HashMap<>();
-    protected String mPhoto = null;
+    final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    Date dateTime;
+    List<String> tagArray = UserVars.TagsDefaults;
+    List<String> accessArray = UserVars.AccessDefaults;
+    Location latestLoc;
+    Double[] userLoc = new Double[3];
+    double gpsAcc = 0.0;
+    final Map<String, Object> itemsOut = new HashMap<>();
+    String mPhoto = null;
 
     /**
      * The location object
@@ -72,17 +71,17 @@ public abstract class NewRecord extends AppCompatActivity
     /**
      * The record created or loaded by the user
      */
-    protected Record record;
+    Record record;
 
     /**
      * The index of the record in the app's record list (for old records only
      */
-    int recordIndex = -1;
+    private int recordIndex = -1;
 
     /**
      * A request code for list picker activities
      */
-    protected final int LIST_PICKER_REQUEST_CODE = 100;
+    final int LIST_PICKER_REQUEST_CODE = 100;
 
     //endregion
 
@@ -93,7 +92,7 @@ public abstract class NewRecord extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         // Get the current application.
-        app = (MyApplication) this.getApplicationContext();
+        app = (KoraApplication) this.getApplicationContext();
 
         // Create an object to handle location requests
         userLocation = new UserLocation(this);
@@ -108,9 +107,6 @@ public abstract class NewRecord extends AppCompatActivity
                 // Get the date and time this view was created.
                 // TODO: allow user to update datetime
                 dateTime = new Date();
-
-                // Tell the User Location class to get the user's location.
-                userLocation.setRequestingLocation(true);
 
                 // Build a Google API Client to connect to Play Services.
                 userLocation.buildGoogleApiClient();
@@ -150,22 +146,9 @@ public abstract class NewRecord extends AppCompatActivity
         userLocation.disconnectFromGoogleApi();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // Stop tracking the user's location;
-//        userLocation.stopLocationUpdates();
-    }
-
     //endregion
 
     //region Abstract Methods
-
-    /**
-     * Sets up the UI fields in the activity
-     */
-    abstract void setUpFields();
 
     /**
      * Fills the properties map to add to the Record object
@@ -197,7 +180,7 @@ public abstract class NewRecord extends AppCompatActivity
      * @param mode type
      * @param previous existing
      */
-    protected void goToListPicker(View v, String mode, List<String> previous) {
+    void goToListPicker(View v, String mode, List<String> previous) {
 
         if (v instanceof TextView && ((TextView) v).getError() != null) {
             ((TextView) v).setError(null);
@@ -244,7 +227,7 @@ public abstract class NewRecord extends AppCompatActivity
      * @param type datatype
      * @return name
      */
-    protected String setDefaultName (String type) {
+    String setDefaultName (String type) {
         // Format the datetime object as as string.
         String dateString = df.format(dateTime);
 
@@ -259,7 +242,7 @@ public abstract class NewRecord extends AppCompatActivity
     /**
      * Creates and executes an asynchronous task to save the new record.
      */
-    protected void saveRecord () {
+    void saveRecord () {
         if (getCurrentFocus() != null) {
             getCurrentFocus().clearFocus();
         }
@@ -370,7 +353,7 @@ public abstract class NewRecord extends AppCompatActivity
      * @param inView TextView
      * @return ArrayList
      */
-    protected List<String> stringFromViewToArray(TextView inView) {
+    List<String> stringFromViewToArray(TextView inView) {
 
         // The array to return.
         List<String> outArray = new ArrayList<>();
@@ -391,22 +374,22 @@ public abstract class NewRecord extends AppCompatActivity
      * @param values ArrayList
      * @return String
      */
-    protected String arrayToStringForView(List<String> values) {
+    @SuppressWarnings("replaceable")
+    String arrayToStringForView(List<String> values) {
 
         // Construct a string from the ArrayList to put in the text view.
         StringBuilder sb = new StringBuilder();
 
         String delimiter = "";
-        for (Iterator<String> s = values.iterator(); s.hasNext();) {
-            String appString = s.next();
+
+        for (String appString : values) {
             if (!sb.toString().contains(appString)) {
                 sb.append(delimiter).append(appString);
                 delimiter = ", ";
             }
         }
-        String displayString = sb.toString();
 
-        return displayString;
+        return sb.toString();
     }
 
     boolean checkLocationStale() {
@@ -430,7 +413,7 @@ public abstract class NewRecord extends AppCompatActivity
         return staleLoc;
     }
 
-    public void showNoticeDialog(String numMin) {
+    private void showNoticeDialog(String numMin) {
         Bundle b = new Bundle();
         b.putString("NUMMIN", numMin);
 

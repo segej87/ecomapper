@@ -19,7 +19,7 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 /**
- * Created by jonse on 10/15/2016.
+ * Created for the Kora project by jonse on 10/15/2016.
  */
 
 class UserLocation implements GoogleApiClient.ConnectionCallbacks,
@@ -78,6 +78,8 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void onConnected(Bundle bundle) {
+        // Flag that it is ok to request location updates
+        mRequestingLocationUpdates = true;
 
         // Get the user's last known location.
         getLastLocation();

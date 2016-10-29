@@ -3,7 +3,6 @@ package com.gmail.jonsege.androiddatacollection;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -13,15 +12,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.Contract;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by jon on 9/27/16.
+ * Created for the Kora project by jon on 9/27/16.
  */
 
 class NotebookArrayAdapter extends ArrayAdapter<Record> {
+
     //region Class Variables
 
     // The context for the adapter.
@@ -85,7 +87,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
                 setImageView(viewHolder.imageView, imgFile.getAbsolutePath());
             }
         } else {
-            int resource = 0;
+            int resource;
 
             switch(dt) {
                 case "meas":
@@ -131,7 +133,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
     /**
      * Caches the views in each row
      */
-    static class ViewHolderItem {
+    private static class ViewHolderItem {
         ImageView imageView;
         TextView titleView;
         TextView dateLine;
@@ -151,7 +153,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
                 replaceAll("_","");
 
         // First check the Bitmap cache
-        final Bitmap cachedBitmap = ((MyApplication) context.getApplicationContext())
+        final Bitmap cachedBitmap = ((KoraApplication) context.getApplicationContext())
                 .getBitmapFromMemCache(cacheKey);
 
         if (cachedBitmap != null) {
@@ -170,7 +172,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
             // Decode bitmap with inSampleSize set
             options.inJustDecodeBounds = false;
             Bitmap loadedBitmap = BitmapFactory.decodeFile(path, options);
-            ((MyApplication) context.getApplicationContext())
+            ((KoraApplication) context.getApplicationContext())
                     .addBitmapToMemoryCache(cacheKey, loadedBitmap);
 
             if (loadedBitmap == null) {
@@ -182,6 +184,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
         }
     }
 
+    @Contract(pure = true)
     private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;

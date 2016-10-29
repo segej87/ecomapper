@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gmail.jonsege.androiddatacollection">
 
-    <!-- Permissions for internet access and location services -->
+    <!-- Permissions for internet access, location services, camera use, and writing to storage -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
@@ -10,7 +10,7 @@
     <uses-feature android:name="android.hardware.camera" android:required="true" />
 
     <application
-        android:name=".MyApplication"
+        android:name=".KoraApplication"
         android:allowBackup="true"
         android:icon="@mipmap/kora_logo"
         android:label="@string/app_name"

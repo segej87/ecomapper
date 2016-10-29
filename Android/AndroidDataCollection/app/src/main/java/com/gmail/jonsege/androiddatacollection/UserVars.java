@@ -6,10 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by jon on 9/23/16.
+ * Created for the Kora project by jon on 9/23/16.
  */
 
 class UserVars {
+
     /**
      * The user ID of the current user
      */
@@ -34,6 +35,16 @@ class UserVars {
      * Filename to save media
      */
     static String MediasSaveFileName = "Medias-testing";
+
+    /**
+     * A map linking blob urls to local urls
+     */
+    static final Map<String, String> Medias = new HashMap<>();
+
+    /**
+     * A list of media marked for upload
+     */
+    static final List<String> MarkedMedia = new ArrayList<>();
 
     /**
      * An array of access levels, with the built-in public and private options
@@ -66,4 +77,8 @@ class UserVars {
     static String SpecDefault = null;
     static String UnitsDefault = null;
 
+    /**
+     * Public strings
+     */
+    static final String blobRootString = "https://ecomapper.blob.core.windows.net/";
 }

@@ -178,7 +178,6 @@ public class NewMeas extends NewRecord {
     /**
      * Sets up the UI fields in the activity
      */
-    @Override
     @SuppressWarnings("unchecked") void setUpFields () {
         mNameTextField = (EditText) findViewById(R.id.nameTextField);
         mAccessTextField = (TextView) findViewById(R.id.accessTextField);

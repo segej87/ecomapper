@@ -293,7 +293,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (loginResult.contains(getString(R.string.io_success))) {
                     Log.i(TAG,getString(R.string.new_login_log,uuid));
-                    String userVarsResult = DataIO.saveUserVars(LoginActivity.this);
+                    DataIO.saveUserVars(LoginActivity.this);
                     moveToNotebook();
                 } else {
                     showError(loginResult);
@@ -301,7 +301,7 @@ public class LoginActivity extends AppCompatActivity {
             } else if (!meshListResult) {
                 showError(getString(R.string.save_user_vars_failure));
             }else {
-                if (meshListResult && result.contains(getString(R.string.server_connection_error))) {
+                if (result.contains(getString(R.string.server_connection_error))) {
                     showError(getString(R.string.internet_failure_title));
                 }
                 //TODO: Add possible returned errors.

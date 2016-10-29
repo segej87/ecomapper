@@ -45,8 +45,8 @@ public class ListPickerActivity extends AppCompatActivity {
     /**
      * The adapters for the list views.
      */
-    ArrayAdapter<String> mFullAdapter;
-    ArrayAdapter<String> mSelectedAdapter;
+    private ArrayAdapter<String> mFullAdapter;
+    private ArrayAdapter<String> mSelectedAdapter;
 
     /**
      * The data sources for the list views.
@@ -75,7 +75,7 @@ public class ListPickerActivity extends AppCompatActivity {
     /**
      * A string to add to the defaults list
      */
-    String changeDefault = null;
+    private String changeDefault = null;
 
 
     //endregion
@@ -387,7 +387,7 @@ public class ListPickerActivity extends AppCompatActivity {
                 String newItem = mAddNew.getText().toString();
 
                 if (newItem.equals("") || selectedList.contains(newItem)) {
-
+                    mAddNew.setText(null);
                 } else if (fullList.contains(newItem)) {
                     mAvailableView.performItemClick(v, fullList.indexOf(newItem), 0);
                 } else if (!fullList.contains(newItem) && !selectedList.contains(newItem)) {

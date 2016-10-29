@@ -11,9 +11,6 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_username_not_found">Username not found</string>
     <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
     <string name="internet_failure_title">Connection problem</string>
     <string name="internet_failure">Make sure you are connected to the internet.</string>
     <string name="php_server_root">http://ecocollector.azurewebsites.net/</string>
@@ -26,7 +23,6 @@
     <string name="server_connection_error">Server Error: %1$s</string>
     <string name="server_password_error">do not match</string>
     <string name="server_username_error">not found</string>
-    <string name="title_activity_main">MainActivity</string>
     <string name="saved_login_log">Logging in with saved uuid: %1$s</string>
     <string name="new_login_log">Logging in with new uuid: %1$s</string>
     <string name="saved_logout_log">Logging out of uuid: %1$s</string>
@@ -40,7 +36,6 @@
 
     <!-- Strings related to DataIO -->
     <string name="uuid_save_key">Saved_UUID</string>
-    <string name="uuid_remove_report">Removing old UUID: </string>
     <string name="logout_flag">Logout</string>
     <string name="save_login_failure">Failed to save login: %1$s</string>
     <string name="load_login_failure">Failed to load login: %1$s</string>
@@ -53,33 +48,28 @@
     <string name="load_record_report">Loading %1$d records</string>
     <string name="load_record_failure">Failed to load records: %1$s</string>
     <string name="media_file_prefix">Medias-</string>
-    <string name="save_medias_failure">Failed to save media</string>
     <string name="io_success">Success</string>
     <string name="json_encode_error">"Error encoding json object: %1$s"</string>
     <string name="json_decode_error">"Error decoding json object: %1$s"</string>
     <string name="general_error_prefix">Error: %1$s</string>
-    <string name="file_deleted_success">File %1$s deleted</string>
-    <string name="file_deleted_failure">File %1$s could not be deleted</string>
     <string name="user_vars_save_success">User variables %1$s saved to %2$s</string>
     <string name="add_new_user_var_entry">Adding new %1$s: %2$s</string>
+    <string name="delete_photo_fail">Could not delete photo</string>
+    <string name="create_file_fail">Could not create file: %1$s</string>
+    <string name="create_file_success">Created file: %1$s</string>
 
     <!-- Strings related to new records -->
     <string name="start_new_record">Starting new add %1$s activity</string>
-    <string name="notebook_context_name">NOTEBOOK</string>
     <string name="enter_name_hint">Enter a name for this %1$s</string>
     <string name="default_name_button">Use default name</string>
     <string name="access_header">Access levels</string>
-    <string name="access_hint">Selected access levels</string>
     <string name="measured_header">Measured item</string>
-    <string name="measured_hint">Selected measured item</string>
     <string name="value_header">Value</string>
     <string name="value_hint">Enter the value of the measurement</string>
     <string name="unit_header">Units</string>
-    <string name="unit_hint">Selected unit of measurement</string>
     <string name="note_header">Note (optional)</string>
     <string name="note_header_required">Note</string>
     <string name="tags_header">Tags</string>
-    <string name="tags_hint">Selected tags</string>
     <string name="add_button_string">+</string>
     <string name="default_name">%1$s - %2$s</string>
     <string name="adding_record">Adding new record</string>
@@ -97,6 +87,8 @@
     <string name="photo_field_string">Photo</string>
     <string name="wrong_number_format">Please enter a valid number</string>
     <string name="photo_button_description">Choose a photo from the gallery, or take a new one.</string>
+    <string name="camera_start">Camera activity started</string>
+    <string name="camera_cancel">Camera activity canceled</string>
 
     <string name="start_old_record">Starting activity to edit %1$s record</string>
 
@@ -142,7 +134,6 @@
     <string name="title_constructor_editing">Edit</string>
     <string name="manage_defaults_string">Manage Defaults</string>
 
-    <string name="old_location_error_title">Warning: old location</string>
     <string name="old_location_error_message">The location has not been updated in %1$s minutes.
         Please check the GPS Accuracy to make sure it is not 0.0. If you ignore this message the
         location of this record may not be accurate.</string>
@@ -151,9 +142,4 @@
 
 
     <string name="parse_failure">Failed to parse %1$s: %2$s</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_settings">Settings</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.gmail.jonsege.androiddatacollection;
 
-import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by jon on 9/24/16.
+ * Created for the Kora project by jon on 9/24/16.
  */
 
 class Record {
@@ -27,9 +26,11 @@ class Record {
     /**
      * Variables for the record
      */
-    final String type;
+    private final String type;
     Double[] coords = new Double[3];
-    String photoPath;
+
+    // The path to the record's media on the local filesystem
+    final String photoPath;
     Map<String, Object> props = new HashMap<>();
 
     //endregion
@@ -84,9 +85,13 @@ class Record {
                 }
             }
 
-            // If the record is a photo, add the local filepath.
+            // If the record is a photo, add the blob filepath.
             if (props.get("datatype").equals("photo")) {
-                propsJsonOut.put("filepath",photoPath);
+                String blobPath = UserVars.blobRootString +
+                        UserVars.UUID + "/" +
+                        photoPath.substring(photoPath.lastIndexOf('/') + 1);
+
+                propsJsonOut.put("filepath", blobPath);
             }
 
             // Add the keys to the feature array
@@ -96,7 +101,7 @@ class Record {
 
             return recordJsonOut;
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Error encoding record to JSON: " + e.getLocalizedMessage());
         }
 
         return recordJsonOut;

@@ -12,10 +12,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by jonse on 10/6/2016.
+ * Created for the Kora project by jonse on 10/6/2016.
  */
 
-public class MyApplication extends Application {
+public class KoraApplication extends Application {
 
     //region Class Variables
 
@@ -32,7 +32,7 @@ public class MyApplication extends Application {
     /**
      * A LruCache for images in the list view
      */
-    LruCache<String, Bitmap> mMemoryCache;
+    private LruCache<String, Bitmap> mMemoryCache;
 
     //endregion
 
@@ -42,7 +42,7 @@ public class MyApplication extends Application {
         MultiDex.install(this);
     }
 
-    //region Getters and Setters
+    //region Record Getters and Setters
 
     /**
      * Returns the list of records being used by the application.
@@ -89,7 +89,7 @@ public class MyApplication extends Application {
      *      A report of success or failure
      */
     public synchronized String replaceRecords(List<Record> records) {
-        deleteRecords();
+        deleteRecordsOnly();
         this.records.addAll(records);
         return getString(R.string.io_success);
     }
@@ -102,12 +102,18 @@ public class MyApplication extends Application {
      *      The new record to put at the specified index
      */
     public synchronized void replaceRecord(int index, Record record) {
+        if (!this.records.get(index).photoPath.equals(record.photoPath)) {
+            DataIO.deleteFile(this.records.get(index).photoPath);
+        }
         this.records.set(index, record);
     }
 
-    public synchronized boolean deleteRecord(Record record) {
+    public synchronized boolean deleteRecordAndMedia(Record record) {
         try {
             this.records.remove(record);
+            if (record.photoPath != null) {
+                DataIO.deleteFile(record.photoPath);
+            }
             return true;
         } catch (Exception e) {
             Log.e(TAG,getString(R.string.general_error_prefix,e.getLocalizedMessage()));
@@ -116,7 +122,25 @@ public class MyApplication extends Application {
         return false;
     }
 
-    public synchronized void deleteRecords() {
+    /**
+     * If all records are deleted at once, and the media should be deleted
+     */
+    public synchronized void deleteRecordsAndMedia() {
+        for (Iterator<Record> r = this.records.iterator(); r.hasNext();) {
+            Record record= r.next();
+            if (record != null) {
+                r.remove();
+                if (record.photoPath != null) {
+                    DataIO.deleteFile(record.photoPath);
+                }
+            }
+        }
+    }
+
+    /**
+     * If only the records should be deleted, but not the media
+     */
+    public synchronized void deleteRecordsOnly() {
         for (Iterator<Record> r = this.records.iterator(); r.hasNext();) {
             Record record= r.next();
             if (record != null) {

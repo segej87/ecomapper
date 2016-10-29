@@ -9,6 +9,11 @@
 
 # Add any project specific keep options here:
 
+# For keeping jackson dependencies
+-keep class com.microsoft.azure.storage.table.** { *; }
+-dontwarn com.fasterxml.jackson.core**
+-keep class com.microsoft.windowsazure.mobileservices.** { *; }
+
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:
