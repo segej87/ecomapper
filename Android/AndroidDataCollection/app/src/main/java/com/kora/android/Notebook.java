@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -70,6 +71,9 @@ public class Notebook extends AppCompatActivity {
         //Set up the toolbar.
         setUpToolbar();
 
+        //Set up the button bar.
+        setUpButtons();
+
         // Set the list view from the layout.
         listView = (ListView) findViewById(R.id.recordsList);
 
@@ -84,8 +88,8 @@ public class Notebook extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
 
         // Set the list view's adapter to the custom adapter for displaying records.
         setUpListViewAdapter();
@@ -112,15 +116,6 @@ public class Notebook extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.new_meas:
-                goToNew("meas");
-                return true;
-            case R.id.new_note:
-                goToNew("note");
-                return true;
-            case R.id.new_photo:
-                goToNew("photo");
-                return true;
             case R.id.logout:
                 logoutButtonHandler();
                 return true;
@@ -207,6 +202,36 @@ public class Notebook extends AppCompatActivity {
                 }
 
                 goToOld(position, outClass);
+            }
+        });
+    }
+
+    //endregion
+
+    //region UI Methods
+
+    private void setUpButtons() {
+        ImageButton mMeasButton = (ImageButton) findViewById(R.id.meas_button);
+        mMeasButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToNew("meas");
+            }
+        });
+
+        ImageButton mNoteButton = (ImageButton) findViewById(R.id.note_button);
+        mNoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToNew("note");
+            }
+        });
+
+        ImageButton mPhotoButton = (ImageButton) findViewById(R.id.photo_button);
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToNew("photo");
             }
         });
     }
@@ -439,8 +464,13 @@ public class Notebook extends AppCompatActivity {
                 boolean res = DataIO.uploadBlob(filePath);
                 if (res) {
                     UserVars.Medias.remove(m);
+                    String cacheKey = m.substring(m.lastIndexOf('/') + 1).
+                            replaceAll(".jpg","").
+                            replaceAll("_","");
+                    app.removeBitmapFromMemCache(cacheKey);
                     iter.remove();
                 }
+                DataIO.saveUserVars(Notebook.this);
             }
             return true;
         }
@@ -448,7 +478,7 @@ public class Notebook extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean result) {
             if (result) {
-                DataIO.saveUserVars(Notebook.this);
+                Log.i(TAG, getString(R.string.media_upload_complete));
             }
         }
     }
@@ -486,8 +516,7 @@ public class Notebook extends AppCompatActivity {
 
         try {
             if (records.size() > 0) {
-                for (Iterator<Record> r = records.iterator(); r.hasNext(); ) {
-                    Record record = r.next();
+                for (Record record : records) {
                     if (record != null) {
                         if (record.props.get("datatype").equals("photo")) {
                             numPhotos++;

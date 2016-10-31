@@ -1,6 +1,7 @@
 package com.kora.android;
 
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -9,10 +10,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class NewMeas extends NewRecord {
 
@@ -27,6 +30,7 @@ public class NewMeas extends NewRecord {
     private EditText mNoteTextField;
     private TextView mTagTextField;
     private TextView mGPSAccField;
+    private TextView mGPSStabField;
 
     // Tag for this class.
     private final String TAG = "new_meas";
@@ -128,9 +132,11 @@ public class NewMeas extends NewRecord {
                 mAccessTextField.setText(displayString);
                 break;
             case "species":
+                species = displayString;
                 mMeasTextField.setText(displayString);
                 break;
             case "units":
+                units = displayString;
                 mUnitsTextField.setText(displayString);
                 break;
             case "tags":
@@ -178,7 +184,9 @@ public class NewMeas extends NewRecord {
     /**
      * Sets up the UI fields in the activity
      */
-    @SuppressWarnings("unchecked") void setUpFields () {
+    @SuppressWarnings("unchecked") private void setUpFields () {
+
+        // Pull the views from the layout
         mNameTextField = (EditText) findViewById(R.id.nameTextField);
         mAccessTextField = (TextView) findViewById(R.id.accessTextField);
         mMeasTextField = (TextView) findViewById(R.id.measTextField);
@@ -186,48 +194,63 @@ public class NewMeas extends NewRecord {
         mUnitsTextField = (TextView) findViewById(R.id.unitsTextField);
         mNoteTextField = (EditText) findViewById(R.id.notesTextField);
         mTagTextField = (TextView) findViewById(R.id.tagTextField);
-        mGPSAccField = (TextView) findViewById(R.id.gpsAccView);
+        GridLayout mGPSReportLayout = (GridLayout) findViewById(R.id.gpsReportGrid);
+        mGPSAccField = (TextView) findViewById(R.id.gpsAccReport);
+        mGPSStabField = (TextView) findViewById(R.id.gpsStabReport);
         mNameTextField.setHint(getString(R.string.enter_name_hint,getString(R.string.measurement_name_tag)));
 
         if (mode.equals("new")) {
-            mAccessTextField.setText(arrayToStringForView(UserVars.AccessDefaults));
-            mTagTextField.setText(arrayToStringForView(UserVars.TagsDefaults));
-            mMeasTextField.setText(UserVars.SpecDefault);
-            mUnitsTextField.setText(UserVars.UnitsDefault);
-            mGPSAccField.setText(getString(R.string.gps_acc_starter, String.valueOf(gpsAcc)));
+            if (!isFromSavedState) {
+                // Set default values for items
+                accessArray = UserVars.AccessDefaults;
+                tagArray = UserVars.TagsDefaults;
+                species = UserVars.SpecDefault;
+                units = UserVars.UnitsDefault;
+            }
+
+            // Set up the GPS section
+            updateGPSField();
         } else if (mode.equals("old")) {
-            mNameTextField.setText(record.props.get("name").toString());
-            mAccessTextField.setText(arrayToStringForView((List<String>) record.props.get("access")));
-            mMeasTextField.setText(record.props.get("species").toString());
-            mValTextField.setText(record.props.get("value").toString());
-            mUnitsTextField.setText(record.props.get("units").toString());
-            mNoteTextField.setText(record.props.get("text").toString());
-            mTagTextField.setText(arrayToStringForView((List<String>) record.props.get("tags")));
-            mGPSAccField.setVisibility(View.GONE);
+            if (!isFromSavedState) {
+                try {
+                    mNameTextField.setText(record.props.get("name").toString());
+                    accessArray = (ArrayList<String>) record.props.get("access");
+                    species = record.props.get("species").toString();
+                    mValTextField.setText(record.props.get("value").toString());
+                    units = record.props.get("units").toString();
+                    mNoteTextField.setText(record.props.get("text").toString());
+                    tagArray = (ArrayList<String>) record.props.get("tags");
+                } catch (Exception e) {
+                    Log.i(TAG, e.getLocalizedMessage());
+                }
 
-            try {
-                dateTime = df.parse(record.props.get("datetime").toString());
-            } catch (Exception e) {
-                Log.i(TAG,getString(R.string.parse_failure,
-                        "date",
-                        e.getLocalizedMessage()));
+                try {
+                    dateTime = df.parse(record.props.get("datetime").toString());
+                } catch (Exception e) {
+                    Log.i(TAG, getString(R.string.parse_failure,
+                            "date",
+                            e.getLocalizedMessage()));
+                }
+
+                userLoc = record.coords;
+
+                try {
+                    gpsAcc = Double.valueOf(record.props.get("accuracy").toString());
+                } catch (Exception e) {
+                    Log.i(TAG, getString(R.string.parse_failure,
+                            "accuracy",
+                            e.getLocalizedMessage()));
+                }
             }
 
-            try {
-                tagArray = (ArrayList<String>) record.props.get("tags");
-                accessArray = (ArrayList<String>) record.props.get("access");
-            } catch (ClassCastException e) {
-                Log.i(TAG,e.getLocalizedMessage());
-            }
-            userLoc = record.coords;
-            try {
-                gpsAcc = Double.valueOf(record.props.get("accuracy").toString());
-            } catch (Exception e) {
-                Log.i(TAG,getString(R.string.parse_failure,
-                        "accuracy",
-                        e.getLocalizedMessage()));
-            }
+            // Hide the gps layout
+            mGPSReportLayout.setVisibility(View.GONE);
         }
+
+        mAccessTextField.setText(arrayToStringForView(accessArray));
+        mMeasTextField.setText(species);
+        mUnitsTextField.setText(units);
+        mTagTextField.setText(arrayToStringForView(tagArray));
     }
 
     private void setUpPickerButtons() {
@@ -270,7 +293,31 @@ public class NewMeas extends NewRecord {
      */
     @Override
     void updateGPSField() {
-        mGPSAccField.setText(getString(R.string.gps_acc_starter,String.format("%.2f",gpsAcc)));
+        String accOutString;
+        if (gpsAcc == -1)
+            accOutString = getString(R.string.gps_locking);
+        else
+            accOutString = getString(R.string.gps_w_unit,String.format(Locale.getDefault(),"%.2f",gpsAcc));
+
+        mGPSAccField.setText(accOutString);
+        if (gpsAcc == -1 || gpsAcc > UserVars.minGPSAccuracy) {
+            mGPSAccField.setTextColor(ContextCompat.getColor(this, R.color.dark_red));
+        } else {
+            mGPSAccField.setTextColor(ContextCompat.getColor(this, R.color.dark_green));
+        }
+
+        String stabOutString;
+        if (gpsAcc == -1)
+            stabOutString = getString(R.string.gps_locking);
+        else
+            stabOutString = getString(R.string.gps_w_unit,String.format(Locale.getDefault(),"%.2f",gpsStab));
+
+        mGPSStabField.setText(stabOutString);
+        if (gpsStab == -1 || gpsStab > UserVars.minGPSStability) {
+            mGPSStabField.setTextColor(ContextCompat.getColor(this, R.color.dark_red));
+        } else {
+            mGPSStabField.setTextColor(ContextCompat.getColor(this, R.color.dark_green));
+        }
     }
 
     //endregion
@@ -318,11 +365,12 @@ public class NewMeas extends NewRecord {
 
         boolean dateCheck = dateTime != null;
 
-        boolean locCheck = mode.equals("old") || (userOverrideStale || !checkLocationStale());
+        boolean locCheck = mode.equals("old") || (userOverrideStale || checkLocationOK());
 
         boolean valCheck;
         try {
-            Double.parseDouble(mValTextField.getText().toString());
+            final double v = Double.parseDouble(mValTextField.getText().toString());
+            Log.i(TAG, getString(R.string.parse_success,String.valueOf(v)));
             valCheck = true;
         } catch (NumberFormatException e) {
             Log.i(TAG,getString(R.string.parse_failure,

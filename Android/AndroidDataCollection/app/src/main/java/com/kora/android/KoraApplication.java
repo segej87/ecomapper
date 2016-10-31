@@ -72,14 +72,14 @@ public class KoraApplication extends Application {
         Log.i(TAG,getString(R.string.adding_record));
     }
 
-    /**
-     * Appends records to the applications records list
-     * @param records
-     *      An array list of records to add to the list
-     */
-    public synchronized void addRecords(List<Record> records) {
-        this.records.addAll(records);
-    }
+//    /**
+//     * Appends records to the applications records list
+//     * @param records
+//     *      An array list of records to add to the list
+//     */
+//    public synchronized void addRecords(List<Record> records) {
+//        this.records.addAll(records);
+//    }
 
     /**
      * Replaces the application's record list with a provided list
@@ -115,6 +115,10 @@ public class KoraApplication extends Application {
             this.records.remove(record);
             if (record.photoPath != null) {
                 DataIO.deleteFile(record.photoPath);
+                String cacheKey = record.photoPath.substring(record.photoPath.lastIndexOf('/') + 1).
+                        replaceAll(".jpg","").
+                        replaceAll("_","");
+                removeBitmapFromMemCache(cacheKey);
             }
             return true;
         } catch (Exception e) {
@@ -124,20 +128,20 @@ public class KoraApplication extends Application {
         return false;
     }
 
-    /**
-     * If all records are deleted at once, and the media should be deleted
-     */
-    public synchronized void deleteRecordsAndMedia() {
-        for (Iterator<Record> r = this.records.iterator(); r.hasNext();) {
-            Record record= r.next();
-            if (record != null) {
-                r.remove();
-                if (record.photoPath != null) {
-                    DataIO.deleteFile(record.photoPath);
-                }
-            }
-        }
-    }
+//    /**
+//     * If all records are deleted at once, and the media should be deleted
+//     */
+//    public synchronized void deleteRecordsAndMedia() {
+//        for (Iterator<Record> r = this.records.iterator(); r.hasNext();) {
+//            Record record= r.next();
+//            if (record != null) {
+//                r.remove();
+//                if (record.photoPath != null) {
+//                    DataIO.deleteFile(record.photoPath);
+//                }
+//            }
+//        }
+//    }
 
     /**
      * If only the records should be deleted, but not the media
@@ -186,6 +190,12 @@ public class KoraApplication extends Application {
 
     public synchronized Bitmap getBitmapFromMemCache(String key) {
         return mMemoryCache.get(key);
+    }
+
+    public synchronized void removeBitmapFromMemCache(String key) {
+        if (mMemoryCache != null) {
+            mMemoryCache.remove(key);
+        }
     }
 
     //endregion

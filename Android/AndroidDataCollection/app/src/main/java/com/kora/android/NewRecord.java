@@ -13,11 +13,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -40,8 +42,14 @@ public abstract class NewRecord extends AppCompatActivity
     String TAG = "new_record";
 
     /**
+     * A flag indicating whether the class is being created from a previous state
+     */
+    boolean isFromSavedState = false;
+
+    /**
      * The current mode of record entry (new or old)
      */
+    private static final String MODE = "mode";
     String mode;
 
     /**
@@ -49,14 +57,60 @@ public abstract class NewRecord extends AppCompatActivity
      */
     String type;
     //TODO: Figure out how to specify time zone
-    final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+
+    /**
+     * The date and time when the record was opened
+     */
+    private static final String DATE_TIME = "dateTime";
     Date dateTime;
+
+    /**
+     * A list of tags for the record
+     */
+    private static final String TAG_ARRAY = "tagArray";
     List<String> tagArray = UserVars.TagsDefaults;
+
+    /**
+     * A list of access levels for the record
+     */
+    private static final String ACCESS_ARRAY = "accessArray";
     List<String> accessArray = UserVars.AccessDefaults;
+
+    /**
+     * A string with the species name (for measurements only)
+     */
+    private static final String SPECIES_STRING = "species";
+    String species = null;
+
+    /**
+     * A string with the units (for measurements only)
+     */
+    private static final String UNITS_STRING = "units";
+    String units = null;
+
+    /**
+     * The user's most recently detected location (from UserLocation class)
+     */
+    private static final String LOCATION = "latestLoc";
     Location latestLoc;
+
+    /**
+     * The most recent location's accuracy (reported by Play Services)
+     */
+    private static final String ACCURACY = "gpsAcc";
+    double gpsAcc = -1;
+
+    /**
+     * The current location stability (calculated by the UserLocation class)
+     */
+    private static final String STABILITY = "gpsStab";
+    double gpsStab = -1;
+
     Double[] userLoc = new Double[3];
-    double gpsAcc = 0.0;
     final Map<String, Object> itemsOut = new HashMap<>();
+
+    private static final String PHOTO = "mPhoto";
     String mPhoto = null;
 
     /**
@@ -75,8 +129,9 @@ public abstract class NewRecord extends AppCompatActivity
     Record record;
 
     /**
-     * The index of the record in the app's record list (for old records only
+     * The index of the record in the app's record list (for old records only)
      */
+    private static final String RECORD_INDEX = "recordIndex";
     private int recordIndex = -1;
 
     /**
@@ -92,30 +147,50 @@ public abstract class NewRecord extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null) {
+            isFromSavedState = true;
+
+            // Restore state members from saved instance
+            mode = savedInstanceState.getString(MODE);
+            recordIndex = savedInstanceState.getInt(RECORD_INDEX);
+            tagArray = savedInstanceState.getStringArrayList(TAG_ARRAY);
+            accessArray = savedInstanceState.getStringArrayList(ACCESS_ARRAY);
+            species = savedInstanceState.getString(SPECIES_STRING);
+            units = savedInstanceState.getString(UNITS_STRING);
+            mPhoto = savedInstanceState.getString(PHOTO);
+            gpsAcc = savedInstanceState.getDouble(ACCURACY);
+            gpsStab = savedInstanceState.getDouble(STABILITY);
+
+            String dateString = savedInstanceState.getString(DATE_TIME);
+            if (dateString != null) {
+                dateTime = df.parse(dateString, new ParsePosition(0));
+            }
+            latestLoc = savedInstanceState.getParcelable(LOCATION);
+        } else {
+            // Get the current record mode.
+            Intent intent = getIntent();
+            mode = intent.getStringExtra("MODE");
+            recordIndex = intent.getIntExtra("INDEX",-1);
+        }
+
         // Get the current application.
         app = (KoraApplication) this.getApplicationContext();
 
         // Create an object to handle location requests
         userLocation = new UserLocation(this);
 
-        // Get the current record mode.
-        Intent intent = getIntent();
-        mode = intent.getStringExtra("MODE");
-
         // If the mode is new, get the current datetime and start tracking location.
         switch(mode) {
             case "new":
                 // Get the date and time this view was created.
                 // TODO: allow user to update datetime
-                dateTime = new Date();
+                if (dateTime == null)
+                    dateTime = new Date();
 
                 // Build a Google API Client to connect to Play Services.
                 userLocation.buildGoogleApiClient();
                 break;
             case "old":
-                // Get the index of the record to load
-                recordIndex = intent.getIntExtra("INDEX",-1);
-
                 // If the index is -1, return an error. Otherwise, load the record.
                 if (recordIndex == -1) {
                     Log.i(TAG,getString(R.string.load_record_failure));
@@ -124,7 +199,7 @@ public abstract class NewRecord extends AppCompatActivity
                 }
 
                 // Tell the User Location class not to get the user's location.
-                userLocation.setRequestingLocation(false);
+                userLocation.requestStopUpdatingLocation();
 
                 break;
         }
@@ -140,11 +215,31 @@ public abstract class NewRecord extends AppCompatActivity
 
     @Override
     protected void onStop() {
-        super.onStop();
-
         // Stop tracking location and disconnect from Play Services.
         userLocation.stopLocationUpdates();
         userLocation.disconnectFromGoogleApi();
+
+        super.onStop();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current state
+        savedInstanceState.putString(MODE, mode);
+        savedInstanceState.putInt(RECORD_INDEX, recordIndex);
+        savedInstanceState.putStringArrayList(TAG_ARRAY, (ArrayList) tagArray);
+        savedInstanceState.putStringArrayList(ACCESS_ARRAY, (ArrayList) accessArray);
+        savedInstanceState.putString(SPECIES_STRING, species);
+        savedInstanceState.putString(UNITS_STRING, units);
+        savedInstanceState.putString(PHOTO, mPhoto);
+        savedInstanceState.putString(DATE_TIME, df.format(dateTime));
+        savedInstanceState.putParcelable(LOCATION, latestLoc);
+        savedInstanceState.putDouble(ACCURACY, gpsAcc);
+        savedInstanceState.putDouble(STABILITY, gpsStab);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     //endregion
@@ -398,31 +493,62 @@ public abstract class NewRecord extends AppCompatActivity
         return sb.toString();
     }
 
-    boolean checkLocationStale() {
+    boolean checkLocationOK() {
         boolean staleLoc;
 
-        //TODO: Warn user of location failure!
         if (latestLoc == null) {
-            Toast.makeText(NewRecord.this, getString(R.string.no_user_location_found), Toast.LENGTH_SHORT);
+            Toast.makeText(NewRecord.this,
+                    getString(R.string.no_user_location_found),
+                    Toast.LENGTH_SHORT)
+            .show();
             return true;
         }
 
-        Long elapsedTime = ((new Date()).getTime() - latestLoc.getTime()) / 60000;
+        Long elapsedTime = ((new Date()).getTime() - latestLoc.getTime())/60000;
         String numMin = String.valueOf((elapsedTime.intValue()));
 
-        if (elapsedTime > 1) {
-            staleLoc = true;
-            showNoticeDialog(numMin);
-        } else {
-            staleLoc = false;
+        staleLoc = elapsedTime > UserVars.maxUpdateTime ||
+                (gpsAcc == -1 || gpsAcc > UserVars.minGPSAccuracy) ||
+                (gpsStab == -1 || gpsStab > UserVars.minGPSStability);
+
+        if (staleLoc) {
+            String minOutString;
+            if (elapsedTime > UserVars.maxUpdateTime)
+                minOutString = numMin;
+            else
+                minOutString = "none";
+
+            String accOutString;
+            if (gpsAcc == -1)
+                accOutString = getString(R.string.gps_locking);
+            else if (gpsAcc > UserVars.minGPSAccuracy)
+                accOutString = getString(R.string.gps_w_unit,
+                        String.format(Locale.getDefault(), "%.2f", gpsAcc));
+            else
+                accOutString = "none";
+
+            String stabOutString;
+            if (gpsStab == -1)
+                stabOutString = getString(R.string.gps_locking);
+            else if (gpsStab > UserVars.minGPSStability)
+                stabOutString = getString(R.string.gps_w_unit,
+                        String.format(Locale.getDefault(), "%.2f", gpsStab));
+            else
+                stabOutString = "none";
+
+            showNoticeDialog(minOutString,
+                    accOutString,
+                    stabOutString);
         }
 
-        return staleLoc;
+        return !staleLoc;
     }
 
-    private void showNoticeDialog(String numMin) {
+    private void showNoticeDialog(String numMin, String acc, String stab) {
         Bundle b = new Bundle();
         b.putString("NUMMIN", numMin);
+        b.putString("ACC", acc);
+        b.putString("STAB", stab);
 
         // Create an instance of the dialog fragment and show it
         DialogFragment dialog = new LocationOverrideFragment();
@@ -431,14 +557,14 @@ public abstract class NewRecord extends AppCompatActivity
     }
 
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
+    public void onDialogPositiveClick() {
         // User touched the dialog's positive button
         this.userOverrideStale = true;
         saveRecord();
     }
 
     @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
+    public void onDialogNegativeClick() {
         // User touched the dialog's negative button
         this.userOverrideStale = false;
     }

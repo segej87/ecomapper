@@ -35,6 +35,7 @@ public class ListPickerActivity extends AppCompatActivity {
     /**
      * The list picker mode.
       */
+    private static final String MODE = "mode";
     private String mode;
 
     /**
@@ -53,7 +54,10 @@ public class ListPickerActivity extends AppCompatActivity {
     /**
      * The data sources for the list views.
      */
+    private static final String FULL_LIST = "fullList";
     private List<String> fullList;
+
+    private static final String SELECTED_LIST = "selectedList";
     private List<String> selectedList = new ArrayList<>();
 
     /**
@@ -92,17 +96,23 @@ public class ListPickerActivity extends AppCompatActivity {
         // Set up the toolbar.
         setUpToolbar();
 
-        // Get the list picker mode.
-        mode = getIntent().getStringExtra("MODE");
+        if (savedInstanceState != null) {
+            mode = savedInstanceState.getString(MODE);
+            fullList = savedInstanceState.getStringArrayList(FULL_LIST);
+            selectedList = savedInstanceState.getStringArrayList(SELECTED_LIST);
+        } else {
+            // Get the list picker mode from the intent.
+            mode = getIntent().getStringExtra("MODE");
 
-        // Get any existing selected items.
-        List<String> previous = getIntent().getStringArrayListExtra("PREVIOUS");
+            // Get any existing selected items.
+            List<String> previous = getIntent().getStringArrayListExtra("PREVIOUS");
+
+            // Get the full data list from User Variables depending on the mode.
+            getInitialData(previous);
+        }
 
         // Set up the fields.
         setUpFields();
-
-        // Get the full data list from User Variables depending on the mode.
-        getInitialData(previous);
 
         // Set the adapters for the list views.
         setUpListViewAdapters();
@@ -115,6 +125,18 @@ public class ListPickerActivity extends AppCompatActivity {
 
         // Register the selected list view for context menu.
         registerForContextMenu(mSelectedView);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current state
+        savedInstanceState.putString(MODE, mode);
+        savedInstanceState.putStringArrayList(FULL_LIST, (ArrayList) fullList);
+        savedInstanceState.putStringArrayList(SELECTED_LIST, (ArrayList) selectedList);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     //endregion

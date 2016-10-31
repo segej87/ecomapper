@@ -18,6 +18,9 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created for the Kora project by jonse on 10/15/2016.
  */
@@ -50,6 +53,11 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
      * Location objects
      */
     private Location mLastLocation;
+
+    /**
+     * A list for monitoring GPS stability
+     */
+    private final List<Float> stabList = new ArrayList<>();
 
     //endregion
 
@@ -242,7 +250,6 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
      */
     private void startLocationUpdates() {
         try {
-
             // Log that location updates are starting, then request location updates from API
             Log.i(context.TAG,context.getString(R.string.location_updates_start));
             LocationServices.FusedLocationApi.requestLocationUpdates(
@@ -271,6 +278,15 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
     public void onLocationChanged(Location location) {
         //TODO: warn user if location changes by more than accuracy
 
+        //Set the calling context's stability variable
+        if (context.latestLoc == null) {
+            stabList.add((float) -1);
+        } else {
+            stabList.add(location.distanceTo(context.latestLoc));
+        }
+
+        context.gpsStab = calculateGPSStability();
+
         // Set the calling context's location array using the new location
         context.latestLoc = location;
 
@@ -285,8 +301,46 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
 
     //region Getters and Setters
 
-    void setRequestingLocation(boolean request) {
-        this.mRequestingLocationUpdates = request;
+    void requestStopUpdatingLocation() {
+        this.mRequestingLocationUpdates = false;
+    }
+
+    //endregion
+
+    //region Helper Methods
+
+    private float calculateGPSStability() {
+
+        int stabListSize = stabList.size();
+
+        float stabAdd;
+        int counter = 0;
+        if (stabListSize < 5) {
+            stabAdd = stabList.get(0);
+            counter++;
+            if (stabListSize > 1) {
+                for (Float s : stabList.subList(1, stabListSize - 1)) {
+                    if (s != -1) {
+                        stabAdd = stabAdd + s;
+                        counter++;
+                    }
+                }
+            }
+        } else {
+            stabAdd = stabList.get(stabListSize-5);
+            counter++;
+            for (Float s : stabList.subList(stabListSize-4,stabListSize-1)) {
+                if (s != -1) {
+                    stabAdd = stabAdd + s;
+                    counter++;
+                }
+            }
+        }
+
+        if (counter != 0)
+            return stabAdd/counter;
+
+        return -1;
     }
 
     //endregion

@@ -165,9 +165,8 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
             BitmapFactory.decodeFile(path, options);
 
             // Calculate inSampleSize
-            options.inSampleSize = calculateInSampleSize(options,
-                    89,
-                    89);
+            // TODO: Check!!
+            options.inSampleSize = calculateInSampleSize(options);
 
             // Decode bitmap with inSampleSize set
             options.inJustDecodeBounds = false;
@@ -185,16 +184,19 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
     }
 
     @Contract(pure = true)
-    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    private static int calculateInSampleSize(BitmapFactory.Options options) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
 
+        final int reqWidth = 89;
+        final int reqHeight = 89;
+
         if (height > reqHeight || width > reqWidth) {
 
-            final int halfHeight = height / 3;
-            final int halfWidth = width / 3;
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
 
             // Calculate the largest inSampleSize value that is a power of 2 and keeps both
             // height and width larger than the requested height and width.
@@ -203,6 +205,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
                 inSampleSize *= 2;
             }
         }
+
         return inSampleSize;
     }
 

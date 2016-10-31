@@ -5,7 +5,7 @@
     android:id="@+id/activity_notebook"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.gmail.jonsege.android.Notebook" >
+    tools:context="com.kora.android.Notebook" >
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/notebook_toolbar"
@@ -15,13 +15,65 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
+    <LinearLayout
+        android:id="@+id/gap_view"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/notebook_toolbar"
+        android:background="@color/background_grey" />
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/notebook_toolbar"
-        android:layout_marginTop="10dp"
-        android:paddingTop="10dp"
-        android:id="@+id/recordsList"
-        android:background="@color/backgroundLight" />
+        android:layout_below="@+id/gap_view"
+        android:layout_above="@+id/footer_layout"
+        android:id="@+id/recordsList" />
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/footer_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:orientation="horizontal"
+        android:background="@color/background_grey"
+        android:gravity="center" >
+
+        <ImageButton
+            android:id="@+id/meas_button"
+            android:contentDescription="@string/new_meas"
+            android:src="@mipmap/meas_icon"
+            android:scaleType="fitCenter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            style="?attr/buttonBarButtonStyle"/>
+
+        <ImageButton
+            android:id="@+id/note_button"
+            android:contentDescription="@string/new_note"
+            android:src="@mipmap/note_icon"
+            android:scaleType="fitCenter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            style="?attr/buttonBarButtonStyle"/>
+
+        <ImageButton
+            android:id="@+id/photo_button"
+            android:contentDescription="@string/new_photo"
+            android:src="@mipmap/photo_icon"
+            android:scaleType="fitCenter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            style="?attr/buttonBarButtonStyle"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

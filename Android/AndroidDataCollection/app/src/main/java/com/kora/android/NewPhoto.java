@@ -3,8 +3,8 @@ package com.kora.android;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.Contract;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class NewPhoto extends NewRecord {
 
@@ -40,6 +42,7 @@ public class NewPhoto extends NewRecord {
     private EditText mNoteTextField;
     private TextView mTagTextField;
     private TextView mGPSAccField;
+    private TextView mGPSStabField;
 
     /**
      * Request code for taking a new photo
@@ -223,52 +226,70 @@ public class NewPhoto extends NewRecord {
     /**
      * Sets up the UI fields in the activity
      */
-    @SuppressWarnings("unchecked") void setUpFields () {
+    @SuppressWarnings("unchecked") private void setUpFields () {
+
+        // Pull the views from the layout.
         mNameTextField = (EditText) findViewById(R.id.nameTextField);
         mAccessTextField = (TextView) findViewById(R.id.accessTextField);
         mPhotoButton = (ImageButton) findViewById(R.id.photoButton);
         mNoteTextField = (EditText) findViewById(R.id.notesTextField);
         mTagTextField = (TextView) findViewById(R.id.tagTextField);
-        mGPSAccField = (TextView) findViewById(R.id.gpsAccView);
+        GridLayout mGPSReportLayout = (GridLayout) findViewById(R.id.gpsReportGrid);
+        mGPSAccField = (TextView) findViewById(R.id.gpsAccReport);
+        mGPSStabField = (TextView) findViewById(R.id.gpsStabReport);
         mNameTextField.setHint(getString(R.string.enter_name_hint,getString(R.string.photo_name_tag)));
 
         if (mode.equals("new")) {
-            mAccessTextField.setText(arrayToStringForView(UserVars.AccessDefaults));
-            mTagTextField.setText(arrayToStringForView(UserVars.TagsDefaults));
-            mGPSAccField.setText(getString(R.string.gps_acc_starter, String.valueOf(gpsAcc)));
+            if (!isFromSavedState) {
+                // Set default values for items
+                accessArray = UserVars.AccessDefaults;
+                tagArray = UserVars.TagsDefaults;
+            }
+
+            // Set up the GPS section
+            updateGPSField();
         } else if (mode.equals("old")) {
-            mNameTextField.setText(record.props.get("name").toString());
-            mAccessTextField.setText(arrayToStringForView((List<String>) record.props.get("access")));
-            mPhoto = record.photoPath;
-            setImageButton();
+            if (!isFromSavedState) {
+                try {
+                    mNameTextField.setText(record.props.get("name").toString());
+                    accessArray = (ArrayList<String>) record.props.get("access");
+                    mNoteTextField.setText(record.props.get("text").toString());
+                    tagArray = (ArrayList<String>) record.props.get("tags");
+                    mPhoto = record.photoPath;
+                } catch (Exception e) {
+                    Log.i(TAG, e.getLocalizedMessage());
+                }
+
+                try {
+                    dateTime = df.parse(record.props.get("datetime").toString());
+                } catch (Exception e) {
+                    Log.i(TAG, getString(R.string.parse_failure,
+                            "date",
+                            e.getLocalizedMessage()));
+                }
+
+                userLoc = record.coords;
+
+                try {
+                    gpsAcc = Double.valueOf(record.props.get("accuracy").toString());
+                } catch (Exception e) {
+                    Log.i(TAG, getString(R.string.parse_failure,
+                            "accuracy",
+                            e.getLocalizedMessage()));
+                }
+            }
+
+            // Disable the take photo option
             mPhotoButton.setEnabled(false);
-            mNoteTextField.setText(record.props.get("text").toString());
-            mTagTextField.setText(arrayToStringForView((List<String>) record.props.get("tags")));
-            mGPSAccField.setVisibility(View.GONE);
 
-            try {
-                dateTime = df.parse(record.props.get("datetime").toString());
-            } catch (Exception e) {
-                Log.i(TAG,getString(R.string.parse_failure,
-                        "date",
-                        e.getLocalizedMessage()));
-            }
-
-            try {
-                tagArray = (ArrayList<String>) record.props.get("tags");
-                accessArray = (ArrayList<String>) record.props.get("access");
-            } catch (ClassCastException e) {
-                Log.i(TAG,e.getLocalizedMessage());
-            }
-            userLoc = record.coords;
-            try {
-                gpsAcc = Double.valueOf(record.props.get("accuracy").toString());
-            } catch (Exception e) {
-                Log.i(TAG,getString(R.string.parse_failure,
-                        "accuracy",
-                        e.getLocalizedMessage()));
-            }
+            // Hide the gps layout
+            mGPSReportLayout.setVisibility(View.GONE);
         }
+
+        setImageButton();
+
+        mAccessTextField.setText(arrayToStringForView(accessArray));
+        mTagTextField.setText(arrayToStringForView(tagArray));
     }
 
     private void setUpPickerButtons() {
@@ -295,7 +316,31 @@ public class NewPhoto extends NewRecord {
      */
     @Override
     void updateGPSField() {
-        mGPSAccField.setText(getString(R.string.gps_acc_starter,String.valueOf(gpsAcc)));
+        String accOutString;
+        if (gpsAcc == -1)
+            accOutString = getString(R.string.gps_locking);
+        else
+            accOutString = getString(R.string.gps_w_unit,String.format(Locale.getDefault(),"%.2f",gpsAcc));
+
+        mGPSAccField.setText(accOutString);
+        if (gpsAcc == -1 || gpsAcc > UserVars.minGPSAccuracy) {
+            mGPSAccField.setTextColor(ContextCompat.getColor(this, R.color.dark_red));
+        } else {
+            mGPSAccField.setTextColor(ContextCompat.getColor(this, R.color.dark_green));
+        }
+
+        String stabOutString;
+        if (gpsAcc == -1)
+            stabOutString = getString(R.string.gps_locking);
+        else
+            stabOutString = getString(R.string.gps_w_unit,String.format(Locale.getDefault(),"%.2f",gpsStab));
+
+        mGPSStabField.setText(stabOutString);
+        if (gpsStab == -1 || gpsStab > UserVars.minGPSStability) {
+            mGPSStabField.setTextColor(ContextCompat.getColor(this, R.color.dark_red));
+        } else {
+            mGPSStabField.setTextColor(ContextCompat.getColor(this, R.color.dark_green));
+        }
     }
 
     //endregion
@@ -349,9 +394,8 @@ public class NewPhoto extends NewRecord {
                 BitmapFactory.decodeFile(mPhoto, options);
 
                 // Calculate inSampleSize
-                options.inSampleSize = calculateInSampleSize(options,
-                        200,
-                        200);
+                //TODO: Figure out how to calculate reqWidth and reqHeight
+                options.inSampleSize = calculateInSampleSize(options);
 
                 // Decode bitmap with inSampleSize set
                 options.inJustDecodeBounds = false;
@@ -370,14 +414,18 @@ public class NewPhoto extends NewRecord {
     }
 
     @Contract(pure = true)
-    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    private static int calculateInSampleSize(BitmapFactory.Options options) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
+
+        final int reqWidth = 300;
+        final int reqHeight = 300;
+
         int inSampleSize = 1;
 
-        final int halfHeight = height / 3;
-        final int halfWidth = width / 3;
+        final int halfHeight = height / 2;
+        final int halfWidth = width / 2;
 
         // Calculate the largest inSampleSize value that is a power of 2 and keeps both
         // height and width larger than the requested height and width.
@@ -397,7 +445,7 @@ public class NewPhoto extends NewRecord {
         boolean dateCheck = dateTime != null;
 
 
-        boolean locCheck = mode.equals("old") || userOverrideStale || !checkLocationStale();
+        boolean locCheck = mode.equals("old") || userOverrideStale || checkLocationOK();
 
         if (!(mNameTextField.getText() != null &&
                 !mNameTextField.getText().toString().equals(""))) {
@@ -439,7 +487,7 @@ public class NewPhoto extends NewRecord {
         } else if (errorView instanceof TextView) {
             ((TextView) errorView).setError(errorString);
         } else if (errorView instanceof ImageButton) {
-            errorView.setBackgroundColor(Color.RED);
+            errorView.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_red));
         }
 
         errorView.requestFocus();

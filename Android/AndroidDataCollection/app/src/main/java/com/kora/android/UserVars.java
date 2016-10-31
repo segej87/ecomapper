@@ -78,6 +78,13 @@ class UserVars {
     static String UnitsDefault = null;
 
     /**
+     * Location settings
+     */
+    static final int maxUpdateTime = 1;
+    static final int minGPSAccuracy = 50;
+    static final int minGPSStability = 50;
+
+    /**
      * Public strings
      */
     static final String blobRootString = "https://ecomapper.blob.core.windows.net/";

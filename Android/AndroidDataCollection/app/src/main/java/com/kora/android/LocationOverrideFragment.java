@@ -16,8 +16,8 @@ import android.support.v7.app.AlertDialog;
 public class LocationOverrideFragment extends DialogFragment {
 
     public interface LocationOverrideListener {
-        void onDialogPositiveClick(DialogFragment dialog);
-        void onDialogNegativeClick(DialogFragment dialog);
+        void onDialogPositiveClick();
+        void onDialogNegativeClick();
     }
 
     private LocationOverrideListener mListener;
@@ -60,18 +60,34 @@ public class LocationOverrideFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle b = getArguments();
         String numMin = b.getString("NUMMIN");
+        String gpsAcc = b.getString("ACC");
+        String gpsStab = b.getString("STAB");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(getString(R.string.location_error_starter));
+
+        if (numMin != null && !numMin.equals("none"))
+            sb.append(getString(R.string.old_location_error_message, numMin));
+
+        if (gpsAcc != null && !gpsAcc.equals("none"))
+            sb.append(getString(R.string.inaccurate_location_error_message, gpsAcc));
+
+        if (gpsStab != null && !gpsStab.equals("none"))
+            sb.append(getString(R.string.unstable_location_error_message, gpsStab));
+
+        sb.append(getString(R.string.location_error_ending));
 
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(getString(R.string.old_location_error_message, numMin))
+        builder.setMessage(sb.toString())
                 .setPositiveButton(R.string.old_location_use_option, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogPositiveClick(LocationOverrideFragment.this);
+                        mListener.onDialogPositiveClick();
                     }
                 })
                 .setNegativeButton(R.string.old_location_wait_option, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogNegativeClick(LocationOverrideFragment.this);
+                        mListener.onDialogNegativeClick();
                     }
                 });
 

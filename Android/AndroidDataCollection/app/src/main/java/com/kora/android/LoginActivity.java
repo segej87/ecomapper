@@ -3,7 +3,7 @@ package com.kora.android;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Set up the toolbar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.notebook_toolbar);
-        myToolbar.setTitleTextColor(Color.LTGRAY);
+        myToolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white));
         setSupportActionBar(myToolbar);
 
         // Set up the login form.

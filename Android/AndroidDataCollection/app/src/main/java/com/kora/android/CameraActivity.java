@@ -45,21 +45,25 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
     /**
      * A flag indicating whether the activity is being called from the camera
      */
+    private static final String ACTIVITY_RESULT = "isFromActivityResult";
     private boolean isFromActivityResult = false;
 
     /**
      * The file path to write the photo and return to the New Photo activity
      */
+    private static final String OUTPUT_FILE = "outputFilePath";
     private String outputFilePath;
 
     /**
      * A datetime string for creating the unique file name
      */
+    private static final String DATE_TIME = "dateTime";
     private String dateTime;
 
     /**
      * The Uri for the new photo
      */
+    private static final String PHOTO_URI = "photoUri";
     private Uri photoUri;
 
     //endregion
@@ -68,93 +72,45 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_camera);
+
+        if (savedInstanceState != null) {
+            // Restore state members from saved instance
+            isFromActivityResult = savedInstanceState.getBoolean(ACTIVITY_RESULT);
+            outputFilePath = savedInstanceState.getString(OUTPUT_FILE);
+            dateTime = savedInstanceState.getString(DATE_TIME);
+            photoUri = savedInstanceState.getParcelable(PHOTO_URI);
+        } else {
+            // Read the datetime string from the calling intent
+            dateTime = getIntent().getStringExtra("DATE");
+        }
 
         // Get the package manager to monitor the intent
         pm = getPackageManager();
-
-        // Read the datetime string from the calling intent
-        dateTime = getIntent().getStringExtra("DATE");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
         if(!isFromActivityResult){
             dispatchTakePictureIntent();
         }
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        if (isFromActivityResult) {
-            //TODO: Implement ContentProvider!!
-        }
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current state
+        savedInstanceState.putBoolean(ACTIVITY_RESULT, isFromActivityResult);
+        savedInstanceState.putString(OUTPUT_FILE, outputFilePath);
+        savedInstanceState.putString(DATE_TIME, dateTime);
+        savedInstanceState.putParcelable(PHOTO_URI, photoUri);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
     }
 
-    /**
-     * Release memory when the UI becomes hidden or when system resources become low.
-     * @param level the memory-related event that was raised.
-     */
-    public void onTrimMemory(int level) {
-
-        // Determine which lifecycle or system event was raised.
-        switch (level) {
-
-            case ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN:
-
-                /*
-                   Release any UI objects that currently hold memory.
-
-                   The user interface has moved to the background.
-                */
-
-                break;
-
-            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
-            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW:
-            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL:
-                System.gc();
-
-                /*
-                   Release any memory that your app doesn't need to run.
-
-                   The device is running low on memory while the app is running.
-                   The event raised indicates the severity of the memory-related event.
-                   If the event is TRIM_MEMORY_RUNNING_CRITICAL, then the system will
-                   begin killing background processes.
-                */
-
-                break;
-
-            case ComponentCallbacks2.TRIM_MEMORY_BACKGROUND:
-            case ComponentCallbacks2.TRIM_MEMORY_MODERATE:
-                System.gc();
-            case ComponentCallbacks2.TRIM_MEMORY_COMPLETE:
-
-                /*
-                   Release as much memory as the process can.
-
-                   The app is on the LRU list and the system is running low on memory.
-                   The event raised indicates where the app sits within the LRU list.
-                   If the event is TRIM_MEMORY_COMPLETE, the process will be one of
-                   the first to be terminated.
-                */
-                System.gc();
-
-                break;
-
-            default:
-                /*
-                  Release any non-critical data structures.
-
-                  The app received an unrecognized memory level value
-                  from the system. Treat this as a generic low-memory message.
-                */
-                break;
-        }
-    }
 
     //endregion
 
@@ -175,9 +131,10 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
             }
             if (photoFile != null) {
                 photoUri = Uri.fromFile(photoFile);
+//                photoUri = getUriForFile(CameraActivity.this, "org.koramap.fileprovider", photoFile);
 
                 Log.i(TAG,getString(R.string.camera_start));
-                isFromActivityResult=true;
+                isFromActivityResult = true;
 
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
@@ -187,11 +144,6 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        System.out.println("Result code " +
-                resultCode +
-                " after request code " +
-                requestCode +
-                ". Success code is " + RESULT_OK);
 
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
@@ -237,8 +189,6 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
             cropIntent.putExtra("crop", "true");
             cropIntent.putExtra("aspectX", 1);
             cropIntent.putExtra("aspectY", 1);
-            cropIntent.putExtra("outputX", 256);
-            cropIntent.putExtra("outputY", 256);
             cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
 
             // Start the crop intent for result
@@ -266,6 +216,7 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
         String imageFileName = createUniquePhotoName();
 
         final File root = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + UserVars.MediasSaveFileName + File.separator);
+//        final File root = new File(getFilesDir() + File.separator + "Medias" + File.separator + UserVars.MediasSaveFileName + File.separator);
         boolean fileCheck = root.exists();
         if (!fileCheck) {
             fileCheck = root.mkdirs();

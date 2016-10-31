@@ -6,32 +6,20 @@
         android:id="@+id/opMenuGroup"
         >
 
-        <item android:id="@+id/new_meas"
-            android:title="@string/new_meas"
-            android:icon="@mipmap/meas_icon"
-            app:showAsAction="ifRoom"/>
-
-        <item android:id="@+id/new_note"
-            android:title="@string/new_note"
-            android:icon="@mipmap/note_icon"
-            app:showAsAction="ifRoom" />
-
-        <item android:id="@+id/new_photo"
-            android:title="@string/new_photo"
-            android:icon="@mipmap/photo_icon"
-            app:showAsAction="ifRoom" />
-
         <item android:id="@+id/sync"
             android:title="@string/sync_string"
-            android:icon="@android:drawable/ic_popup_sync" />
+            android:icon="@android:drawable/ic_popup_sync"
+            app:showAsAction="ifRoom"/>
 
         <item android:id="@+id/defaults"
             android:title="@string/manage_defaults_string"
-            android:enabled="false" />
+            android:icon="@android:drawable/ic_menu_preferences"
+            app:showAsAction="ifRoom"/>
 
         <item android:id="@+id/logout"
             android:title="@string/logout_flag"
-            android:icon="@android:drawable/ic_lock_power_off" />
+            android:icon="@android:drawable/ic_lock_power_off"
+            app:showAsAction="ifRoom"/>
 
     </group>
 
