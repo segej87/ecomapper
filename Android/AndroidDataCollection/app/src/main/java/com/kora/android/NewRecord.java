@@ -371,10 +371,6 @@ public abstract class NewRecord extends AppCompatActivity
                 // If the user's location was not found, set to default (null island).
                 if (latestLoc == null) {
                     Log.i(TAG, getString(R.string.no_user_location_found));
-                    Toast.makeText(NewRecord.this,
-                            getString(R.string.no_user_location_found),
-                            Toast.LENGTH_SHORT)
-                            .show();
                     userLoc[0] = 0.0;
                     userLoc[1] = 0.0;
                     userLoc[2] = 0.0;

@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="true" />
 
     <application
@@ -21,7 +22,7 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
         <provider
-            android:name = "android.support.v4.content.FileProvider"
+            android:name="android.support.v4.content.FileProvider"
             android:authorities="org.koramap.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">

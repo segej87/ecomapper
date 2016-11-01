@@ -6,6 +6,7 @@ import android.content.ComponentCallbacks2;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -14,6 +15,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+
+import static android.support.v4.content.FileProvider.getUriForFile;
 
 /**
  * Created for the Kora project by jonse on 10/27/2016.
@@ -130,13 +133,22 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
                 e.printStackTrace();
             }
             if (photoFile != null) {
-                photoUri = Uri.fromFile(photoFile);
-//                photoUri = getUriForFile(CameraActivity.this, "org.koramap.fileprovider", photoFile);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                    Log.i(TAG, "Using file Uri");
+                    photoUri = Uri.fromFile(photoFile);
+                } else {
+                    Log.i(TAG, "Using content Uri");
+                    photoUri = getUriForFile(CameraActivity.this,
+                            "org.koramap.fileprovider",
+                            photoFile);
+                }
 
                 Log.i(TAG,getString(R.string.camera_start));
                 isFromActivityResult = true;
 
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                takePictureIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
@@ -144,7 +156,6 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_IMAGE_CAPTURE:
@@ -158,10 +169,7 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
                 case REQUEST_IMAGE_CROP:
                     isFromActivityResult = true;
                     try {
-                        Intent resultIntent = new Intent();
-                        resultIntent.putExtra("PATH", outputFilePath);
-                        setResult(Activity.RESULT_OK, resultIntent);
-                        finish();
+                        moveToNewPhoto();
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     }
@@ -191,13 +199,24 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
             cropIntent.putExtra("aspectY", 1);
             cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
 
+            cropIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
             // Start the crop intent for result
             startActivityForResult(cropIntent, REQUEST_IMAGE_CROP);
         } catch (ActivityNotFoundException e) {
             Log.e(TAG, "This device doesn't support the crop feature");
             Toast toast = Toast.makeText(this, "This device doesn't support the crop feature", Toast.LENGTH_SHORT);
             toast.show();
+            moveToNewPhoto();
         }
+    }
+
+    private void moveToNewPhoto() {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("PATH", outputFilePath);
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
     }
 
     //endregion
@@ -215,14 +234,15 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
         // Create an image file name
         String imageFileName = createUniquePhotoName();
 
-        final File root = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + UserVars.MediasSaveFileName + File.separator);
-//        final File root = new File(getFilesDir() + File.separator + "Medias" + File.separator + UserVars.MediasSaveFileName + File.separator);
-        boolean fileCheck = root.exists();
-        if (!fileCheck) {
-            fileCheck = root.mkdirs();
-        }
+        final File root;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
+            root = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        else
+            root = new File(CameraActivity.this.getFilesDir(), "images");
 
-        File noMedFile = new File(root + File.separator + ".nomedia");
+        if (!root.exists()) root.mkdirs();
+
+        File noMedFile = new File(root, ".nomedia");
         boolean noMedCheck = noMedFile.exists();
         if (!noMedCheck) {
             try {
@@ -235,12 +255,10 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
             }
         }
 
-        final File sdImageMainDirectory = new File(root, imageFileName);
-        if (fileCheck) {
-            outputFilePath = sdImageMainDirectory.getAbsolutePath();
-        }
+        final File newImageFile = new File(root, imageFileName);
+        outputFilePath = newImageFile.getAbsolutePath();
 
-        return sdImageMainDirectory;
+        return newImageFile;
     }
 
     //endregion

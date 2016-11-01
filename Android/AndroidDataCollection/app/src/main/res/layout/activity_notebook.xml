@@ -15,18 +15,10 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-    <LinearLayout
-        android:id="@+id/gap_view"
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:orientation="horizontal"
-        android:layout_below="@+id/notebook_toolbar"
-        android:background="@color/background_grey" />
-
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/gap_view"
+        android:layout_below="@+id/notebook_toolbar"
         android:layout_above="@+id/footer_layout"
         android:id="@+id/recordsList" />
 
