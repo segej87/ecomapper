@@ -38,4 +38,5 @@ dependencies {
     compile 'com.android.support:multidex:1.0.1'
     compile 'org.jetbrains:annotations-java5:15.0'
     compile 'com.microsoft.azure.android:azure-storage-android:0.7.0@aar'
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
 }

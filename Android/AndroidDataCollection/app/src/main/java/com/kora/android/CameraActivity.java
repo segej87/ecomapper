@@ -1,7 +1,6 @@
 package com.kora.android;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.ComponentCallbacks2;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,7 +11,9 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.File;
 
@@ -34,11 +35,6 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
      * Request code for taking a new photo
      */
     private final int REQUEST_IMAGE_CAPTURE = 250;
-
-    /**
-     * Request code for cropping a photo
-     */
-    private final int REQUEST_IMAGE_CROP = 251;
 
     /**
      * A package manager to check if the camera is already open
@@ -133,15 +129,12 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
                 e.printStackTrace();
             }
             if (photoFile != null) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                    Log.i(TAG, "Using file Uri");
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N)
                     photoUri = Uri.fromFile(photoFile);
-                } else {
-                    Log.i(TAG, "Using content Uri");
+                else
                     photoUri = getUriForFile(CameraActivity.this,
                             "org.koramap.fileprovider",
                             photoFile);
-                }
 
                 Log.i(TAG,getString(R.string.camera_start));
                 isFromActivityResult = true;
@@ -156,30 +149,24 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        isFromActivityResult = true;
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_IMAGE_CAPTURE:
-                    isFromActivityResult = true;
                     try {
                         performCrop();
                     } catch (Exception e) {
                         Log.e(TAG, e.getLocalizedMessage());
                     }
                     break;
-                case REQUEST_IMAGE_CROP:
-                    isFromActivityResult = true;
-                    try {
-                        moveToNewPhoto();
-                    } catch (Exception e) {
-                        Log.e(TAG, e.getLocalizedMessage());
-                    }
+                case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
+                    moveToNewPhoto();
                     break;
             }
         } else {
             Log.i(TAG, getString(R.string.camera_cancel));
-            isFromActivityResult = true;
             switch (requestCode) {
-                case REQUEST_IMAGE_CROP:
+                case CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE:
                     DataIO.deleteFile(outputFilePath);
                     break;
             }
@@ -188,28 +175,11 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
     }
 
     private void performCrop() {
-        try {
-            Log.i(TAG, "Starting crop");
-            Intent cropIntent = new Intent("com.android.camera.action.CROP");
-
-            // Set options for the crop intent.
-            cropIntent.setDataAndType(photoUri, "image/*");
-            cropIntent.putExtra("crop", "true");
-            cropIntent.putExtra("aspectX", 1);
-            cropIntent.putExtra("aspectY", 1);
-            cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-
-            cropIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-
-            // Start the crop intent for result
-            startActivityForResult(cropIntent, REQUEST_IMAGE_CROP);
-        } catch (ActivityNotFoundException e) {
-            Log.e(TAG, "This device doesn't support the crop feature");
-            Toast toast = Toast.makeText(this, "This device doesn't support the crop feature", Toast.LENGTH_SHORT);
-            toast.show();
-            moveToNewPhoto();
-        }
+        CropImage.activity(photoUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setAspectRatio(1, 1)
+                .setOutputUri(photoUri)
+                .start(CameraActivity.this);
     }
 
     private void moveToNewPhoto() {

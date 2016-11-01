@@ -46,6 +46,8 @@
         <activity android:name="com.kora.android.Notebook" />
         <activity android:name="com.kora.android.ListPickerActivity" />
         <activity android:name="com.kora.android.CameraActivity" />
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
     </application>
 
 </manifest>
