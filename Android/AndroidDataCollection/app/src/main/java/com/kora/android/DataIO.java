@@ -600,6 +600,26 @@ final class DataIO {
         return context.getString(R.string.io_success);
     }
 
+    /**
+     *
+     */
+    static boolean recoverFromMemoryLoss(Context context) {
+        Log.e(TAG, "Recovering from memory loss");
+
+        String savedLogin = DataIO.loadLogin(context);
+        String savedUUID = savedLogin.replace(context.getString(R.string.io_success) + ": ","");
+        if (!savedUUID.equals("")) {
+            Log.i(TAG, context.getString(R.string.saved_login_log, savedUUID));
+            UserVars.UUID = savedUUID;
+            UserVars.UserVarsSaveFileName = context.getString(R.string.user_vars_file_prefix) + savedUUID;
+            String userVarsResult = DataIO.loadUserVars(context);
+            Log.i(TAG, context.getString(R.string.load_user_vars_report, userVarsResult));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     //endregion
 
     //region Records
@@ -660,27 +680,6 @@ final class DataIO {
     private static JSONObject loadFullRecordsFile(Context context) {
         // A JSON Object to decode data from the file.
         JSONObject jResult = null;
-
-        // If the user vars have not been loaded, load.
-        if (UserVars.RecordsSaveFileName == null) {
-            if (context instanceof Notebook) {
-                ((Notebook) context).isRecoveringFromLostMemory = true;
-            }
-
-            String savedLogin = DataIO.loadLogin(context);
-            String savedUUID = savedLogin.replace(context.getString(R.string.io_success) + ": ","");
-            if (!savedUUID.equals("")) {
-                Log.i(TAG, context.getString(R.string.saved_login_log, savedUUID));
-                UserVars.UUID = savedUUID;
-                UserVars.UserVarsSaveFileName = context.getString(R.string.user_vars_file_prefix) + savedUUID;
-                String userVarsResult = DataIO.loadUserVars(context);
-                Log.i(TAG, context.getString(R.string.load_user_vars_report, userVarsResult));
-            } else {
-                Intent intent = new Intent(context, StartScreen.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                context.startActivity(intent);
-            }
-        }
 
         // The file containing the record data.
         File recFile = new File(context.getFilesDir(),UserVars.RecordsSaveFileName);

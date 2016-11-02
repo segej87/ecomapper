@@ -82,11 +82,6 @@ public class Notebook extends AppCompatActivity
     private static final int SYNC_REQUEST = 500;
     private static final int LOGOUT_REQUEST = 501;
 
-    /**
-     * Flag indicating that app is recovering from lost memory
-     */
-    boolean isRecoveringFromLostMemory = false;
-
     //endregion
 
     //region Initialization
@@ -98,6 +93,12 @@ public class Notebook extends AppCompatActivity
 
         // Get the current application context.
         app = (KoraApplication) this.getApplicationContext();
+
+        if (UserVars.UUID.equals("")) {
+            boolean recovered = DataIO.recoverFromMemoryLoss(this);
+            if (!recovered)
+                moveToLogin();
+        }
 
         //Set up the toolbar.
         setUpToolbar();
@@ -463,11 +464,6 @@ public class Notebook extends AppCompatActivity
 
             // Set the list view's adapter to the custom adapter for displaying records.
             setUpListViewAdapter();
-
-            if (isRecoveringFromLostMemory) {
-                setUpToolbar();
-                isRecoveringFromLostMemory = false;
-            }
         }
     }
 

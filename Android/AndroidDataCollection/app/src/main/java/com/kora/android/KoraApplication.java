@@ -72,15 +72,6 @@ public class KoraApplication extends Application {
         Log.i(TAG,getString(R.string.adding_record));
     }
 
-//    /**
-//     * Appends records to the applications records list
-//     * @param records
-//     *      An array list of records to add to the list
-//     */
-//    public synchronized void addRecords(List<Record> records) {
-//        this.records.addAll(records);
-//    }
-
     /**
      * Replaces the application's record list with a provided list
      * @param records
@@ -127,21 +118,6 @@ public class KoraApplication extends Application {
 
         return false;
     }
-
-//    /**
-//     * If all records are deleted at once, and the media should be deleted
-//     */
-//    public synchronized void deleteRecordsAndMedia() {
-//        for (Iterator<Record> r = this.records.iterator(); r.hasNext();) {
-//            Record record= r.next();
-//            if (record != null) {
-//                r.remove();
-//                if (record.photoPath != null) {
-//                    DataIO.deleteFile(record.photoPath);
-//                }
-//            }
-//        }
-//    }
 
     /**
      * If only the records should be deleted, but not the media
