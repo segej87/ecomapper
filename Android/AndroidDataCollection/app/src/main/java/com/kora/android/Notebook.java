@@ -20,14 +20,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static android.view.View.VISIBLE;
 
 public class Notebook extends AppCompatActivity
         implements ConfirmActionDialogFragment.ConfirmActionListener {
@@ -67,7 +72,7 @@ public class Notebook extends AppCompatActivity
     /**
      * A progress spinner to indicate ongoing sync
      */
-    private ProgressBar progressView;
+    private ProgressBar mRecordsProgress;
 
     /**
      * New record buttons
@@ -77,10 +82,24 @@ public class Notebook extends AppCompatActivity
     private ImageButton mPhotoButton;
 
     /**
+     * Media monitor views
+     */
+    private LinearLayout mMediaMonitor;
+    private TextView mMediaCounter;
+    private ProgressBar mMediaProgress;
+    private ImageView mMediaPlaceholder;
+
+    /**
      * Request codes for action confirmation dialog
      */
     private static final int SYNC_REQUEST = 500;
     private static final int LOGOUT_REQUEST = 501;
+
+    /**
+     * Request codes for progress spinners
+     */
+    private static final int RECORDS_REQUEST = 1000;
+    private static final int MEDIAS_REQUEST = 1001;
 
     //endregion
 
@@ -100,17 +119,14 @@ public class Notebook extends AppCompatActivity
                 moveToLogin();
         }
 
-        //Set up the toolbar.
+        // Set up the toolbar.
         setUpToolbar();
 
-        //Set up the button bar.
+        // Set up the button bar.
         setUpButtons();
 
-        // Set the list view from the layout.
-        listView = (ListView) findViewById(R.id.recordsList);
-
-        // Set the progress view from the layout.
-        progressView = (ProgressBar) findViewById(R.id.sync_progress);
+        // Set up views in the layout.
+        setUpFields();
 
         // Load saved records for this user. If any exist, load them into the app context.
         LoadRecordsTask loadRecordsTask = new LoadRecordsTask(this);
@@ -130,11 +146,7 @@ public class Notebook extends AppCompatActivity
         setUpListViewAdapter();
 
         // Start uploading any old medias if on WiFi.
-        if (UserVars.MarkedMedia.size() > 0 && DataIO.isWiFiConnected(Notebook.this)) {
-            UploadMediasTask umt = new UploadMediasTask();
-            Log.i(TAG, "Syncing media");
-            umt.execute((Void) null);
-        }
+        uploadMedias(false);
     }
 
     //endregion
@@ -296,29 +308,70 @@ public class Notebook extends AppCompatActivity
         });
     }
 
+    private void setUpFields() {
+
+        // Set the list view from the layout.
+        listView = (ListView) findViewById(R.id.recordsList);
+
+        // Set the progress view from the layout.
+        mRecordsProgress = (ProgressBar) findViewById(R.id.sync_progress);
+
+        // Set up the media monitor layout.
+        mMediaMonitor = (LinearLayout) findViewById(R.id.media_monitor);
+        mMediaCounter = (TextView) findViewById(R.id.media_counter);
+        mMediaProgress = (ProgressBar) findViewById(R.id.media_progress);
+        mMediaPlaceholder = (ImageView) findViewById(R.id.media_placeholder);
+
+        mMediaMonitor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                uploadMedias(true);
+            }
+        });
+
+        mediaMonitorManager();
+    }
+
     /**
      * Shows the progress UI and hides the login form.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+    private void showProgress(final int requestCode, final boolean show) {
 
-            progressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            progressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    progressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            progressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        final ProgressBar activeProgress;
+        switch (requestCode) {
+            case RECORDS_REQUEST:
+                activeProgress = mRecordsProgress;
+                break;
+            case MEDIAS_REQUEST:
+                activeProgress = mMediaProgress;
+                if (show)
+                    mMediaPlaceholder.setVisibility(View.GONE);
+                else
+                    mMediaPlaceholder.setVisibility(VISIBLE);
+                break;
+            default:
+                activeProgress = null;
+                break;
+        }
+
+        if (activeProgress != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+                int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+                activeProgress.setVisibility(show ? VISIBLE : View.GONE);
+                activeProgress.animate().setDuration(shortAnimTime).alpha(
+                        show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        activeProgress.setVisibility(show ? VISIBLE : View.GONE);
+                    }
+                });
+            } else {
+                // The ViewPropertyAnimator APIs are not available, so simply show
+                // and hide the relevant UI components.
+                activeProgress.setVisibility(show ? VISIBLE : View.GONE);
+            }
         }
     }
 
@@ -412,6 +465,13 @@ public class Notebook extends AppCompatActivity
         startActivity(intent);
     }
 
+    /**
+     * Sends an intent to edit a record
+     * @param position
+     *      The list position of the record to edit in the app's records list
+     * @param dest
+     *      The destination activity (depending on record type)
+     */
     private void goToOld(int position, Class dest) {
         if (dest != null) {
             Intent intent = new Intent(Notebook.this, dest);
@@ -430,6 +490,34 @@ public class Notebook extends AppCompatActivity
         saveLogin.execute((Void) null);
     }
 
+    /**
+     * An asynchronous task to log out of the current user.
+     */
+    public class LogOutTask extends AsyncTask<Void, Void, String> {
+        final Context context;
+
+        LogOutTask(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected String doInBackground(Void...params) {
+            return saveLogin(getString(R.string.logout_flag));
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            String oldUUID = result.replace(context.getString(R.string.io_success) + ": ","");
+            Log.i(TAG,context.getString(R.string.saved_logout_log,oldUUID));
+
+            ClearUserVars clearUserVars = new ClearUserVars(context);
+            clearUserVars.execute((Void) null);
+        }
+    }
+
+    /**
+     * Sends an intent to the login activity
+     */
     private void moveToLogin() {
         Intent intent = new Intent(Notebook.this, LoginActivity.class);
         startActivity(intent);
@@ -464,35 +552,6 @@ public class Notebook extends AppCompatActivity
 
             // Set the list view's adapter to the custom adapter for displaying records.
             setUpListViewAdapter();
-        }
-    }
-
-    //endregion
-
-    //region Asynchronous Classes
-
-    /**
-     * An asynchronous task to log out of the current user.
-     */
-    public class LogOutTask extends AsyncTask<Void, Void, String> {
-        final Context context;
-
-        LogOutTask(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected String doInBackground(Void...params) {
-            return saveLogin(getString(R.string.logout_flag));
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            String oldUUID = result.replace(context.getString(R.string.io_success) + ": ","");
-            Log.i(TAG,context.getString(R.string.saved_logout_log,oldUUID));
-
-            ClearUserVars clearUserVars = new ClearUserVars(context);
-            clearUserVars.execute((Void) null);
         }
     }
 
@@ -540,26 +599,9 @@ public class Notebook extends AppCompatActivity
         }
     }
 
-    private class AttemptSync extends AsyncTask<Void, Void, Boolean> {
-
-        AttemptSync() {
-
-        }
-
-        @Override
-        protected Boolean doInBackground(Void...params) {
-            return app.getRecords().size() == 0 || DataIO.uploadRecords(Notebook.this);
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            if (result) {
-                SetListsTask slt = new SetListsTask();
-                slt.execute((Void) null);
-            }
-        }
-    }
-
+    /**
+     * An asynchronous task to sync user variable lists
+     */
     private class SetListsTask extends AsyncTask<Void, Void, String>{
 
         SetListsTask() {
@@ -578,7 +620,9 @@ public class Notebook extends AppCompatActivity
 
             boolean mediaMark = markMedias();
             DataIO.saveUserVars(Notebook.this);
+            mediaMonitorManager();
 
+            showProgress(RECORDS_REQUEST, false);
             toggleViewsEnabled(true);
 
             if (success && mediaMark) {
@@ -586,22 +630,76 @@ public class Notebook extends AppCompatActivity
                 DataIO.saveRecords(Notebook.this, app.getRecords());
                 adapter.notifyDataSetChanged();
 
-                showProgress(false);
-
-                if (DataIO.isWiFiConnected(Notebook.this)) {
-                    // Kick off an asynchronous task to upload media
-                    Log.i(TAG, "Syncing media");
-                    UploadMediasTask umt = new UploadMediasTask();
-                    umt.execute((Void) null);
-                } else {
-                    Log.i(TAG, "Not syncing media - not connected to WiFi");
-                }
+                uploadMedias(false);
             } else {
                 Log.i(TAG,result);
             }
         }
     }
 
+    //endregion
+
+    //region Server Ops
+
+    /**
+     * A helper method to kick off the asynchronous task
+     */
+    private void attemptSync() {
+        if (app.getRecords().size() > 0) {
+            // Kick off an asynchronous task to upload records
+            Log.i(TAG, "Syncing records");
+            showProgress(RECORDS_REQUEST, true);
+            toggleViewsEnabled(false);
+            AttemptSyncTask syncTask = new AttemptSyncTask();
+            syncTask.execute((Void) null);
+        }
+    }
+
+    /**
+     * An asynchronous task to upload records to the server
+     */
+    private class AttemptSyncTask extends AsyncTask<Void, Void, Boolean> {
+
+        AttemptSyncTask() {
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void...params) {
+            return app.getRecords().size() == 0 || DataIO.uploadRecords(Notebook.this);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result) {
+                SetListsTask slt = new SetListsTask();
+                slt.execute((Void) null);
+            }
+        }
+    }
+
+    /**
+     * A helper method to kick off the asynchronous task
+     */
+    private void uploadMedias(final boolean userTouch) {
+        mMediaMonitor.setEnabled(false);
+        if (UserVars.MarkedMedia.size() > 0 && DataIO.isWiFiConnected(Notebook.this)) {
+            UploadMediasTask umt = new UploadMediasTask();
+            Log.i(TAG, "Syncing media");
+            showProgress(MEDIAS_REQUEST, true);
+            umt.execute((Void) null);
+        } else {
+            if (userTouch)
+                Toast.makeText(Notebook.this,
+                        getString(R.string.no_upload_no_wifi),
+                        Toast.LENGTH_SHORT).show();
+            mMediaMonitor.setEnabled(true);
+        }
+    }
+
+    /**
+     * An asynchronous task to upload media (photos) to the server
+     */
     private class UploadMediasTask extends AsyncTask<Void, Void, Boolean> {
 
         UploadMediasTask() {
@@ -632,6 +730,10 @@ public class Notebook extends AppCompatActivity
             if (result) {
                 Log.i(TAG, getString(R.string.media_upload_complete));
             }
+
+            showProgress(MEDIAS_REQUEST, false);
+            mMediaMonitor.setEnabled(true);
+            mediaMonitorManager();
         }
     }
 
@@ -639,14 +741,16 @@ public class Notebook extends AppCompatActivity
 
     //region Helper Methods
 
-    private void attemptSync() {
-        // Kick off an asynchronous task to upload records
-        Log.i(TAG, "Syncing records");
-        showProgress(true);
+    private void mediaMonitorManager() {
+        int mmSize = UserVars.MarkedMedia.size();
+        if (mmSize == 0)
+            mMediaMonitor.setVisibility(View.GONE);
+        else {
+            if (mMediaMonitor.getVisibility() == View.GONE)
+                mMediaMonitor.setVisibility(View.VISIBLE);
 
-        toggleViewsEnabled(false);
-        AttemptSync syncTask = new AttemptSync();
-        syncTask.execute((Void) null);
+            mMediaCounter.setText(String.valueOf(mmSize));
+        }
     }
 
     private void toggleViewsEnabled(final boolean enabled) {
@@ -655,7 +759,7 @@ public class Notebook extends AppCompatActivity
         mPhotoButton.setEnabled(enabled);
         optionsMenu.setGroupEnabled(R.id.opMenuGroup, enabled);
         listView.setEnabled(enabled);
-
+        mMediaMonitor.setEnabled(enabled);
     }
 
     /**

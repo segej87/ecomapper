@@ -1,7 +1,6 @@
 package com.kora.android;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -627,7 +626,9 @@ final class DataIO {
     /**
      * Saves records as JSON data to a file in the application's data folder
      * @param context context
+     *                The calling context
      * @param records records
+     *                The records to save
      * @return report
      */
     static String saveRecords(Context context, List<Record> records) {
@@ -852,8 +853,6 @@ final class DataIO {
             // Create a data array of the request string.
             byte[] postDataBytes = postData.toString().getBytes("UTF-8");
 
-            //TODO: Check for internet connection. If not return error.
-
             // Create a connection to the list retrieve URL.
             URL url = new URL(addURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -1049,8 +1048,6 @@ final class DataIO {
 
             // Create a data array of the request string.
             byte[] postDataBytes = postData.toString().getBytes("UTF-8");
-
-            //TODO: Check for internet connection. If not return error.
 
             // Create a connection to the list retrieve URL.
             URL url = new URL(listsURL);

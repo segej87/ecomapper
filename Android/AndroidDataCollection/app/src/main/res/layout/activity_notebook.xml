@@ -53,8 +53,8 @@
             android:scaleType="fitCenter"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginStart="25dp"
-            android:layout_marginEnd="25dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
             style="?attr/buttonBarButtonStyle"/>
 
         <ImageButton
@@ -64,8 +64,8 @@
             android:scaleType="fitCenter"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginStart="25dp"
-            android:layout_marginEnd="25dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
             style="?attr/buttonBarButtonStyle"/>
 
         <ImageButton
@@ -75,9 +75,46 @@
             android:scaleType="fitCenter"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginStart="25dp"
-            android:layout_marginEnd="25dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
             style="?attr/buttonBarButtonStyle"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/media_monitor"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignBottom="@+id/footer_layout"
+        android:layout_alignEnd="@+id/footer_layout"
+        android:layout_marginEnd="10dp"
+        android:padding="5dp"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/media_counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textColor="@color/off_white"
+            android:text="0"/>
+
+        <ProgressBar
+            android:id="@+id/media_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:attr/progressBarStyleSmall"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/media_placeholder"
+            android:contentDescription="@string/upload_media"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="-5dp"
+            android:src="@drawable/cast_ic_stop_circle_filled_white"/>
 
     </LinearLayout>
 

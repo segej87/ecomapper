@@ -36,11 +36,15 @@ public class KoraApplication extends Application {
 
     //endregion
 
+    //region Initialization
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
+
+    //endregion
 
     //region Record Getters and Setters
 

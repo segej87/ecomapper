@@ -33,6 +33,8 @@
 
     <!-- Strings related to the Notebook-->
     <string name="icon_description">An image for the record</string>
+    <string name="upload_media">Upload media</string>
+    <string name="no_upload_no_wifi">Can\'t upload media. Not connected to WiFi.</string>
 
     <!-- Strings related to DataIO -->
     <string name="uuid_save_key">Saved_UUID</string>
@@ -47,7 +49,6 @@
     <string name="save_record_failure">Failed to save records: </string>
     <string name="load_record_report">Loading records: %1$d</string>
     <string name="load_record_failure">Failed to load records: %1$s</string>
-    <string name="media_file_prefix">Medias-</string>
     <string name="io_success">Success</string>
     <string name="json_encode_error">"Error encoding json object: %1$s"</string>
     <string name="json_decode_error">"Error decoding json object: %1$s"</string>
