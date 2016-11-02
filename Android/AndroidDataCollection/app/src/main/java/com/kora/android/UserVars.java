@@ -14,27 +14,22 @@ class UserVars {
     /**
      * The user ID of the current user
      */
-    static String UUID = "testing";
+    static String UUID = "";
 
     /**
      * The username of the current user
      */
-    static String UName = "Testing";
+    static String UName;
 
     /**
      * Filename to save these user variables
      */
-    static String UserVarsSaveFileName = "UserVars-testing";
+    static String UserVarsSaveFileName;
 
     /**
      * Filename to save records
      */
-    static String RecordsSaveFileName = "Records-testing";
-
-    /**
-     * Filename to save media
-     */
-    static String MediasSaveFileName = "Medias-testing";
+    static String RecordsSaveFileName;
 
     /**
      * A map linking blob urls to local urls

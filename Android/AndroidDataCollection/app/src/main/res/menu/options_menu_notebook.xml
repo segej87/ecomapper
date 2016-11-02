@@ -11,8 +11,8 @@
             android:icon="@android:drawable/ic_popup_sync"
             app:showAsAction="ifRoom"/>
 
-        <item android:id="@+id/defaults"
-            android:title="@string/manage_defaults_string"
+        <item android:id="@+id/settings"
+            android:title="@string/settings_string"
             android:icon="@android:drawable/ic_menu_preferences"
             app:showAsAction="ifRoom"/>
 

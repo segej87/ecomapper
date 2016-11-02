@@ -146,26 +146,14 @@ public class LoginActivity extends AppCompatActivity {
             // form field with an error.
             focusView.requestFocus();
         } else {
-            //TODO: remove after testing
-            if (username.equals("letmepass") && password.equals("letsdothis")) {
-                UserVars.UUID = "testing";
-                UserVars.UName = "Testing";
-                UserVars.UserVarsSaveFileName = getString(R.string.user_vars_file_prefix) + UserVars.UUID;
-                UserVars.RecordsSaveFileName = getString(R.string.record_file_prefix) + UserVars.UUID;
-                String loginResult = DataIO.saveLogin(this.getApplicationContext(), UserVars.UUID);
-                if (loginResult.contains(getString(R.string.save_login_failure))) {
-                    showError(getString(R.string.save_login_failure));
-                } else {
-                    String userVarsResult = DataIO.saveUserVars(this.getApplicationContext());
-                    Log.i(TAG,"Save login: " + loginResult + ", Save user vars: " + userVarsResult);
-                    moveToNotebook();
-                }
-            } else {
-                // Show a progress spinner, and kick off a background task to
-                // perform the user login attempt.
+            // Show a progress spinner, and kick off a background task to
+            // perform the user login attempt.
+            if (DataIO.isNetworkConnected(this)) {
                 showProgress(true);
                 mAuthTask = new UserLoginTask(username, password);
                 mAuthTask.execute((Void) null);
+            } else {
+                showError(getString(R.string.internet_failure_title));
             }
         }
     }
@@ -201,8 +189,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 byte[] postDataBytes = postData.toString().getBytes("UTF-8");
 
-                //TODO: Check for internet connection. If not return error.
-
                 URL url = new URL(loginURL);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
@@ -236,7 +222,6 @@ public class LoginActivity extends AppCompatActivity {
                 UserVars.UName = mUsername;
                 UserVars.UserVarsSaveFileName = getString(R.string.user_vars_file_prefix) + uid;
                 UserVars.RecordsSaveFileName = getString(R.string.record_file_prefix) + uid;
-                UserVars.MediasSaveFileName = getString(R.string.media_file_prefix) + uid;
 
                 UserListsTask mListTask = new UserListsTask(UserVars.UUID);
                 mListTask.execute((Void) null);
@@ -288,7 +273,6 @@ public class LoginActivity extends AppCompatActivity {
             boolean meshListResult = DataIO.meshUserVars(LoginActivity.this, result);
 
             if (meshListResult && !(result.startsWith(getString(R.string.server_error_string)))) {
-                //TODO: Move to background thread
                 String loginResult = saveLogin(uuid);
 
                 if (loginResult.contains(getString(R.string.io_success))) {
@@ -304,7 +288,6 @@ public class LoginActivity extends AppCompatActivity {
                 if (result.contains(getString(R.string.server_connection_error))) {
                     showError(getString(R.string.internet_failure_title));
                 }
-                //TODO: Add possible returned errors.
             }
         }
 
@@ -334,38 +317,7 @@ public class LoginActivity extends AppCompatActivity {
      * @return boolean
      */
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
-    }
-
-    /**
-     * Presents an error to the user.
-     * @param title description
-     */
-    private void showError(String title) {
-        String showTitle = getString(R.string.general_error_report);
-        String message = getString(R.string.general_error_report);
-
-        if (title.equals(getString(R.string.internet_failure_title))) {
-            showTitle = title;
-            message = getString(R.string.internet_failure);
-        } else if (title.contains(getString(R.string.save_login_failure))) {
-            showTitle = getString(R.string.save_login_failure);
-            message = title;
-        } else if (title.contains(getString(R.string.load_login_failure))) {
-            showTitle = getString(R.string.load_login_failure);
-            message = title;
-        } else if (title.contains(getString(R.string.save_user_vars_failure))) {
-            showTitle = getString(R.string.general_error_title);
-            message = getString(R.string.save_user_vars_failure);
-        }
-
-        AlertDialog.Builder intAlert = new AlertDialog.Builder(this);
-        intAlert.setMessage(message);
-        intAlert.setTitle(showTitle);
-        intAlert.setPositiveButton("OK",null);
-        intAlert.setCancelable(false);
-        intAlert.create().show();
     }
 
     /**
@@ -436,6 +388,36 @@ public class LoginActivity extends AppCompatActivity {
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
+    }
+
+    /**
+     * Presents an error to the user.
+     * @param title description
+     */
+    private void showError(String title) {
+        String showTitle = getString(R.string.general_error_report);
+        String message = getString(R.string.general_error_report);
+
+        if (title.equals(getString(R.string.internet_failure_title))) {
+            showTitle = title;
+            message = getString(R.string.internet_failure);
+        } else if (title.contains(getString(R.string.save_login_failure))) {
+            showTitle = getString(R.string.save_login_failure);
+            message = title;
+        } else if (title.contains(getString(R.string.load_login_failure))) {
+            showTitle = getString(R.string.load_login_failure);
+            message = title;
+        } else if (title.contains(getString(R.string.save_user_vars_failure))) {
+            showTitle = getString(R.string.general_error_title);
+            message = getString(R.string.save_user_vars_failure);
+        }
+
+        AlertDialog.Builder intAlert = new AlertDialog.Builder(this);
+        intAlert.setMessage(message);
+        intAlert.setTitle(showTitle);
+        intAlert.setPositiveButton("OK",null);
+        intAlert.setCancelable(false);
+        intAlert.create().show();
     }
 
     //endregion

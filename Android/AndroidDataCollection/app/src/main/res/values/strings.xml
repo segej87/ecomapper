@@ -134,7 +134,7 @@
     <string name="title_constructor">%1$s %2$s</string>
     <string name="title_constructor_new">New</string>
     <string name="title_constructor_editing">Edit</string>
-    <string name="manage_defaults_string">Manage Defaults</string>
+    <string name="settings_string">Settings</string>
 
     <string name="location_error_starter">Your location may not be accurate.\n\n</string>
     <string name="old_location_error_message">Last location update: %1$s minutes ago.\n\n</string>
@@ -145,6 +145,20 @@
     <string name="old_location_use_option">Ignore</string>
     <string name="gps_locking">Locking</string>
 
+    <string name="logout_confirmation_message">Are you sure you want to log out of Kora?</string>
+    <string name="logout_positive_string">Log out</string>
+    <string name="logout_negative_string">Stay</string>
+
+    <string name="sync_confirmation_message">Syncing deletes all records from your phone. Do you want to continue?</string>
+    <string name="sync_positive_string">Sync</string>
+    <string name="sync_negative_string">Cancel</string>
+
+    <string name="cancel_confirmation_message">Are you sure you want to leave?
+        All info in this record will be lost.</string>
+    <string name="cancel_positive_string">Leave</string>
+    <string name="cancel_negative_string">Stay</string>
+
+    <string name="user_cancel">User canceled action.</string>
 
     <string name="parse_failure">Failed to parse %1$s: %2$s</string>
     <string name="parse_success">Parsed value %1$s</string>

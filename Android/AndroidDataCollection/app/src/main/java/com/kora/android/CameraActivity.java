@@ -210,18 +210,20 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
         else
             root = new File(CameraActivity.this.getFilesDir(), "images");
 
-        if (!root.exists()) root.mkdirs();
+        boolean rootExists = root != null && (root.exists() || root.mkdirs());
 
-        File noMedFile = new File(root, ".nomedia");
-        boolean noMedCheck = noMedFile.exists();
-        if (!noMedCheck) {
-            try {
-                noMedCheck = noMedFile.createNewFile();
-                if (noMedCheck) {
-                    Log.i(TAG,getString(R.string.create_file_success,noMedFile.getAbsolutePath()));
+        if (rootExists) {
+            File noMedFile = new File(root, ".nomedia");
+            boolean noMedCheck = noMedFile.exists();
+            if (!noMedCheck) {
+                try {
+                    noMedCheck = noMedFile.createNewFile();
+                    if (noMedCheck) {
+                        Log.i(TAG, getString(R.string.create_file_success, noMedFile.getAbsolutePath()));
+                    }
+                } catch (java.io.IOException e) {
+                    Log.e(TAG, getString(R.string.create_file_fail, noMedFile.getAbsolutePath()));
                 }
-            } catch (java.io.IOException e) {
-                Log.e(TAG,getString(R.string.create_file_fail,noMedFile.getAbsolutePath()));
             }
         }
 

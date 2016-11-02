@@ -1,8 +1,14 @@
 package com.kora.android;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +21,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -22,7 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class Notebook extends AppCompatActivity {
+public class Notebook extends AppCompatActivity
+        implements ConfirmActionDialogFragment.ConfirmActionListener {
 
     //region Class Variables
 
@@ -56,6 +64,29 @@ public class Notebook extends AppCompatActivity {
      */
     private Record choppingBlock;
 
+    /**
+     * A progress spinner to indicate ongoing sync
+     */
+    private ProgressBar progressView;
+
+    /**
+     * New record buttons
+     */
+    private ImageButton mMeasButton;
+    private ImageButton mNoteButton;
+    private ImageButton mPhotoButton;
+
+    /**
+     * Request codes for action confirmation dialog
+     */
+    private static final int SYNC_REQUEST = 500;
+    private static final int LOGOUT_REQUEST = 501;
+
+    /**
+     * Flag indicating that app is recovering from lost memory
+     */
+    boolean isRecoveringFromLostMemory = false;
+
     //endregion
 
     //region Initialization
@@ -77,6 +108,9 @@ public class Notebook extends AppCompatActivity {
         // Set the list view from the layout.
         listView = (ListView) findViewById(R.id.recordsList);
 
+        // Set the progress view from the layout.
+        progressView = (ProgressBar) findViewById(R.id.sync_progress);
+
         // Load saved records for this user. If any exist, load them into the app context.
         LoadRecordsTask loadRecordsTask = new LoadRecordsTask(this);
         loadRecordsTask.execute((Void) null);
@@ -93,6 +127,13 @@ public class Notebook extends AppCompatActivity {
 
         // Set the list view's adapter to the custom adapter for displaying records.
         setUpListViewAdapter();
+
+        // Start uploading any old medias if on WiFi.
+        if (UserVars.MarkedMedia.size() > 0 && DataIO.isWiFiConnected(Notebook.this)) {
+            UploadMediasTask umt = new UploadMediasTask();
+            Log.i(TAG, "Syncing media");
+            umt.execute((Void) null);
+        }
     }
 
     //endregion
@@ -117,15 +158,19 @@ public class Notebook extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.logout:
-                logoutButtonHandler();
+                showConfirmDialog(LOGOUT_REQUEST,
+                        getString(R.string.logout_confirmation_message),
+                        getString(R.string.logout_positive_string),
+                        getString(R.string.logout_negative_string));
                 return true;
             case R.id.sync:
-                // Kick off an asynchronous task to upload records
-                Log.i(TAG,"Syncing records");
-                AttemptSync syncTask = new AttemptSync();
-                optionsMenu.setGroupEnabled(R.id.opMenuGroup,false);
-                syncTask.execute((Void) null);
-
+                if (DataIO.isNetworkConnected(Notebook.this)) {
+                    showConfirmDialog(SYNC_REQUEST,
+                            getString(R.string.sync_confirmation_message),
+                            getString(R.string.sync_positive_string),
+                            getString(R.string.sync_negative_string));
+                } else
+                    showError(R.string.internet_failure_title);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -210,8 +255,22 @@ public class Notebook extends AppCompatActivity {
 
     //region UI Methods
 
+    /**
+     * Sets up the activity's toolbar
+     */
+    private void setUpToolbar() {
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.notebook_toolbar);
+        getLayoutInflater().inflate(R.layout.action_bar_notebook, myToolbar);
+        myToolbar.setTitle("");
+        setSupportActionBar(myToolbar);
+
+        // Set the logged in text.
+        TextView loggedInText = (TextView) findViewById(R.id.action_bar_logged_in);
+        loggedInText.setText(getString(R.string.logged_in_text_string,UserVars.UName));
+    }
+
     private void setUpButtons() {
-        ImageButton mMeasButton = (ImageButton) findViewById(R.id.meas_button);
+        mMeasButton = (ImageButton) findViewById(R.id.meas_button);
         mMeasButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -219,7 +278,7 @@ public class Notebook extends AppCompatActivity {
             }
         });
 
-        ImageButton mNoteButton = (ImageButton) findViewById(R.id.note_button);
+        mNoteButton = (ImageButton) findViewById(R.id.note_button);
         mNoteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -227,13 +286,99 @@ public class Notebook extends AppCompatActivity {
             }
         });
 
-        ImageButton mPhotoButton = (ImageButton) findViewById(R.id.photo_button);
+        mPhotoButton = (ImageButton) findViewById(R.id.photo_button);
         mPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 goToNew("photo");
             }
         });
+    }
+
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            progressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            progressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    progressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            progressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    /**
+     * Presents an error to the user.
+     * @param title description
+     */
+    private void showError(int title) {
+        String showTitle;
+        String message;
+
+        switch (title) {
+            case R.string.internet_failure_title:
+                showTitle = getString(R.string.internet_failure_title);
+                message = getString(R.string.internet_failure);
+                break;
+            default:
+                showTitle = getString(R.string.general_error_report);
+                message = getString(R.string.general_error_report);
+        }
+
+        AlertDialog.Builder intAlert = new AlertDialog.Builder(this);
+        intAlert.setMessage(message);
+        intAlert.setTitle(showTitle);
+        intAlert.setPositiveButton("OK",null);
+        intAlert.setCancelable(false);
+        intAlert.create().show();
+    }
+
+    private void showConfirmDialog(int requestCode, String message, String positiveString, String negativeString) {
+        Bundle b = new Bundle();
+        b.putInt("REQUEST_CODE", requestCode);
+        b.putString("MESSAGE", message);
+        b.putString("POSSTRING", positiveString);
+        b.putString("NEGSTRING", negativeString);
+
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new ConfirmActionDialogFragment();
+        dialog.setArguments(b);
+        dialog.show(getSupportFragmentManager(), "ConfirmActionDialogFragment");
+    }
+
+    @Override
+    public void onConfirmPositiveClick(DialogFragment d) {
+        // User touched the dialog's positive button
+        int requestCode = d.getArguments().getInt("REQUEST_CODE");
+
+        switch(requestCode) {
+            case SYNC_REQUEST:
+                attemptSync();
+                break;
+            case LOGOUT_REQUEST:
+                logoutButtonHandler();
+                break;
+        }
+    }
+
+    @Override
+    public void onConfirmNegativeClick() {
+        // User touched the dialog's negative button
+        Log.i(TAG, getString(R.string.user_cancel));
     }
 
     //endregion
@@ -318,6 +463,11 @@ public class Notebook extends AppCompatActivity {
 
             // Set the list view's adapter to the custom adapter for displaying records.
             setUpListViewAdapter();
+
+            if (isRecoveringFromLostMemory) {
+                setUpToolbar();
+                isRecoveringFromLostMemory = false;
+            }
         }
     }
 
@@ -411,8 +561,6 @@ public class Notebook extends AppCompatActivity {
                 SetListsTask slt = new SetListsTask();
                 slt.execute((Void) null);
             }
-
-            optionsMenu.setGroupEnabled(R.id.opMenuGroup,true);
         }
     }
 
@@ -435,15 +583,23 @@ public class Notebook extends AppCompatActivity {
             boolean mediaMark = markMedias();
             DataIO.saveUserVars(Notebook.this);
 
+            toggleViewsEnabled(true);
+
             if (success && mediaMark) {
                 app.deleteRecordsOnly();
                 DataIO.saveRecords(Notebook.this, app.getRecords());
                 adapter.notifyDataSetChanged();
 
-                // Kick off an asynchronous task to upload media
-                Log.i(TAG,"Syncing media");
-                UploadMediasTask umt = new UploadMediasTask();
-                umt.execute((Void) null);
+                showProgress(false);
+
+                if (DataIO.isWiFiConnected(Notebook.this)) {
+                    // Kick off an asynchronous task to upload media
+                    Log.i(TAG, "Syncing media");
+                    UploadMediasTask umt = new UploadMediasTask();
+                    umt.execute((Void) null);
+                } else {
+                    Log.i(TAG, "Not syncing media - not connected to WiFi");
+                }
             } else {
                 Log.i(TAG,result);
             }
@@ -487,18 +643,23 @@ public class Notebook extends AppCompatActivity {
 
     //region Helper Methods
 
-    /**
-     * Sets up the activity's toolbar
-     */
-    private void setUpToolbar() {
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.notebook_toolbar);
-        getLayoutInflater().inflate(R.layout.action_bar_notebook, myToolbar);
-        myToolbar.setTitle("");
-        setSupportActionBar(myToolbar);
+    private void attemptSync() {
+        // Kick off an asynchronous task to upload records
+        Log.i(TAG, "Syncing records");
+        showProgress(true);
 
-        // Set the logged in text.
-        TextView loggedInText = (TextView) findViewById(R.id.action_bar_logged_in);
-        loggedInText.setText(getString(R.string.logged_in_text_string,UserVars.UName));
+        toggleViewsEnabled(false);
+        AttemptSync syncTask = new AttemptSync();
+        syncTask.execute((Void) null);
+    }
+
+    private void toggleViewsEnabled(final boolean enabled) {
+        mMeasButton.setEnabled(enabled);
+        mNoteButton.setEnabled(enabled);
+        mPhotoButton.setEnabled(enabled);
+        optionsMenu.setGroupEnabled(R.id.opMenuGroup, enabled);
+        listView.setEnabled(enabled);
+
     }
 
     /**

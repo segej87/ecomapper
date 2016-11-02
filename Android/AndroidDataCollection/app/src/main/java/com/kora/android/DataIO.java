@@ -1,7 +1,10 @@
 package com.kora.android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -221,11 +224,8 @@ final class DataIO {
     /**
      * Saves the user variables to a shared preferences file
      * @param context context
-     * @return report
      */
-    static String saveUserVars(Context context) {
-        String errorString;
-
+    static void saveUserVars(Context context) {
         // The output stream for saving
         FileOutputStream os;
 
@@ -238,7 +238,6 @@ final class DataIO {
             jsonObject.put("UName", UserVars.UName);
             jsonObject.put("UserVarsSaveFileName", UserVars.UserVarsSaveFileName);
             jsonObject.put("RecordsSaveFileName",UserVars.RecordsSaveFileName);
-            jsonObject.put("MediasSaveFileName",UserVars.MediasSaveFileName);
             jsonObject.put("AccessLevels",new JSONArray(UserVars.AccessLevels));
             jsonObject.put("AccessDefaults",new JSONArray(UserVars.AccessDefaults));
             jsonObject.put("TagsDefaults",new JSONArray(UserVars.TagsDefaults));
@@ -278,16 +277,10 @@ final class DataIO {
             // Close the output stream
             os.close();
 
-            Log.i(TAG,context.getString(R.string.user_vars_save_success,jsonObject.toString(),UserVars.UserVarsSaveFileName));
-
-            // Return a report.
-            return context.getString(R.string.io_success) + ": " + UserVars.UserVarsSaveFileName;
+            Log.i(TAG, context.getString(R.string.user_vars_save_success,jsonObject.toString(),UserVars.UserVarsSaveFileName));
         } catch (Exception e) {
-            errorString = e.getLocalizedMessage();
+            Log.e(TAG, e.getLocalizedMessage());
         }
-
-        // Return a report.
-        return context.getString(R.string.save_user_vars_failure,errorString);
     }
 
     /**
@@ -327,8 +320,6 @@ final class DataIO {
             UserVars.UName = jResult.get("UName").toString();
 
             UserVars.RecordsSaveFileName = jResult.get("RecordsSaveFileName").toString();
-
-            UserVars.MediasSaveFileName = jResult.get("MediasSaveFileName").toString();
 
             // Add the access levels to the default values.
             JSONArray alJArray = (JSONArray) jResult.get("AccessLevels");
@@ -591,9 +582,8 @@ final class DataIO {
     static String resetUserVars(Context context) {
         UserVars.UUID = "testing";
         UserVars.UName = "Testing";
-        UserVars.UserVarsSaveFileName = "UserVars-testing";
-        UserVars.RecordsSaveFileName = "Records-testing";
-        UserVars.MediasSaveFileName = "Medias-testing";
+        UserVars.UserVarsSaveFileName = null;
+        UserVars.RecordsSaveFileName = null;
         UserVars.AccessLevels = new ArrayList<String>() {{
             add("Public");
             add("Private");
@@ -670,6 +660,27 @@ final class DataIO {
     private static JSONObject loadFullRecordsFile(Context context) {
         // A JSON Object to decode data from the file.
         JSONObject jResult = null;
+
+        // If the user vars have not been loaded, load.
+        if (UserVars.RecordsSaveFileName == null) {
+            if (context instanceof Notebook) {
+                ((Notebook) context).isRecoveringFromLostMemory = true;
+            }
+
+            String savedLogin = DataIO.loadLogin(context);
+            String savedUUID = savedLogin.replace(context.getString(R.string.io_success) + ": ","");
+            if (!savedUUID.equals("")) {
+                Log.i(TAG, context.getString(R.string.saved_login_log, savedUUID));
+                UserVars.UUID = savedUUID;
+                UserVars.UserVarsSaveFileName = context.getString(R.string.user_vars_file_prefix) + savedUUID;
+                String userVarsResult = DataIO.loadUserVars(context);
+                Log.i(TAG, context.getString(R.string.load_user_vars_report, userVarsResult));
+            } else {
+                Intent intent = new Intent(context, StartScreen.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                context.startActivity(intent);
+            }
+        }
 
         // The file containing the record data.
         File recFile = new File(context.getFilesDir(),UserVars.RecordsSaveFileName);
@@ -989,6 +1000,22 @@ final class DataIO {
     //endregion
 
     //region Server Ops
+
+    static boolean isNetworkConnected(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        return activeNetwork != null && activeNetwork.isConnected();
+    }
+
+    static boolean isWiFiConnected(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        return activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+    }
 
     /**
      * Retrieves lists from the server

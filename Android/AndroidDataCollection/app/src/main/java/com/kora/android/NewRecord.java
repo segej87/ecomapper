@@ -27,7 +27,7 @@ import java.util.Map;
  */
 
 public abstract class NewRecord extends AppCompatActivity
-        implements LocationOverrideFragment.LocationOverrideListener {
+        implements LocationOverrideFragment.LocationOverrideListener, ConfirmActionDialogFragment.ConfirmActionListener {
 
     //region Class Variables
 
@@ -137,7 +137,13 @@ public abstract class NewRecord extends AppCompatActivity
     /**
      * A request code for list picker activities
      */
-    final int LIST_PICKER_REQUEST_CODE = 100;
+    final static int LIST_PICKER_REQUEST_CODE = 100;
+
+    /**
+     * A request code for cancelling the record activity
+     */
+    final static int CANCEL_REQUEST = 501;
+    final static int PHOTO_CANCEL_REQUEST = 502;
 
     //endregion
 
@@ -331,6 +337,63 @@ public abstract class NewRecord extends AppCompatActivity
         return getString(R.string.default_name,type,dateString);
     }
 
+    private void showNoticeDialog(String numMin, String acc, String stab) {
+        Bundle b = new Bundle();
+        b.putString("NUMMIN", numMin);
+        b.putString("ACC", acc);
+        b.putString("STAB", stab);
+
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new LocationOverrideFragment();
+        dialog.setArguments(b);
+        dialog.show(getSupportFragmentManager(), "LocationOverrideFragment");
+    }
+
+    @Override
+    public void onDialogPositiveClick() {
+        // User touched the dialog's positive button
+        this.userOverrideStale = true;
+        saveRecord();
+    }
+
+    @Override
+    public void onDialogNegativeClick() {
+        // User touched the dialog's negative button
+        this.userOverrideStale = false;
+    }
+
+    void showConfirmDialog(int requestCode, String message, String positiveString, String negativeString) {
+        Bundle b = new Bundle();
+        b.putInt("REQUEST_CODE", requestCode);
+        b.putString("MESSAGE", message);
+        b.putString("POSSTRING", positiveString);
+        b.putString("NEGSTRING", negativeString);
+
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new ConfirmActionDialogFragment();
+        dialog.setArguments(b);
+        dialog.show(getSupportFragmentManager(), "ConfirmActionDialogFragment");
+    }
+
+    @Override
+    public void onConfirmPositiveClick(DialogFragment d) {
+        int requestCode = d.getArguments().getInt("REQUEST_CODE");
+        switch (requestCode) {
+            case CANCEL_REQUEST:
+                moveToNotebook();
+                break;
+            case PHOTO_CANCEL_REQUEST:
+                DataIO.deleteFile(mPhoto);
+                moveToNotebook();
+                break;
+        }
+    }
+
+    @Override
+    public void onConfirmNegativeClick() {
+        Log.i(TAG, getString(R.string.user_cancel));
+    }
+
     //endregion
 
     //region Data I/O
@@ -416,7 +479,10 @@ public abstract class NewRecord extends AppCompatActivity
 
         @Override
         protected void onCancelled() {
-            //TODO: warn user about losing data.
+            showConfirmDialog(CANCEL_REQUEST,
+                    getString(R.string.cancel_confirmation_message),
+                    getString(R.string.cancel_positive_string),
+                    getString(R.string.cancel_negative_string));
         }
     }
 
@@ -538,31 +604,6 @@ public abstract class NewRecord extends AppCompatActivity
         }
 
         return !staleLoc;
-    }
-
-    private void showNoticeDialog(String numMin, String acc, String stab) {
-        Bundle b = new Bundle();
-        b.putString("NUMMIN", numMin);
-        b.putString("ACC", acc);
-        b.putString("STAB", stab);
-
-        // Create an instance of the dialog fragment and show it
-        DialogFragment dialog = new LocationOverrideFragment();
-        dialog.setArguments(b);
-        dialog.show(getSupportFragmentManager(), "LocationOverrideFragment");
-    }
-
-    @Override
-    public void onDialogPositiveClick() {
-        // User touched the dialog's positive button
-        this.userOverrideStale = true;
-        saveRecord();
-    }
-
-    @Override
-    public void onDialogNegativeClick() {
-        // User touched the dialog's negative button
-        this.userOverrideStale = false;
     }
 
     //endregion

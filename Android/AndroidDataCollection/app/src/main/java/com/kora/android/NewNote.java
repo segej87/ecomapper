@@ -94,7 +94,13 @@ public class NewNote extends NewRecord {
                 saveRecord();
                 return true;
             case R.id.cancel_record:
-                moveToNotebook();
+                if (mode.equals("new"))
+                    showConfirmDialog(CANCEL_REQUEST,
+                            getString(R.string.cancel_confirmation_message),
+                            getString(R.string.cancel_positive_string),
+                            getString(R.string.cancel_negative_string));
+                else
+                    moveToNotebook();
                 return true;
             default:
                 return false;

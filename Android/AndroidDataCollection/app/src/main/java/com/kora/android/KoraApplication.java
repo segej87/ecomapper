@@ -189,6 +189,10 @@ public class KoraApplication extends Application {
     }
 
     public synchronized Bitmap getBitmapFromMemCache(String key) {
+        if (mMemoryCache == null) {
+            setUpMemoryCache();
+        }
+
         return mMemoryCache.get(key);
     }
 

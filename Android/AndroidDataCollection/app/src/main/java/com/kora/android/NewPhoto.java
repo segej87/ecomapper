@@ -132,8 +132,12 @@ public class NewPhoto extends NewRecord {
                 return true;
             case R.id.cancel_record:
                 if (mode.equals("new"))
-                    DataIO.deleteFile(mPhoto);
-                moveToNotebook();
+                    showConfirmDialog(PHOTO_CANCEL_REQUEST,
+                            getString(R.string.cancel_confirmation_message),
+                            getString(R.string.cancel_positive_string),
+                            getString(R.string.cancel_negative_string));
+                else
+                    moveToNotebook();
                 return true;
             default:
                 return false;
