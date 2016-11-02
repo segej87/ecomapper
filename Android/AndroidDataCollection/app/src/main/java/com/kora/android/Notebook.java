@@ -711,7 +711,7 @@ public class Notebook extends AppCompatActivity
             for (Iterator<String> iter = UserVars.MarkedMedia.iterator(); iter.hasNext(); ) {
                 String m = iter.next();
                 String filePath = UserVars.Medias.get(m);
-                boolean res = DataIO.uploadBlob(filePath);
+                boolean res = DataIO.isWiFiConnected(Notebook.this) && DataIO.uploadBlob(filePath);
                 if (res) {
                     UserVars.Medias.remove(m);
                     String cacheKey = m.substring(m.lastIndexOf('/') + 1).
@@ -719,6 +719,8 @@ public class Notebook extends AppCompatActivity
                             replaceAll("_","");
                     app.removeBitmapFromMemCache(cacheKey);
                     iter.remove();
+                } else {
+                    this.cancel(true);
                 }
                 DataIO.saveUserVars(Notebook.this);
             }
@@ -730,6 +732,15 @@ public class Notebook extends AppCompatActivity
             if (result) {
                 Log.i(TAG, getString(R.string.media_upload_complete));
             }
+
+            showProgress(MEDIAS_REQUEST, false);
+            mMediaMonitor.setEnabled(true);
+            mediaMonitorManager();
+        }
+
+        @Override
+        protected void onCancelled() {
+            Log.i(TAG, getString(R.string.no_upload_no_wifi));
 
             showProgress(MEDIAS_REQUEST, false);
             mMediaMonitor.setEnabled(true);
