@@ -323,7 +323,7 @@ public class NewNote extends NewRecord {
 
         boolean dateCheck = dateTime != null;
 
-        boolean locCheck = userOverrideStale || checkLocationOK();
+        boolean locCheck = mode.equals("old") || (userOverrideStale || checkLocationOK());
 
         if (!(mNameTextField.getText() != null &&
                 !mNameTextField.getText().toString().equals(""))) {

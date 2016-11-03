@@ -1,9 +1,12 @@
 package com.kora.android;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -48,6 +51,11 @@ public class NewPhoto extends NewRecord {
      * Request code for taking a new photo
      */
     private final int CAMERA_IDENTIFIER = 199;
+
+    /**
+     * Request code for asking camera permission
+     */
+    private final int MY_PERMISSIONS_REQUEST_CAMERA = 301;
 
     /**
      * Make sure that only one camera is open
@@ -242,6 +250,8 @@ public class NewPhoto extends NewRecord {
         mGPSAccField = (TextView) findViewById(R.id.gpsAccReport);
         mGPSStabField = (TextView) findViewById(R.id.gpsStabReport);
         mNameTextField.setHint(getString(R.string.enter_name_hint,getString(R.string.photo_name_tag)));
+
+        checkPermissions();
 
         if (mode.equals("new")) {
             if (!isFromSavedState) {
@@ -497,6 +507,44 @@ public class NewPhoto extends NewRecord {
         errorView.requestFocus();
 
         return (firstError.equals("none") && dateCheck && locCheck);
+    }
+
+    //endregion
+
+    //region Camera Permissions
+
+    private void checkPermissions() {
+        if (ContextCompat.checkSelfPermission(NewPhoto.this,
+                android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(NewPhoto.this,
+                    android.Manifest.permission.CAMERA)) {
+
+                ActivityCompat.requestPermissions(NewPhoto.this,
+                        new String[]{android.Manifest.permission.CAMERA},
+                        MY_PERMISSIONS_REQUEST_CAMERA);
+
+            } else {
+                ActivityCompat.requestPermissions(NewPhoto.this,
+                        new String[]{android.Manifest.permission.CAMERA},
+                        MY_PERMISSIONS_REQUEST_CAMERA);
+            }
+        } else {
+            mPhotoButton.setEnabled(true);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA: {
+
+                mPhotoButton.setEnabled(grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED);
+                break;
+            }
+        }
     }
 
     //endregion

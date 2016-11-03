@@ -155,7 +155,8 @@ final class DataIO {
             // Add access levels to User Variables only if they aren't already there.
             JSONArray accessArray = jObject.getJSONArray("institutions");
             for (int i = 0; i < accessArray.length(); i++) {
-                if (!UserVars.AccessLevels.contains(accessArray.getString(i))) {
+                if (!accessArray.getString(i).contains(context.getString(R.string.server_warning_string)) &&
+                        !UserVars.AccessLevels.contains(accessArray.getString(i))) {
                     UserVars.AccessLevels.add(accessArray.getString(i));
                 }
             }
@@ -167,22 +168,28 @@ final class DataIO {
             JSONArray tagsArray = jObject.getJSONArray("tags");
             List<String> tagCheck = new ArrayList<>();
             for (int i=0; i<tagsArray.length(); i++) {
-                tagCheck.add(i, tagsArray.getString(i));
-                UserVars.Tags.put(tagsArray.getString(i), addArray);
+                if (!tagsArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
+                    tagCheck.add(i, tagsArray.getString(i));
+                    UserVars.Tags.put(tagsArray.getString(i), addArray);
+                }
             }
 
             JSONArray specArray = jObject.getJSONArray("species");
             List<String> specCheck = new ArrayList<>();
             for (int i = 0; i < specArray.length(); i++) {
-                specCheck.add(i, specArray.getString(i));
-                UserVars.Species.put(specArray.getString(i),addArray);
+                if (!specArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
+                    specCheck.add(i, specArray.getString(i));
+                    UserVars.Species.put(specArray.getString(i), addArray);
+                }
             }
 
             JSONArray unitArray = jObject.getJSONArray("units");
             List<String> unitCheck = new ArrayList<>();
             for (int i = 0; i < unitArray.length(); i++) {
-                unitCheck.add(i, unitArray.getString(i));
-                UserVars.Units.put(unitArray.getString(i),addArray);
+                if (!unitArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
+                    unitCheck.add(i, unitArray.getString(i));
+                    UserVars.Units.put(unitArray.getString(i), addArray);
+                }
             }
 
             // Remove any old server objects from User Vars
@@ -885,7 +892,8 @@ final class DataIO {
         // Log the server's response.
         Log.i(TAG,context.getString(R.string.list_server_response,response));
 
-        return response.contains("Success!");
+        return response.contains(context.getString(R.string.server_success)) ||
+                response.contains(context.getString(R.string.server_no_new_records));
     }
 
     //endregion
@@ -1100,7 +1108,8 @@ final class DataIO {
             // Add access level's to the default values in the User Variables
             JSONArray accessArray = jObject.getJSONArray("institutions");
             for (int i = 0; i < accessArray.length(); i++) {
-                if (!UserVars.AccessLevels.contains(accessArray.getString(i))) {
+                if (!accessArray.getString(i).contains(context.getString(R.string.server_warning_string)) &&
+                        !UserVars.AccessLevels.contains(accessArray.getString(i))) {
                     UserVars.AccessLevels.add(accessArray.getString(i));
                 }
             }
@@ -1111,17 +1120,23 @@ final class DataIO {
             // Put values from each JSON Array into the appropriate maps.
             JSONArray tagsArray = jObject.getJSONArray("tags");
             for (int i = 0; i < tagsArray.length(); i++) {
-                UserVars.Tags.put(tagsArray.getString(i),addArray);
+                if (!tagsArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
+                    UserVars.Tags.put(tagsArray.getString(i), addArray);
+                }
             }
 
             JSONArray specArray = jObject.getJSONArray("species");
             for (int i = 0; i < specArray.length(); i++) {
-                UserVars.Species.put(specArray.getString(i),addArray);
+                if (!specArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
+                    UserVars.Species.put(specArray.getString(i), addArray);
+                }
             }
 
             JSONArray unitArray = jObject.getJSONArray("units");
             for (int i = 0; i < unitArray.length(); i++) {
-                UserVars.Units.put(unitArray.getString(i),addArray);
+                if (!unitArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
+                    UserVars.Units.put(unitArray.getString(i), addArray);
+                }
             }
 
             return true;

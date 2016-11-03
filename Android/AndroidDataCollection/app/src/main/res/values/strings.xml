@@ -19,7 +19,6 @@
     <string name="php_add_records">add_records.php/</string>
     <string name="login_server_response">Login server response: %1$s</string>
     <string name="list_server_response">List server response: %1$s</string>
-    <string name="server_error_string">Error:</string>
     <string name="server_connection_error">Server Error: %1$s</string>
     <string name="server_password_error">do not match</string>
     <string name="server_username_error">not found</string>
@@ -30,6 +29,12 @@
     <string name="general_error_title">Error</string>
     <string name="general_error_report">The app has encountered an error.</string>
     <string name="load_user_vars_report">Loading user variables: %1$s</string>
+
+
+    <string name="server_success">Success!</string>
+    <string name="server_no_new_records">No new records detected</string>
+    <string name="server_error_string">Error:</string>
+    <string name="server_warning_string">Warning:</string>
 
     <!-- Strings related to the Notebook-->
     <string name="icon_description">An image for the record</string>
@@ -150,7 +155,7 @@
     <string name="logout_positive_string">Log out</string>
     <string name="logout_negative_string">Stay</string>
 
-    <string name="sync_confirmation_message">Syncing deletes all records from your phone. Do you want to continue?</string>
+    <string name="sync_confirmation_message">All records will be removed after you sync. Do you want to continue?</string>
     <string name="sync_positive_string">Sync</string>
     <string name="sync_negative_string">Cancel</string>
 

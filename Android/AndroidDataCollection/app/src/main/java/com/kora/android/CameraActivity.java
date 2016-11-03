@@ -71,7 +71,6 @@ public class CameraActivity extends AppCompatActivity implements ComponentCallba
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_camera);
 
         if (savedInstanceState != null) {
