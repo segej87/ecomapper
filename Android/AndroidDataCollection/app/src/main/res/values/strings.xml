@@ -120,7 +120,7 @@
     <string name="location_updates_start">Starting location updates</string>
     <string name="location_updates_stop">Stopping location updates</string>
     <string name="location_updates_start_error">Error starting location updates: %1$s</string>
-    <string name="no_user_location_found">No user location found. Sending to null island.</string>
+    <string name="no_user_location_found">Location not found. Sending to null island.</string>
     <string name="last_location_null">The last location object is empty</string>
     <string name="gps_acc_starter">Current GPS Accuracy:</string>
     <string name="gps_stab_starter">Current GPS Stability:</string>
@@ -142,6 +142,7 @@
     <string name="title_constructor_editing">Edit</string>
     <string name="settings_string">Settings</string>
 
+    <string name="no_location_found">Your location was not found.\n\n</string>
     <string name="location_error_starter">Your location may not be accurate.\n\n</string>
     <string name="old_location_error_message">Last location update: %1$s minutes ago.\n\n</string>
     <string name="inaccurate_location_error_message">Current accuracy: %1$s.\n\n</string>

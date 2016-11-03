@@ -104,9 +104,10 @@ public class MapDisplay extends PApplet {
 		}
 		
 		//read in point data from geoJSON
-		SQLReader sqr = new SQLReader("segej87", "J5e14s87!");
+//		SQLReader sqr = new SQLReader("segej87", "J5e14s87!");
 //		SQLReader sqr = new SQLReader("mruth", "M@rty9!");
 		//SQLReader sqr = new SQLReader("ctsege", "ctsege85");
+		SQLReader sqr = new SQLReader("rsege", "redbird5");
 		List<Feature> personFeats = GeoJSONReader.loadDataFromJSON(this, sqr.jsonString);
 		
 		//loop through features and find which country they're in by comparing to countryMarkers

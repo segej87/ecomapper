@@ -59,21 +59,27 @@ public class LocationOverrideFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle b = getArguments();
+        boolean nullLoc = b.getBoolean("NULLLOC");
         String numMin = b.getString("NUMMIN");
         String gpsAcc = b.getString("ACC");
         String gpsStab = b.getString("STAB");
 
         StringBuilder sb = new StringBuilder();
-        sb.append(getString(R.string.location_error_starter));
 
-        if (numMin != null && !numMin.equals("none"))
-            sb.append(getString(R.string.old_location_error_message, numMin));
+        if (nullLoc)
+            sb.append(getString(R.string.no_location_found));
+        else {
+            sb.append(getString(R.string.location_error_starter));
 
-        if (gpsAcc != null && !gpsAcc.equals("none"))
-            sb.append(getString(R.string.inaccurate_location_error_message, gpsAcc));
+            if (numMin != null && !numMin.equals("none"))
+                sb.append(getString(R.string.old_location_error_message, numMin));
 
-        if (gpsStab != null && !gpsStab.equals("none"))
-            sb.append(getString(R.string.unstable_location_error_message, gpsStab));
+            if (gpsAcc != null && !gpsAcc.equals("none"))
+                sb.append(getString(R.string.inaccurate_location_error_message, gpsAcc));
+
+            if (gpsStab != null && !gpsStab.equals("none"))
+                sb.append(getString(R.string.unstable_location_error_message, gpsStab));
+        }
 
         sb.append(getString(R.string.location_error_ending));
 

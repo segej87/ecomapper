@@ -340,8 +340,9 @@ public abstract class NewRecord extends AppCompatActivity
         return getString(R.string.default_name,type,dateString);
     }
 
-    private void showNoticeDialog(String numMin, String acc, String stab) {
+    private void showNoticeDialog(boolean nullLoc, String numMin, String acc, String stab) {
         Bundle b = new Bundle();
+        b.putBoolean("NULLLOC", nullLoc);
         b.putString("NUMMIN", numMin);
         b.putString("ACC", acc);
         b.putString("STAB", stab);
@@ -459,6 +460,12 @@ public abstract class NewRecord extends AppCompatActivity
             // If success, add the record to the list, save the list, and finish the activity.
             if (result) {
 
+                if (latestLoc == null) {
+                    Toast.makeText(NewRecord.this,
+                            getString(R.string.no_user_location_found),
+                            Toast.LENGTH_SHORT).show();
+                }
+
                 if (recordIndex == -1) {
                     // Add the new record to the application's list.
                     app.addRecord(record);
@@ -562,11 +569,8 @@ public abstract class NewRecord extends AppCompatActivity
         boolean staleLoc;
 
         if (latestLoc == null) {
-            Toast.makeText(NewRecord.this,
-                    getString(R.string.no_user_location_found),
-                    Toast.LENGTH_SHORT)
-            .show();
-            return true;
+            showNoticeDialog(true, null, null, null);
+            return false;
         }
 
         Long elapsedTime = ((new Date()).getTime() - latestLoc.getTime())/60000;
@@ -601,7 +605,8 @@ public abstract class NewRecord extends AppCompatActivity
             else
                 stabOutString = "none";
 
-            showNoticeDialog(minOutString,
+            showNoticeDialog(false,
+                    minOutString,
                     accOutString,
                     stabOutString);
         }
