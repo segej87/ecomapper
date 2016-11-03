@@ -113,7 +113,7 @@ public class Notebook extends AppCompatActivity
         // Get the current application context.
         app = (KoraApplication) this.getApplicationContext();
 
-        if (UserVars.UUID.equals("")) {
+        if (UserVars.UUID == null) {
             boolean recovered = DataIO.recoverFromMemoryLoss(this);
             if (!recovered)
                 moveToLogin();
@@ -645,14 +645,12 @@ public class Notebook extends AppCompatActivity
      * A helper method to kick off the asynchronous task
      */
     private void attemptSync() {
-        if (app.getRecords().size() > 0) {
-            // Kick off an asynchronous task to upload records
-            Log.i(TAG, "Syncing records");
-            showProgress(RECORDS_REQUEST, true);
-            toggleViewsEnabled(false);
-            AttemptSyncTask syncTask = new AttemptSyncTask();
-            syncTask.execute((Void) null);
-        }
+        // Kick off an asynchronous task to upload records
+        Log.i(TAG, "Syncing records");
+        showProgress(RECORDS_REQUEST, true);
+        toggleViewsEnabled(false);
+        AttemptSyncTask syncTask = new AttemptSyncTask();
+        syncTask.execute((Void) null);
     }
 
     /**

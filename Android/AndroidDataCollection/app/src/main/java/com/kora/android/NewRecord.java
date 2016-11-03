@@ -153,7 +153,7 @@ public abstract class NewRecord extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (UserVars.UUID.equals(""))
+        if (UserVars.UUID == null)
             moveToNotebook();
 
         if (savedInstanceState != null) {

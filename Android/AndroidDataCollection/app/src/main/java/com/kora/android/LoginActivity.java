@@ -103,8 +103,7 @@ public class LoginActivity extends AppCompatActivity {
     //region Login Methods
 
     /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
+     * Attempts to sign in. If there are form errors, the
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
@@ -124,7 +123,11 @@ public class LoginActivity extends AppCompatActivity {
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(username)) {
+            mPasswordView.setError(getString(R.string.error_field_required));
+            focusView = mPasswordView;
+            cancel = true;
+        } else if (!isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -422,4 +425,3 @@ public class LoginActivity extends AppCompatActivity {
 
     //endregion
 }
-

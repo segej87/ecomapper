@@ -14,7 +14,7 @@ class UserVars {
     /**
      * The user ID of the current user
      */
-    static String UUID = "";
+    static String UUID;
 
     /**
      * The username of the current user

@@ -165,6 +165,7 @@ final class DataIO {
             Object[] addArray = createUserVarAddArray("Server");
 
             // Put values from each JSON Array into the appropriate maps.
+
             JSONArray tagsArray = jObject.getJSONArray("tags");
             List<String> tagCheck = new ArrayList<>();
             for (int i=0; i<tagsArray.length(); i++) {
@@ -192,31 +193,7 @@ final class DataIO {
                 }
             }
 
-            // Remove any old server objects from User Vars
-
-            for (Iterator<String> iter = UserVars.Tags.keySet().iterator(); iter.hasNext();) {
-                String t = iter.next();
-                if (UserVars.Tags.get(t)[0].equals("Server") &&
-                        !tagCheck.contains(t)) {
-                    iter.remove();
-                }
-            }
-
-            for (Iterator<String> iter = UserVars.Species.keySet().iterator(); iter.hasNext();) {
-                String s = iter.next();
-                if (UserVars.Species.get(s)[0].equals("Server") &&
-                        !specCheck.contains(s)) {
-                    iter.remove();
-                }
-            }
-
-            for (Iterator<String> iter = UserVars.Units.keySet().iterator(); iter.hasNext();) {
-                String u = iter.next();
-                if (UserVars.Units.get(u)[0].equals("Server") &&
-                        !unitCheck.contains(u)) {
-                    iter.remove();
-                }
-            }
+            //TODO: Deal with any items that are no longer on the server. If they're still in the local list, keep and reset counts. If not in the local list, remove.
 
             return true;
         } catch (JSONException e) {
