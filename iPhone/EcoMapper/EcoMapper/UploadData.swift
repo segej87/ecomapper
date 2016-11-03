@@ -39,7 +39,7 @@ open class UploadData {
             request.httpMethod = "POST"
             
             // Create the POST string with necessary variables, and put in HTTP body
-            let postString = "GUID=\(UserVars.uuid!)&geojson=\(dataString!)"
+            let postString = "GUID=\(UserVars.UUID!)&geojson=\(dataString!)"
             request.httpBody = postString.data(using: String.Encoding.utf8)
             
             // Create a session with the PHP script, and attempt to upload records
@@ -61,7 +61,7 @@ open class UploadData {
                 let responseString = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)
                 
                 // TODO: make sure this executes so "Local" items are changed to "Server"
-                self.getListsUsingUUID(UserVars.uuid!)
+                self.getListsUsingUUID(UserVars.UUID!)
                 
                 // Once background task finishes, perform post-upload operations
                 DispatchQueue.main.async {
@@ -171,7 +171,7 @@ open class UploadData {
     func getContainer() -> AZSCloudBlobContainer {
         // Connect to Azure blob storage container for media
         let connectionString = "DefaultEndpointsProtocol=https;AccountName=ecomapper;AccountKey=c0h6WIRF2ObRNWwAkp9arNRLb1KUa0/fZwnKohRwgZfrbVca5WXPxIqJKPeSVyK1oPdAgbIghCpPJNayrId1tw=="
-        let containerName = UserVars.uuid!
+        let containerName = UserVars.UUID!
         
         let storageAccount : AZSCloudStorageAccount;
         try! storageAccount = AZSCloudStorageAccount(fromConnectionString: connectionString)

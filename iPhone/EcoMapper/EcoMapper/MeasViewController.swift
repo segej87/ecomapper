@@ -161,6 +161,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     func getDateTime(){
         let currentDate = Date()
         let dateFormatter = DateFormatter()
+        //TODO: Get locale!!!!!!!!!!!!!!!!!
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         dateTime = dateFormatter.string(from: currentDate)
     }
@@ -377,7 +378,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     
     // MARK: Actions
     @IBAction func setDefaultNameText(_ sender: UIButton) {
-        nameTextField.text = "Meas" + " - " + dateTime!
+        nameTextField.text = "Meas - " + dateTime!
     }
     
     // MARK: Helper methods
