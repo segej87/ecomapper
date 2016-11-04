@@ -167,28 +167,22 @@ final class DataIO {
             // Put values from each JSON Array into the appropriate maps.
 
             JSONArray tagsArray = jObject.getJSONArray("tags");
-            List<String> tagCheck = new ArrayList<>();
             for (int i=0; i<tagsArray.length(); i++) {
                 if (!tagsArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
-                    tagCheck.add(i, tagsArray.getString(i));
                     UserVars.Tags.put(tagsArray.getString(i), addArray);
                 }
             }
 
             JSONArray specArray = jObject.getJSONArray("species");
-            List<String> specCheck = new ArrayList<>();
             for (int i = 0; i < specArray.length(); i++) {
                 if (!specArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
-                    specCheck.add(i, specArray.getString(i));
                     UserVars.Species.put(specArray.getString(i), addArray);
                 }
             }
 
             JSONArray unitArray = jObject.getJSONArray("units");
-            List<String> unitCheck = new ArrayList<>();
             for (int i = 0; i < unitArray.length(); i++) {
                 if (!unitArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
-                    unitCheck.add(i, unitArray.getString(i));
                     UserVars.Units.put(unitArray.getString(i), addArray);
                 }
             }
@@ -567,6 +561,13 @@ final class DataIO {
         UserVars.UName = "Testing";
         UserVars.UserVarsSaveFileName = null;
         UserVars.RecordsSaveFileName = null;
+        UserVars.Medias.clear();
+        for (Iterator<String> iter = UserVars.MarkedMedia.iterator(); iter.hasNext(); ) {
+            String m = iter.next();
+            if (m != null) {
+                iter.remove();
+            }
+        }
         UserVars.AccessLevels = new ArrayList<String>() {{
             add("Public");
             add("Private");
@@ -997,7 +998,7 @@ final class DataIO {
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
-        return activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+        return activeNetwork != null && activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
     }
 
     /**

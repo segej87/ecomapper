@@ -313,7 +313,7 @@ public class NewMeas extends NewRecord {
         }
 
         String stabOutString;
-        if (gpsAcc == -1)
+        if (gpsStab == -1)
             stabOutString = getString(R.string.gps_locking);
         else
             stabOutString = getString(R.string.gps_w_unit,String.format(Locale.getDefault(),"%.2f",gpsStab));

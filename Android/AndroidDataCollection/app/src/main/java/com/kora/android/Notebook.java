@@ -502,7 +502,7 @@ public class Notebook extends AppCompatActivity
 
         @Override
         protected String doInBackground(Void...params) {
-            return saveLogin(getString(R.string.logout_flag));
+            return DataIO.saveLogin(Notebook.this, getString(R.string.logout_flag));
         }
 
         @Override
@@ -613,27 +613,29 @@ public class Notebook extends AppCompatActivity
         }
 
         protected void onPostExecute(String result) {
+
+            showProgress(RECORDS_REQUEST, false);
+            toggleViewsEnabled(true);
+
             boolean success = false;
             if (!result.contains(getString(R.string.server_error_string))) {
                 success = DataIO.setLists(Notebook.this, result);
             }
 
+            if (success)
+                DataIO.saveUserVars(Notebook.this);
+            else
+                Toast.makeText(Notebook.this,
+                        getString(R.string.load_user_vars_failure),
+                        Toast.LENGTH_SHORT).show();
+
             boolean mediaMark = markMedias();
-            DataIO.saveUserVars(Notebook.this);
             mediaMonitorManager();
 
-            showProgress(RECORDS_REQUEST, false);
-            toggleViewsEnabled(true);
-
-            if (success && mediaMark) {
-                app.deleteRecordsOnly();
-                DataIO.saveRecords(Notebook.this, app.getRecords());
-                adapter.notifyDataSetChanged();
-
+            if (mediaMark)
                 uploadMedias(false);
-            } else {
+            else
                 Log.i(TAG,result);
-            }
         }
     }
 
@@ -670,6 +672,12 @@ public class Notebook extends AppCompatActivity
         @Override
         protected void onPostExecute(Boolean result) {
             if (result) {
+                if (app.getRecords().size() > 0) {
+                    app.deleteRecordsOnly();
+                    DataIO.saveRecords(Notebook.this, app.getRecords());
+                    adapter.notifyDataSetChanged();
+                }
+
                 SetListsTask slt = new SetListsTask();
                 slt.execute((Void) null);
             }
@@ -769,15 +777,6 @@ public class Notebook extends AppCompatActivity
         optionsMenu.setGroupEnabled(R.id.opMenuGroup, enabled);
         listView.setEnabled(enabled);
         mMediaMonitor.setEnabled(enabled);
-    }
-
-    /**
-     * Saves the current user ID to a shared preferences file. Used for logging out.
-     * @param uuid UserID
-     * @return result
-     */
-    private String saveLogin(String uuid) {
-        return DataIO.saveLogin(this, uuid);
     }
 
     private boolean markMedias() {

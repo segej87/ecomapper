@@ -55,6 +55,11 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
     private Location mLastLocation;
 
     /**
+     * Flag indicating whether last known location is being used
+     */
+    private boolean updatedLocation = false;
+
+    /**
      * A list for monitoring GPS stability
      */
     private final List<Float> stabList = new ArrayList<>();
@@ -278,12 +283,15 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
     public void onLocationChanged(Location location) {
         //TODO: warn user if location changes by more than accuracy
 
-        //Set the calling context's stability variable
-        if (context.latestLoc == null) {
+        //Set the calling context's stability variable.
+        if (context.latestLoc == null || (!updatedLocation && location.distanceTo(context.latestLoc) > 100)) {
             stabList.add((float) -1);
         } else {
             stabList.add(location.distanceTo(context.latestLoc));
         }
+
+        if (!updatedLocation)
+            updatedLocation = true;
 
         context.gpsStab = calculateGPSStability();
 
@@ -314,8 +322,9 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
         int stabListSize = stabList.size();
 
         float stabAdd;
+        int numAv = 5;
         int counter = 0;
-        if (stabListSize < 5) {
+        if (stabListSize < numAv) {
             stabAdd = stabList.get(0);
             counter++;
             if (stabListSize > 1) {
@@ -327,9 +336,9 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
                 }
             }
         } else {
-            stabAdd = stabList.get(stabListSize-5);
+            stabAdd = stabList.get(stabListSize-numAv);
             counter++;
-            for (Float s : stabList.subList(stabListSize-4,stabListSize-1)) {
+            for (Float s : stabList.subList(stabListSize-(numAv-1),stabListSize-1)) {
                 if (s != -1) {
                     stabAdd = stabAdd + s;
                     counter++;
