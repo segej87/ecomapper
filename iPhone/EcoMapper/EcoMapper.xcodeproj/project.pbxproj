@@ -11,6 +11,7 @@
 		FC052F531D2EA1F5003DCD19 /* NewPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */; };
 		FC0824FC1D87798E00286707 /* DataRetriever.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0824FB1D87798E00286707 /* DataRetriever.swift */; };
 		FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3349DB1D1B365F00D112EA /* Reachability.swift */; };
+		FC42C25A1DCBFE3600D442B9 /* NotebookViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC42C2591DCBFE3600D442B9 /* NotebookViewController.swift */; };
 		FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4E22221D21B93F00A57ED6 /* Media.swift */; };
 		FC53E2FE1DCBD86F00AD9B92 /* UserVarSaveFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC53E2FD1DCBD86F00AD9B92 /* UserVarSaveFile.swift */; };
 		FC546EAA1D26C95200E62B6C /* UploadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC546EA91D26C95200E62B6C /* UploadData.swift */; };
@@ -49,6 +50,7 @@
 		FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewPhoto.swift; sourceTree = "<group>"; };
 		FC0824FB1D87798E00286707 /* DataRetriever.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataRetriever.swift; sourceTree = "<group>"; };
 		FC3349DB1D1B365F00D112EA /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
+		FC42C2591DCBFE3600D442B9 /* NotebookViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotebookViewController.swift; sourceTree = "<group>"; };
 		FC4E22221D21B93F00A57ED6 /* Media.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		FC53E2FD1DCBD86F00AD9B92 /* UserVarSaveFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserVarSaveFile.swift; sourceTree = "<group>"; };
 		FC546EA91D26C95200E62B6C /* UploadData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadData.swift; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 				FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */,
 				FC0824FB1D87798E00286707 /* DataRetriever.swift */,
 				FC53E2FD1DCBD86F00AD9B92 /* UserVarSaveFile.swift */,
+				FC42C2591DCBFE3600D442B9 /* NotebookViewController.swift */,
 			);
 			path = EcoMapper;
 			sourceTree = "<group>";
@@ -274,6 +277,7 @@
 				FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */,
 				FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */,
 				FC546EAA1D26C95200E62B6C /* UploadData.swift in Sources */,
+				FC42C25A1DCBFE3600D442B9 /* NotebookViewController.swift in Sources */,
 				FC84B3C61D1919D400251003 /* Record.swift in Sources */,
 				FC052F531D2EA1F5003DCD19 /* NewPhoto.swift in Sources */,
 				FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */,

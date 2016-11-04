@@ -47,7 +47,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         DispatchQueue.main.async {
             if let uvuuid = UserVars.UUID {
                 if self.loadUserVars(uuid: uvuuid) {
-                    self.performSegue(withIdentifier: "Login", sender: "saved login")
+                    self.performSegue(withIdentifier: "NewNotebook", sender: "saved login")
                 }
             }
         }
@@ -75,14 +75,15 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     // Actions to perform before segue away from login view controller
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Print login status to log.
-        NSLog("Logging in to username \(UserVars.UName!) with \(sender!)")
+        print(sender!)
+//        NSLog("Logging in to username \(UserVars.UName!) with \(sender!)")
     }
     
     // When the app returns to the login page, clear key variables
     @IBAction func unwindToLogin(_ sender: UIStoryboardSegue) {
         // Make sure the text fields and login result are blank
-        usernameView.text = nil
-        passwordView.text = nil
+        usernameView.text = ""
+        passwordView.text = ""
         serverString = nil
         
         // Clear all of the user variables
@@ -182,7 +183,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                 if loginSuccess {
                     UserVars.UUID = self.serverString?.lowercased
                     
-                    if !self.loadUserVars(uuid: UserVars.UUID!) {
+                    if self.loadUserVars(uuid: UserVars.UUID!) {
                         UserVars.UName = self.usernameView.text
                     }
                     
@@ -304,7 +305,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                         self.activityView.stopAnimating()
                         
                         // Perform a segue to the record table view controller
-                        self.performSegue(withIdentifier: "Login", sender: "new login")
+                        self.performSegue(withIdentifier: "NewNotebook", sender: "new login")
                         
                     } catch let error as NSError {
                         print("Login list retrieve parse error: \(error.localizedDescription)")
