@@ -7,10 +7,9 @@
 //
 
 import UIKit
-import CoreLocation
 import QuartzCore
 
-class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate {
+class MeasViewController: RecordViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate {
     
     // MARK: Properties
     // IB Properties
@@ -28,29 +27,6 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     @IBOutlet weak var unitsPickerButton: UIButton!
     @IBOutlet weak var accessPickerButton: UIButton!
     
-    // Class variables
-    // The Core Location manager
-    let locationManager = CLLocationManager()
-    
-    // Array to hold selected multi-pick items (tags and access levels)
-    var tagArray = [String]()
-    var accessArray = [String]()
-    
-    /*
-     This value will be filled with the user's location by the CLLocationManager delegate
-     */
-    var userLoc: [Double]?
-    var gpsAcc = 0.0
-    
-    /*
-     This value will be filled with the date and time recorded when the view was opened
-     */
-    var dateTime: String?
-    
-    /*
-     This value is either passed by 'RecordTableViewController' in 'prepareForSegue(_:sender:)' or constructed as part of adding a new record.
-     */
-    var record: Record?
     
     // MARK: Initialization
     override func viewDidLoad() {
@@ -68,24 +44,6 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         
         // Handle the notes field's user input through delegate callbacks.
         notesTextField.delegate = self
-        
-        // Set up views if editing an existing Record.
-        if let savedRecord = record {
-            setupEditingMode(record: savedRecord)
-        } else {
-            // Get the current datetime
-            getDateTime()
-            
-            // If location is authorized, start location services
-            locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            if #available(iOS 8.0, *) {
-                locationManager.requestWhenInUseAuthorization()
-            } else {
-                // Do nothing
-            }
-            locationManager.startUpdatingLocation()
-        }
         
         // Enable the Save button only if the required text fields have a valid name.
         checkValidName()
@@ -119,33 +77,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         return true
     }
     
-    // MARK: Location methods
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last {
-            // Current implementation of best accuracy algorithm
-            if location.horizontalAccuracy < gpsAcc || gpsAcc == 0.0 {
-                gpsAcc = location.horizontalAccuracy
-                let lon = location.coordinate.longitude
-                let lat = location.coordinate.latitude
-                self.userLoc = [lon, lat]
-                print("New best accuracy: \(gpsAcc) m")
-                
-                gpsAccView.text = "Current GPS Accuracy: \(gpsAcc) m"
-            }
-        }
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("Failed to find user's location: \(error.localizedDescription)")
-        print("No location found, using null island")
-        noGPS()
-        let lon = 0.0
-        let lat = 0.0
-        self.userLoc = [lon, lat]
-        checkValidName()
-    }
-    
-    func noGPS() {
+    override func noGPS() {
         if #available(iOS 8.0, *) {
             let alertVC = UIAlertController(title: "No GPS", message: "Can't pinpoint your location, using default", preferredStyle: .alert)
             let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
@@ -157,13 +89,8 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         }
     }
     
-    // MARK: Date methods
-    func getDateTime(){
-        let currentDate = Date()
-        let dateFormatter = DateFormatter()
-        //TODO: Get locale!!!!!!!!!!!!!!!!!
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateTime = dateFormatter.string(from: currentDate)
+    override func updateGPS() {
+        gpsAccView.text = "Current GPS Accuracy: \(gpsAcc) m"
     }
     
     // MARK: Navigation
@@ -395,7 +322,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         self.notesTextField.layer.borderColor = UIColor.init(red: 200/255.0, green: 199/255.0, blue: 204/255.0, alpha: 1.0).cgColor
     }
     
-    func setupEditingMode(record: Record) {
+    override func setupEditingMode(record: Record) {
         navigationItem.title = "Editing Measurement"
         nameTextField.text = record.props["name"] as? String
         accessTextField.text = (record.props["access"] as? [String])?.joined(separator: ", ")
@@ -411,7 +338,7 @@ class MeasViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         gpsAccView.isHidden = true
     }
     
-    func checkValidName() {
+    override func checkValidName() {
         // Disable the Save button if the required text fields are empty.
         let text1 = nameTextField.text ?? ""
         let text2 = measTextField.text ?? ""

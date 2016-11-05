@@ -10,18 +10,32 @@ import UIKit
 
 class NotebookViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
+    
+    // MARK: User Variables
+    
+    /*
+     UI References
+     */
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var syncButton: UIBarButtonItem!
     @IBOutlet weak var logoutButton: UIBarButtonItem!
-
-    // Create an object to store lists retrieved from server
+    @IBOutlet weak var editButton: UIBarButtonItem!
+    
+    /*
+     An object to store lists retrieved from the server
+     */
     var listString : NSString?
     
-    // Array for holding saved records.
+    /*
+     An array to hold saved records.
+     */
     var records = [Record]()
     
-    // Array for holding names and paths to media on device.
+    /*
+     An array for holding names and paths to media on this device.
+     */
     var medias = [Media]()
+    
     
     // MARK: Initialization
     
@@ -30,9 +44,6 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         
         // Style the navigation bar's background color and button colors.
         styleNavigationBar()
-        
-        // Add an edit button item to the navigation bar
-        navigationItem.leftBarButtonItem = editButtonItem
         
         // Load any saved records. If none, load nothing.
         if let savedRecords = loadRecords() {
@@ -53,7 +64,9 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         // Dispose of any resources that can be recreated.
     }
     
-    // MARK: Table view data source
+    
+    //MARK: Table View Data Source Methods
+    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -63,7 +76,6 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         // Table view cells are reused and should be dequeued using a cell identifier.
         let cellIdentifier = "RecordTableViewCell"
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! RecordTableViewCell
@@ -113,7 +125,6 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // Override to support selection of cells in the table view.
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         // Get the selected record, and determine its datatype.
         let selectedRecord = records[(indexPath as NSIndexPath).row]
         let dt = selectedRecord.props["datatype"] as! String
@@ -128,24 +139,22 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-    /*
-     // Override to support conditional editing of the table view.
-     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-     // Return false if you do not want the specified item to be editable.
-     return true
-     }
-     */
-    
     // Override to support editing the table view.
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        
+        // First, get the selected row and record
+        let selectedRow = (indexPath as NSIndexPath).row
+        let selectedRecord = records[selectedRow]
         
         if editingStyle == .delete {
             
             // Before deleting a photo, the corresponding item in the media list needs to be found and deleted.
-            if records[(indexPath as NSIndexPath).row].props["datatype"] as! String == "photo" {
+            
+            // If the record is a photo, delete the photo, too.
+            if selectedRecord.props["datatype"] as! String == "photo" {
                 
                 // Get the filepath of the photo record.
-                let oldMediaPath = records[(indexPath as NSIndexPath).row].props["filepath"] as! String
+                let oldMediaPath = selectedRecord.props["filepath"] as! String
                 
                 // Remove the root URL string to get the media name (media paths are formatted root URL/mediaName.
                 let oldMediaName = oldMediaPath.replacingOccurrences(of: "\(UserVars.blobRootURLString)\(UserVars.UUID!)/", with: "")
@@ -157,59 +166,28 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
                 if oldMediaIndex != -1 {
                     medias.remove(at: oldMediaIndex)
                 }
-            }
-            
-            // Modify the UserVar lists associated with the record
-            let prevArray = records[(indexPath as NSIndexPath).row].props["tags"] as? [String]
-            for p in prevArray! {
-                var pTag = UserVars.Tags[p]
-                if pTag![0] as! String == "Local" {
-                    pTag![1] = ((pTag![1] as! Int - 1) as AnyObject)
-                    if pTag![1] as! Int == 0 {
-                        UserVars.Tags.removeValue(forKey: p)
-                    } else {
-                        UserVars.Tags[p] = pTag!
-                    }
-                }
-            }
-            
-            if records[(indexPath as NSIndexPath).row].props["datatype"] as! String == "meas" {
-                let specArray = records[(indexPath as NSIndexPath).row].props["species"]?.components(separatedBy: ", ")
-                for s in specArray! {
-                    var sTag = UserVars.Species[s]
-                    if sTag![0] as! String == "Local" {
-                        sTag![1] = ((sTag![1] as! Int - 1) as AnyObject)
-                        if sTag![1] as! Int == 0 {
-                            UserVars.Species.removeValue(forKey: s)
-                        } else {
-                            UserVars.Species[s] = sTag!
-                        }
-                    }
-                }
                 
-                let unitArray = records[(indexPath as NSIndexPath).row].props["units"]?.components(separatedBy: ", ")
-                for u in unitArray! {
-                    var uTag = UserVars.Units[u]
-                    if uTag![0] as! String == "Local" {
-                        uTag![1] = ((uTag![1] as! Int - 1) as AnyObject)
-                        if uTag![1] as! Int == 0 {
-                            UserVars.Units.removeValue(forKey: u)
-                        } else {
-                            UserVars.Units[u] = uTag!
-                        }
-                    }
+                // Try to delete the photo file
+                do {
+                    try FileManager.default.removeItem(atPath: oldMediaPath)
+                    NSLog("Deleted photo \(oldMediaPath)")
+                } catch let error as NSError {
+                    NSLog("Could not delete photo \(oldMediaPath): \(error.localizedDescription)")
                 }
             }
+            
+            // Update the user variables in response to removing the record
+            UserVars.handleDeletedRecord(record: selectedRecord)
             
             // Delete the record from the data source.
-            records.remove(at: (indexPath as NSIndexPath).row)
+            records.remove(at: selectedRow)
             
             // Save the modified data.
             saveRecords()
             saveMedia()
             
             // Save the lists for logins.
-            saveLogin()
+            UserVars.saveUserVars()
             
             // Delete the row from the table.
             tableView.deleteRows(at: [indexPath], with: .fade)
@@ -218,133 +196,98 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-    /*
-     // Override to support rearranging the table view.
-     override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-     
-     }
-     */
-    
-    /*
-     // Override to support conditional rearranging of the table view.
-     override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-     // Return false if you do not want the item to be re-orderable.
-     return true
-     }
-     */
     
     // MARK: Actions
     
-//    @IBAction func attemptSync(_ sender: UIBarButtonItem) {
-//        
-//        // Deactivate the buttons while uploading
-//        deactivateButtons()
-//        
-//        // Initialize the class for uploading data
-//        let ud = UploadData(tableView: self)!
-//        
-//        // Check if the device is connected to a network
-//        if Reachability.isConnectedToNetwork() {
-//            
-//            // Loop through all records and add to features array
-//            var features = [AnyObject]()
-//            for i in 0..<records.count {
-//                let record = records[i]
-//                
-//                // Prepare the record to be written in JSON format and add to features array
-//                let dictItem = record.prepareForJSON()
-//                features.append(dictItem as AnyObject)
-//            }
-//            
-//            // Add requred formatting for geojson, and start uploading procedure
-//            let biggerDict = ["type":"FeatureCollection", "features": features] as [String : Any]
-//            ud.uploadRecords(biggerDict as NSDictionary)
-//            
-//            // Move to an asynchronous thread and upload the media from the media array
-//            let  priority = DispatchQueue.GlobalQueuePriority.default
-//            DispatchQueue.global(priority: priority).async{
-//                ud.uploadMedia()
-//            }
-//        } else {
-//            
-//            // If no network connection, show an alert
-//            if #available(iOS 8.0, *) {
-//                let alertVC = UIAlertController(title: "No connection detected", message: "Can't sync without a data connection", preferredStyle: .alert)
-//                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-//                alertVC.addAction(okAction)
-//                present(alertVC, animated: true, completion: nil)
-//            } else {
-//                let alertVC = UIAlertView(title: "No connection detected", message: "Can't sync without a data connection", delegate: self, cancelButtonTitle: "OK")
-//                alertVC.show()
-//            }
-//            
-//            // Reactivate the buttons
-//            deactivateButtons()
-//        }
-//    }
-    
-    // MARK: Helper methods
-    
-    // Find the index of an item in the Media array based on the media name
-    func indexOfMedia(_ medianame: String) -> Int {
-        var oldMediaIndex = 0
-        while oldMediaIndex < medias.count{
-            if medias[oldMediaIndex].mediaName == medianame {
-                return oldMediaIndex
-            }
-            oldMediaIndex += 1
+    @IBAction func editButtonHandler(_ sender: UIBarButtonItem) {
+        if isEditing {
+            editButton.title = "Edit"
+            self.setEditing(false, animated: true)
+            tableView.setEditing(false, animated: true)
+        } else {
+            editButton.title = "Done"
+            self.setEditing(true, animated: true)
+            tableView.setEditing(true, animated: true)
         }
-        return -1
     }
     
-    func styleNavigationBar() {
-        let nav = self.navigationController?.navigationBar
-        nav?.barStyle = UIBarStyle.black
-        nav?.backgroundColor = UIColor(red: 0/255 as CGFloat, green: 0/255 as CGFloat, blue: 96/255 as CGFloat, alpha: 1)
-        self.navigationController?.navigationBar.tintColor = UIColor.lightGray
-    }
-    
-    func deactivateButtons () {
-        for b in [syncButton, logoutButton, editButtonItem] {
-            b!.isEnabled = false
+    @IBAction func attemptSync(_ sender: UIBarButtonItem) {
+        
+        // Deactivate the buttons while uploading
+        activateButtons(enabled: false)
+        
+        // Initialize the class for uploading data
+        let ud = UploadData(tableView: self)!
+        
+        // Check if the device is connected to a network
+        if Reachability.isConnectedToNetwork() {
+            
+            // Loop through all records and add to features array
+            var features = [AnyObject]()
+            for i in 0..<records.count {
+                let record = records[i]
+                
+                // Prepare the record to be written in JSON format and add to features array
+                let dictItem = record.prepareForJSON()
+                features.append(dictItem as AnyObject)
+            }
+            
+            // Add requred formatting for geojson, and start uploading procedure
+            let biggerDict = ["type":"FeatureCollection", "features": features] as [String : Any]
+            ud.uploadRecords(biggerDict as NSDictionary)
+            
+            // Move to an asynchronous thread and upload the media from the media array
+            let priority = DispatchQoS.QoSClass.default
+            DispatchQueue.global(qos: priority).async{
+                ud.uploadMedia()
+            }
+        } else {
+            
+            // If no network connection, show an alert
+            if #available(iOS 8.0, *) {
+                let alertVC = UIAlertController(title: "No connection detected", message: "Can't sync without a data connection", preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                alertVC.addAction(okAction)
+                present(alertVC, animated: true, completion: nil)
+            } else {
+                let alertVC = UIAlertView(title: "No connection detected", message: "Can't sync without a data connection", delegate: self, cancelButtonTitle: "OK")
+                alertVC.show()
+            }
+            
+            // Reactivate the buttons
+            activateButtons(enabled: true)
         }
         
-        tableView.allowsSelection = false
     }
+    
     
     // MARK: Navigation
     
     // Prepare before navigating away from table view
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "ShowMeasDetail" {
-            let recordDetailViewController = segue.destination as! MeasViewController
-            
-            // Get the cell that generated this segue.
+        
+        var recordDetailViewController: RecordViewController?
+        switch(segue.identifier!) {
+        case "ShowMeasDetail":
+            recordDetailViewController = segue.destination as! MeasViewController
+            break;
+        case "ShowNoteDetail":
+            recordDetailViewController = segue.destination as! NoteViewController
+            break;
+        case "ShowPhotoDetail":
+            recordDetailViewController = segue.destination as! PhotoViewController
+            break;
+        default:
+            break;
+        }
+        
+        // Get the cell that generated this segue.
+        if recordDetailViewController != nil {
             if let selectedRecordCell = tableView.cellForRow(at: tableView.indexPathForSelectedRow!) as? RecordTableViewCell {
                 let indexPath = tableView.indexPath(for: selectedRecordCell)!
                 let selectedRecord = records[(indexPath as NSIndexPath).row]
-                recordDetailViewController.record = selectedRecord
+                recordDetailViewController!.record = selectedRecord
             }
-        } else if segue.identifier == "ShowNoteDetail" {
-            let recordDetailViewController = segue.destination as! NoteViewController
-            
-            // Get the cell that generated this segue.
-            if let selectedRecordCell = tableView.cellForRow(at: tableView.indexPathForSelectedRow!) as? RecordTableViewCell {
-                let indexPath = tableView.indexPath(for: selectedRecordCell)!
-                let selectedRecord = records[(indexPath as NSIndexPath).row]
-                recordDetailViewController.record = selectedRecord
-            }
-        } else if segue.identifier == "ShowPhotoDetail" {
-            let recordDetailViewController = segue.destination as! PhotoViewController
-            
-            // Get the cell that generated this segue.
-            if let selectedRecordCell = tableView.cellForRow(at: tableView.indexPathForSelectedRow!) as? RecordTableViewCell {
-                let indexPath = tableView.indexPath(for: selectedRecordCell)!
-                let selectedRecord = records[(indexPath as NSIndexPath).row]
-                recordDetailViewController.record = selectedRecord
-            }
-        } else if segue.identifier == "Logout" {
-            
         }
     }
     
@@ -412,9 +355,9 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
             saveRecords()
         }
         
-        saveUserVars()
-        saveLogin()
+        UserVars.saveUserVars()
     }
+    
     
     // MARK: NSCoding
     
@@ -450,27 +393,33 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         return nil
     }
     
-    func saveLogin() {
-        // Create a login object with the user variables
-        let loginInfo = LoginInfo(uuid: UserVars.UUID)
-        
-        // Save the login object
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo!, toFile: LoginInfo.ArchiveURL.path)
-        
-        if !isSuccessfulSave {
-            print("Failed to save login info...")
+    
+    // MARK: Helper methods
+    
+    // Find the index of an item in the Media array based on the media name
+    func indexOfMedia(_ medianame: String) -> Int {
+        var oldMediaIndex = 0
+        while oldMediaIndex < medias.count{
+            if medias[oldMediaIndex].mediaName == medianame {
+                return oldMediaIndex
+            }
+            oldMediaIndex += 1
         }
+        return -1
     }
     
-    func saveUserVars() {
-        let userVars = UserVarsSaveFile(userName: UserVars.UName, accessLevels: UserVars.AccessLevels, tags: UserVars.Tags, species: UserVars.Species, units: UserVars.Units, accessDefaults: UserVars.AccessDefaults, tagDefaults: UserVars.TagsDefaults, speciesDefault: UserVars.SpecDefault, unitsDefault: UserVars.UnitsDefault)
-        
-        NSLog("Attempting to save user variables to \(UserVars.UserVarsURL!.path)")
-        
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(userVars, toFile: (UserVars.UserVarsURL!.path))
-        
-        if !isSuccessfulSave {
-            NSLog("Failed to save user variables...")
+    func styleNavigationBar() {
+        let nav = self.navigationController?.navigationBar
+        nav?.barStyle = UIBarStyle.black
+        nav?.backgroundColor = UIColor(red: 0/255 as CGFloat, green: 0/255 as CGFloat, blue: 96/255 as CGFloat, alpha: 1)
+        self.navigationController?.navigationBar.tintColor = UIColor.lightGray
+    }
+    
+    func activateButtons (enabled: Bool) {
+        for b in [syncButton, logoutButton, editButtonItem] {
+            b!.isEnabled = enabled
         }
+        
+        tableView.allowsSelection = enabled
     }
 }

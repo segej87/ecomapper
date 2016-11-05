@@ -10,6 +10,7 @@ import UIKit
 
 class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationControllerDelegate {
     
+    
     // MARK: Class Variables
     
     /* 
@@ -20,8 +21,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     @IBOutlet weak var activityView: UIActivityIndicatorView!
     @IBOutlet weak var loginButton: UIButton!
     
-    // Will store the UUID to pass in to the record table view
-    var serverString: NSString?
     
     // MARK: Initialization
     
@@ -46,12 +45,17 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         }
         DispatchQueue.main.async {
             if let uvuuid = UserVars.UUID {
-                if self.loadUserVars(uuid: uvuuid) {
-                    self.performSegue(withIdentifier: "NewNotebook", sender: "saved login")
+                if UserVars.loadUserVars(uuid: uvuuid) {
+                    if Reachability.isConnectedToNetwork() {
+                        self.getListsUsingUUID(uvuuid, sender: "saved login")
+                    } else {
+                        self.performSegue(withIdentifier: "Notebook", sender: "saved login")
+                    }
                 }
             }
         }
     }
+    
     
     // MARK: UITextField Delegates
     
@@ -60,6 +64,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         // If a username and password have been provided, enable the login button
         if usernameView.text != "" && passwordView.text != "" {
             loginButton.isEnabled = true
+        } else {
+            loginButton.isEnabled = false
         }
     }
     
@@ -67,16 +73,22 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         //Hide the keyboard.
         textField.resignFirstResponder()
+        
+        if usernameView.text != "" && passwordView.text != "" {
+            loginButton.isEnabled = true
+        } else {
+            loginButton.isEnabled = false
+        }
         return true
     }
+    
     
     // MARK: Navigation
     
     // Actions to perform before segue away from login view controller
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Print login status to log.
-        print(sender!)
-//        NSLog("Logging in to username \(UserVars.UName!) with \(sender!)")
+        NSLog("Logging in to username \(UserVars.UName!) with \(sender!)")
     }
     
     // When the app returns to the login page, clear key variables
@@ -84,22 +96,13 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         // Make sure the text fields and login result are blank
         usernameView.text = ""
         passwordView.text = ""
-        serverString = nil
         
         // Clear all of the user variables
-        UserVars.UUID = nil
-        UserVars.UName = nil
-        UserVars.AccessLevels = ["Public", "Private"]
-        UserVars.Tags = [String:[AnyObject]]()
-        UserVars.Species = [String:[AnyObject]]()
-        UserVars.Units = [String:[AnyObject]]()
-        UserVars.AccessDefaults = nil
-        UserVars.TagsDefaults = nil
-        UserVars.SpecDefault = nil
-        UserVars.UnitsDefault = nil
+        UserVars.clearUserVars()
         
-        saveLogin(loginInfo: LoginInfo(uuid: UserVars.UUID)!)
+        saveLogin(loginInfo: LoginInfo(uuid: UserVars.UUID))
     }
+    
     
     // MARK: Actions
 
@@ -110,6 +113,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         // Try to login
         self.attemptLogin()
     }
+    
     
     // MARK: Login authentication
     
@@ -126,17 +130,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
             self.activityView.stopAnimating()
             
             // Present an error message indicating that there is no connection
-            if #available(iOS 9.0, *) {
-                let alertVC = UIAlertController(title: "Login Error", message: "No internet - please check your connection", preferredStyle: .alert)
-                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-                alertVC.addAction(okAction)
-                self.present(alertVC, animated: true, completion: nil)
-            } else {
-                let alertVC = UIAlertView(title: "Login Error", message: "No internet - please check your connection", delegate: self, cancelButtonTitle: "OK")
-                alertVC.show()
-            }
+            showAlertDialog(title: "Network Error", message: "Make sure you are connected to the Internet")
         }
     }
+    
     
     // MARK: Server Ops
     
@@ -169,25 +166,21 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
             
             // Perform rest of login procedure after background server session finishes
             DispatchQueue.main.async {
-                // For reference, print the response string to the log
-                NSLog("Login server response: \(responseString!)")
-                
-                // Set the instance property loginString to the server's response
-                self.serverString = responseString
-                
                 // Boolean to check whether the server's response was nil, or whether an error was returned
-                let loginSuccess = responseString != nil && responseString!.length == 36
+                let loginSuccess = responseString != nil && !responseString!.contains("Error")
                 
-                /* If the login attempt was successful, set the structure variable uuid and segue to the record table view controller. If the attempt was unsuccessful, present an alert with the login error.
+                /* If the login attempt was successful, set the UUID User Variable and load lists. If the attempt was unsuccessful, present an alert with the login error.
                  */
                 if loginSuccess {
-                    UserVars.UUID = self.serverString?.lowercased
+                    // Set the instance property loginString to the server's response
+                    UserVars.UUID = responseString?.lowercased
                     
-                    if self.loadUserVars(uuid: UserVars.UUID!) {
-                        UserVars.UName = self.usernameView.text
+                    if UserVars.loadUserVars(uuid: UserVars.UUID!) {
+                        NSLog("Loading user variables")
                     }
+                    UserVars.UName = self.usernameView.text
                     
-                    self.getListsUsingUUID(UserVars.UUID!)
+                    self.getListsUsingUUID(UserVars.UUID!, sender: "new login")
                 } else {
                     // Stop the activity indicator
                     self.activityView.stopAnimating()
@@ -196,29 +189,21 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                      as configured on the PHP server
                      */
                     var errorString: String?
-                    if self.serverString!.replacingOccurrences(of: "Error", with: "") != self.serverString! as String {
-                        errorString = self.serverString!.replacingOccurrences(of: "Error: ",with: "")
+                    if responseString!.contains("Error") {
+                        errorString = responseString!.replacingOccurrences(of: "Error: ", with: "")
                     } else {
-                        errorString = "Can't connect to the server - please check your internet connection"
+                        errorString = "Network Error - check your Internet connection"
                     }
                     
                     // Present the error to the user
-                    if #available(iOS 9.0, *) {
-                        let alertVC = UIAlertController(title: "Login Error", message: "\(errorString!)", preferredStyle: .alert)
-                        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-                        alertVC.addAction(okAction)
-                        self.present(alertVC, animated: true, completion: nil)
-                    } else {
-                        let alertVC = UIAlertView(title: "Login Error", message: "\(errorString!)", delegate: self, cancelButtonTitle: "OK")
-                        alertVC.show()
-                    }
+                    self.showAlertDialog(title: "Login Error", message: errorString!)
                 }
             }
         }) 
         task.resume()
     }
     
-    func getListsUsingUUID(_ uuid: String) {
+    func getListsUsingUUID(_ uuid: String, sender: String) {
         // Establish a request to the server-side PHP script, and define the method as POST
         let request = NSMutableURLRequest(url: URL(string: UserVars.listScript)!)
         request.httpMethod = "POST"
@@ -249,66 +234,35 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
             DispatchQueue.main.async {
                 
                 // For reference, print the response string to the log
-                print("Login list response: \(responseString!)")
+                NSLog("List server response: \(responseString!)")
                 
                 // Boolean to check whether the server's response was nil, or whether an error was returned
-                let listSuccess = responseString! != ""
+                let listSuccess = responseString! != "" && !responseString!.contains("Error")
                 
-                // If the login attempt was successful, set the user variables for use by other classes and segue to the record table view controller. If the attempt was unsuccessful, present an alert with the login error.
+                // If the attempt was successful, set the User Variables and segue to the notebook view controller. If the attempt was unsuccessful, present an alert dialog.
                 if listSuccess {
                     do {
                         // Encode the response string as data, then parse JSON
                         let responseData = responseString!.data(using: String.Encoding.utf8.rawValue)
                         let responseArray = try JSONSerialization.jsonObject(with: responseData!, options: JSONSerialization.ReadingOptions()) as! [String:AnyObject]
                         
-                        // Initialize an array of all keys to read from the server response
-                        let keys = ["institutions","tags","species","units"]
-                        
-                        // Read the arrays corresponding to the keys, and write to user variables
-                        for k in keys {
-                            let kArray = responseArray[k] as! [String]
-                            
-                            if kArray.count != 1 && !kArray[0].contains("Warning:") {
-                                for i in kArray {
-                                    switch k {
-                                    case "institutions":
-                                        if !UserVars.AccessLevels.contains(i) {
-                                            UserVars.AccessLevels.append(i)
-                                        }
-                                    case "tags":
-                                        if !UserVars.Tags.keys.contains(i) || (UserVars.Tags.keys.contains(i) && UserVars.Tags[i]![0] as! String == "Local") {
-                                            UserVars.Tags[i] = ["Server" as AnyObject,0 as AnyObject]
-                                        }
-                                    case "species":
-                                        if !UserVars.Species.keys.contains(i) || (UserVars.Species.keys.contains(i) && UserVars.Species[i]![0] as! String == "Local") {
-                                            UserVars.Species[i] = ["Server" as AnyObject,0 as AnyObject]
-                                        }
-                                    case "units":
-                                        if !UserVars.Units.keys.contains(i) || (UserVars.Units.keys.contains(i) && UserVars.Units[i]![0] as! String == "Local") {
-                                            UserVars.Units[i] = ["Server" as AnyObject,0 as AnyObject]
-                                        }
-                                    default:
-                                        print("Login list retrieval error: unexpected key")
-                                    }
-                                }
-                                
-                                //TODO: deal with any items that are no longer on the server.
-                            }
-                        }
+                        // Mesh the server's response with saved user variables
+                        UserVars.meshUserVars(array: responseArray)
                         
                         // Write the user variables to the login object and save
-                        self.saveLogin(loginInfo: LoginInfo(uuid: UserVars.UUID)!)
+                        self.saveLogin(loginInfo: LoginInfo(uuid: UserVars.UUID))
                         
-                        self.saveUserVars()
+                        // Save the user variables
+                        UserVars.saveUserVars()
                         
                         // Stop the activity indicator
                         self.activityView.stopAnimating()
                         
-                        // Perform a segue to the record table view controller
-                        self.performSegue(withIdentifier: "NewNotebook", sender: "new login")
+                        // Perform a segue to the notebook view controller
+                        self.performSegue(withIdentifier: "Notebook", sender: sender)
                         
                     } catch let error as NSError {
-                        print("Login list retrieve parse error: \(error.localizedDescription)")
+                        NSLog("Login list retrieve parse error: \(error.localizedDescription)")
                     }
                 } else {
                     // Stop the activity indicator
@@ -316,27 +270,19 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                     
                     // Show the error to the user as an alert controller
                     var errorString: String?
-                    if self.serverString!.replacingOccurrences(of: "Error", with: "") != self.serverString! as String {
-                        errorString = self.serverString!.replacingOccurrences(of: "Error: ",with: "")
+                    if responseString!.contains("Error") {
+                        errorString = responseString!.replacingOccurrences(of: "Error: ",with: "")
                     } else {
-                        errorString = "Can't connect to the server - please check your internet connection"
+                        errorString = "Network Error - check your Internet connection"
                     }
                     
-                    // Present an alert to the user
-                    if #available(iOS 9.0, *) {
-                        let alertVC = UIAlertController(title: "Login Error", message: "\(errorString!)", preferredStyle: .alert)
-                        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-                        alertVC.addAction(okAction)
-                        self.present(alertVC, animated: true, completion: nil)
-                    } else {
-                        let alertVC = UIAlertView(title: "Login Error", message: "\(errorString!)", delegate: self, cancelButtonTitle: "OK")
-                        alertVC.show()
-                    }
+                    self.showAlertDialog(title: "Login Error", message: errorString!)
                 }
             }
         }) 
         task.resume()
     }
+    
     
     // MARK: NSCoding
     
@@ -352,36 +298,18 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         return NSKeyedUnarchiver.unarchiveObject(withFile: LoginInfo.ArchiveURL.path) as? LoginInfo
     }
     
-    func saveUserVars() {
-        let userVars = UserVarsSaveFile(userName: UserVars.UName, accessLevels: UserVars.AccessLevels, tags: UserVars.Tags, species: UserVars.Species, units: UserVars.Units, accessDefaults: UserVars.AccessDefaults, tagDefaults: UserVars.TagsDefaults, speciesDefault: UserVars.SpecDefault, unitsDefault: UserVars.UnitsDefault)
-        
-        NSLog("Attempting to save user variables to \(UserVars.UserVarsURL!.path)")
-        
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(userVars, toFile: (UserVars.UserVarsURL!.path))
-        
-        if !isSuccessfulSave {
-            NSLog("Failed to save user variables...")
-        }
-    }
     
-    func loadUserVars(uuid: String) -> Bool {
-        if let path = UserVars.UserVarsURL?.path {
-            if let loadedUserVars = NSKeyedUnarchiver.unarchiveObject(withFile: path) as? UserVarsSaveFile {
-                NSLog("Loading user variables")
-                UserVars.UName = loadedUserVars.userName
-                UserVars.AccessLevels = loadedUserVars.accessLevels!
-                UserVars.Species = loadedUserVars.species!
-                UserVars.Tags = loadedUserVars.tags!
-                UserVars.Units = loadedUserVars.units!
-                UserVars.AccessDefaults = loadedUserVars.accessDefaults
-                UserVars.TagsDefaults = loadedUserVars.tagDefaults
-                UserVars.SpecDefault = loadedUserVars.speciesDefault
-                UserVars.UnitsDefault = loadedUserVars.unitsDefault
-                
-                return true;
-            }
+    // MARK: Helper Methods
+    
+    func showAlertDialog(title: String, message: String) {
+        if #available(iOS 9.0, *) {
+            let alertVC = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+            alertVC.addAction(okAction)
+            self.present(alertVC, animated: true, completion: nil)
+        } else {
+            let alertVC = UIAlertView(title: title, message: message, delegate: self, cancelButtonTitle: "OK")
+            alertVC.show()
         }
-        
-        return false;
     }
 }

@@ -455,7 +455,7 @@ class RecordTableViewController: UITableViewController {
         let loginInfo = LoginInfo(uuid: UserVars.UUID)
         
         // Save the login object
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo!, toFile: LoginInfo.ArchiveURL.path)
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo, toFile: LoginInfo.ArchiveURL.path)
         
         if !isSuccessfulSave {
             print("Failed to save login info...")

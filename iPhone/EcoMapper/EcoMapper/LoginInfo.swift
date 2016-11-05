@@ -22,7 +22,7 @@ class LoginInfo: NSObject, NSCoding {
     
     // MARK: Initialization
     
-    init?(uuid: String?){
+    init(uuid: String?){
         self.uuid = uuid
         
         super.init()

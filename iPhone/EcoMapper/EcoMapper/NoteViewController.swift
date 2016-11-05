@@ -9,7 +9,7 @@
 import UIKit
 import CoreLocation
 
-class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate {
+class NoteViewController: RecordViewController, UITextFieldDelegate, UITextViewDelegate, UINavigationControllerDelegate {
 
     // MARK: Properties
     // IB properties
@@ -22,27 +22,6 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     @IBOutlet weak var accessPickerButton: UIButton!
     @IBOutlet weak var tagPickerButton: UIButton!
 
-    // Class variables
-    // The Core Location manager
-    let locationManager = CLLocationManager()
-    
-    // Array to hold selected multi-pick items (tags and access levels)
-    var tagArray = [String]()
-    var accessArray = [String]()
-    
-    // For storing the user's location from the CLLocationManager delegate
-    var userLoc: [Double]?
-    
-    // This will be filled by the CLLocationManager delegate
-    var gpsAcc = 0.0
-    
-    // For storing the date and time when the view was opened
-    var dateTime: String?
-    
-    /*
-     This value is either passed by 'RecordTableViewController' in 'prepareForSegue(_:sender:)' or constructed as part of adding a new record.
-     */
-    var record: Record?
     
     // MARK: Initialization
     
@@ -68,34 +47,6 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         // Handle the notes field's user input through delegate callbacks.
         notesTextField.delegate = self
         
-        // Set up views if editing an existing Record.
-        if let record = record {
-            navigationItem.title = "Editing Note"
-            nameTextField.text = record.props["name"] as? String
-            accessTextField.text = (record.props["access"] as! [String]).joined(separator: ", ")
-            accessArray = record.props["access"] as! [String]
-            notesTextField.text = record.props["text"] as? String
-            tagTextField.text = (record.props["tags"] as! [String]).joined(separator: ", ")
-            tagArray = record.props["tags"] as! [String]
-            dateTime = record.props["datetime"] as? String
-            userLoc = record.coords
-            gpsAccView.isHidden = true
-        } else {
-            // Get the current datetime
-            getDateTime()
-            
-            // If location is authorized, start location services
-            locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            if #available(iOS 8.0, *) {
-                locationManager.requestWhenInUseAuthorization()
-            } else {
-                // Do nothing
-            }
-            
-            locationManager.startUpdatingLocation()
-        }
-        
         // Enable the Save button only if the required text fields have a valid name.
         checkValidName()
     }
@@ -118,9 +69,25 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
         checkValidName()
     }
     
+    
+    // MARK: UI Methods
+    
+    override func setupEditingMode(record: Record) {
+        navigationItem.title = "Editing Note"
+        nameTextField.text = record.props["name"] as? String
+        accessTextField.text = (record.props["access"] as! [String]).joined(separator: ", ")
+        accessArray = record.props["access"] as! [String]
+        notesTextField.text = record.props["text"] as? String
+        tagTextField.text = (record.props["tags"] as! [String]).joined(separator: ", ")
+        tagArray = record.props["tags"] as! [String]
+        dateTime = record.props["datetime"] as? String
+        userLoc = record.coords
+        gpsAccView.isHidden = true
+    }
+    
     // MARK: UITextViewDelegate
     
-    func checkValidName() {
+    override func checkValidName() {
         // Disable the Save button if the required text fields are empty.
         let text1 = nameTextField.text ?? ""
         let text2 = notesTextField.text ?? ""
@@ -135,8 +102,12 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
     }
     
     // MARK: Location methods
+    
+    override func updateGPS() {
+        gpsAccView.text = "Current GPS Accuracy: \(gpsAcc) m"
+    }
 
-    func noGPS() {
+    override func noGPS() {
         if #available(iOS 8.0, *) {
             let alertVC = UIAlertController(title: "No GPS", message: "Can't pinpoint your location, using default", preferredStyle: .alert)
             let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
@@ -146,40 +117,6 @@ class NoteViewController: UIViewController, UITextFieldDelegate, UITextViewDeleg
             let alertVC = UIAlertView(title: "No GPS", message: "Can't pinpoint your location, using default", delegate: self, cancelButtonTitle: "OK")
             alertVC.show()
         }
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last {
-            // Current implementation of best accuracy algorithm
-            if location.horizontalAccuracy < gpsAcc || gpsAcc == 0.0 {
-                gpsAcc = location.horizontalAccuracy
-                let lon = location.coordinate.longitude
-                let lat = location.coordinate.latitude
-                self.userLoc = [lon, lat]
-                print("New best accuracy: \(gpsAcc) m")
-                
-                gpsAccView.text = "Current GPS Accuracy: \(gpsAcc) m"
-            }
-        }
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("Failed to find user's location: \(error.localizedDescription)")
-        print("No location found, using default")
-        noGPS()
-        let lon = -123.45
-        let lat = 67.89
-        self.userLoc = [lon, lat]
-        checkValidName()
-    }
-    
-    // MARK: Date methods
-    
-    func getDateTime(){
-        let currentDate = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        dateTime = dateFormatter.string(from: currentDate)
     }
     
     // MARK: Navigation

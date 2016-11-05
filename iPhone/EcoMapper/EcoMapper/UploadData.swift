@@ -13,9 +13,9 @@ open class UploadData {
     
     // MARK: Properties
     // The calling table view
-    var tableView: RecordTableViewController?
+    var tableView: NotebookViewController?
     
-    init?(tableView: RecordTableViewController?) {
+    init?(tableView: NotebookViewController?) {
         self.tableView = tableView
         
         if tableView == nil {
@@ -315,7 +315,7 @@ open class UploadData {
                             }
                         }
                         
-                        self.tableView!.saveLogin()
+                        UserVars.saveUserVars()
                         
                         // Reactivate the buttons and table
                         self.enableButtons()
@@ -350,7 +350,7 @@ open class UploadData {
     //MARK: General helper methods
     
     func enableButtons () {
-        for b in [self.tableView!.syncButton, self.tableView!.logoutButton, self.tableView!.newButton,self.tableView!.editButtonItem] {
+        for b in [self.tableView!.syncButton, self.tableView!.logoutButton,self.tableView!.editButtonItem] {
             b!.isEnabled = true
         }
         
