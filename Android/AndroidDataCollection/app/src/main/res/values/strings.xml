@@ -6,6 +6,7 @@
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Login</string>
     <string name="action_sign_in_short">Login</string>
+    <string name="slogan">Your world. Your voice.</string>
     <string name="error_invalid_email">Please enter a valid username</string>
     <string name="error_invalid_password">This password is invalid</string>
     <string name="error_incorrect_password">This password is incorrect</string>

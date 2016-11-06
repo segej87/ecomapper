@@ -1,6 +1,7 @@
 package com.kora.android;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -34,10 +35,18 @@ public class StartScreen extends AppCompatActivity {
             if (!savedUUID.equals("")) {
                 Log.i(TAG,getString(R.string.saved_login_log, savedUUID));
                 UserVars.UUID = savedUUID;
+
                 UserVars.UserVarsSaveFileName = getString(R.string.user_vars_file_prefix) + savedUUID;
                 String userVarsResult = DataIO.loadUserVars(this);
+
                 Log.i(TAG,getString(R.string.load_user_vars_report,userVarsResult));
-                moveToNotebook();
+
+                if (DataIO.isNetworkConnected(this)) {
+                    UserListsTask ult = new UserListsTask(savedUUID);
+                    ult.execute((Void) null);
+                } else {
+                    moveToNotebook();
+                }
             } else {
                 moveToLogin();
             }
@@ -60,6 +69,42 @@ public class StartScreen extends AppCompatActivity {
         Intent intent = new Intent(StartScreen.this, LoginActivity.class);
         startActivity(intent);
         this.finish();
+    }
+
+    //endregion
+
+    //region User Variables
+
+    /**
+     * An asynchronous task to retrieve user-specific lists and variables from the server.
+     */
+    public class UserListsTask extends AsyncTask<Void, Void, String> {
+
+        private final String uuid;
+
+        UserListsTask(String uuidIn) {
+            uuid = uuidIn;
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            return DataIO.retrieveLists(StartScreen.this, uuid);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            boolean meshListResult = DataIO.meshUserVars(StartScreen.this, result);
+
+            if (meshListResult && !(result.startsWith(getString(R.string.server_error_string)))) {
+                DataIO.saveUserVars(StartScreen.this);
+            } else if (!meshListResult) {
+                Log.e(TAG, getString(R.string.save_user_vars_failure));
+            } else if (result.contains(getString(R.string.server_connection_error))) {
+                Log.e(TAG, getString(R.string.internet_failure_title));
+            }
+
+            moveToNotebook();
+        }
     }
 
     //endregion

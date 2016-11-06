@@ -3,10 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.kora.android.LoginActivity">
+    tools:context="com.kora.android.LoginActivity" >
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/notebook_toolbar"
@@ -17,76 +16,90 @@
 
     <!-- Login progress -->
 
-    <ProgressBar
-        android:id="@+id/login_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
-
-    <ScrollView
-        android:id="@+id/login_form"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content" >
 
-        <LinearLayout
-            android:id="@+id/email_login_form"
+        <ImageView
+            android:contentDescription="@string/cast_expanded_controller_background_image"
+            android:id="@+id/background_image_view"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:src="@mipmap/login_image"
+            android:scaleType="centerCrop"/>
+
+        <EditText
+            android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@mipmap/login_image"
-            android:paddingBottom="91dp">
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:padding="5dp"
+            android:textSize="@dimen/text_size_medium"
+            android:textAlignment="center"
+            android:hint="@string/prompt_username"
+            android:maxLines="1"
+            android:inputType="textNoSuggestions"
+            android:background="?attr/actionModeBackground"
+            android:alpha="0.85"
+            android:gravity="center_vertical|center_horizontal" />
 
-                <EditText
-                    android:id="@+id/username"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prompt_username"
-                    android:maxLines="1"
-                    android:inputType="textNoSuggestions"
-                    android:background="?attr/actionModeBackground"
-                    android:alpha="0.75"
-                    android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:layout_marginLeft="25dp"
-                    android:layout_marginRight="25dp"
-                    android:textSize="@dimen/text_size_medium"
-                    android:textAlignment="center"
-                    android:gravity="center_vertical|center_horizontal" />
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/username"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:padding="5dp"
+            android:textSize="@dimen/text_size_medium"
+            android:textAlignment="center"
+            android:hint="@string/prompt_password"
+            android:maxLines="1"
+            android:inputType="textPassword"
+            android:background="?attr/actionModeBackground"
+            android:alpha="0.85"
+            android:gravity="center_vertical|center_horizontal"
+            android:imeActionId="@+id/login"
+            android:imeActionLabel="@string/action_sign_in_short"
+            android:imeOptions="actionUnspecified" />
 
-                <EditText
-                    android:id="@+id/password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/prompt_password"
-                    android:imeActionId="@+id/login"
-                    android:imeActionLabel="@string/action_sign_in_short"
-                    android:imeOptions="actionUnspecified"
-                    android:inputType="textPassword"
-                    android:maxLines="1"
-                    android:background="?attr/actionModeBackground"
-                    android:alpha="0.75"
-                    android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:layout_marginLeft="25dp"
-                    android:layout_marginRight="25dp"
-                    android:textSize="@dimen/text_size_medium"
-                    android:textAlignment="center"
-                    android:gravity="center_vertical|center_horizontal" />
+        <Button
+            android:id="@+id/email_sign_in_button"
+            style="?android:textAppearanceSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/password"
+            android:background="@color/darkBlue"
+            android:textColor="@color/light"
+            android:layout_marginTop="32dp"
+            android:text="@string/action_sign_in"
+            android:textStyle="bold"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp" />
 
-            <Button
-                android:id="@+id/email_sign_in_button"
-                style="?android:textAppearanceSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/darkBlue"
-                android:textColor="@color/light"
-                android:layout_marginTop="32dp"
-                android:text="@string/action_sign_in"
-                android:textStyle="bold"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp" />
+        <ProgressBar
+            android:id="@+id/login_progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_below="@+id/email_sign_in_button"
+            android:visibility="gone" />
 
-        </LinearLayout>
-    </ScrollView>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/background_image_view"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:gravity="center"
+            android:textSize="@dimen/font_default_size"
+            android:text="@string/slogan"/>
+
+    </RelativeLayout>
 
 </LinearLayout>

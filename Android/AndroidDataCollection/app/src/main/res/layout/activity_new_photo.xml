@@ -43,14 +43,14 @@
             <ImageButton
                 android:id="@+id/photoButton"
                 android:contentDescription="@string/photo_button_description"
+                android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:maxWidth="300dp"
                 android:maxHeight="300dp"
-                android:layout_height="wrap_content"
                 android:scaleType="fitCenter"
                 android:adjustViewBounds="true"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_menu_camera"
+                android:src="@mipmap/camera_sized"
                 />
 
             <EditText

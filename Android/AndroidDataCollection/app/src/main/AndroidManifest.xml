@@ -40,7 +40,8 @@
             </intent-filter>
         </activity>
         <activity android:name="com.kora.android.NewMeas" />
-        <activity android:name="com.kora.android.LoginActivity" />
+        <activity android:name="com.kora.android.LoginActivity"
+            android:screenOrientation="portrait" />
         <activity android:name="com.kora.android.NewPhoto" />
         <activity android:name="com.kora.android.NewNote" />
         <activity android:name="com.kora.android.Notebook" />

@@ -152,38 +152,44 @@ final class DataIO {
             // Try to decode the list server's response as a JSON string.
             JSONObject jObject = new JSONObject(result);
 
-            // Add access levels to User Variables only if they aren't already there.
-            JSONArray accessArray = jObject.getJSONArray("institutions");
-            for (int i = 0; i < accessArray.length(); i++) {
-                if (!accessArray.getString(i).contains(context.getString(R.string.server_warning_string)) &&
-                        !UserVars.AccessLevels.contains(accessArray.getString(i))) {
-                    UserVars.AccessLevels.add(accessArray.getString(i));
-                }
-            }
+            String[] keys = new String[]{"institutions","tags","species","units"};
 
             // For lists pulled from the server, tag each as server and 0 count.
             Object[] addArray = createUserVarAddArray("Server");
 
-            // Put values from each JSON Array into the appropriate maps.
+            for (String k : keys) {
+                JSONArray array = jObject.getJSONArray(k);
 
-            JSONArray tagsArray = jObject.getJSONArray("tags");
-            for (int i=0; i<tagsArray.length(); i++) {
-                if (!tagsArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
-                    UserVars.Tags.put(tagsArray.getString(i), addArray);
-                }
-            }
-
-            JSONArray specArray = jObject.getJSONArray("species");
-            for (int i = 0; i < specArray.length(); i++) {
-                if (!specArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
-                    UserVars.Species.put(specArray.getString(i), addArray);
-                }
-            }
-
-            JSONArray unitArray = jObject.getJSONArray("units");
-            for (int i = 0; i < unitArray.length(); i++) {
-                if (!unitArray.getString(i).contains(context.getString(R.string.server_warning_string))) {
-                    UserVars.Units.put(unitArray.getString(i), addArray);
+                switch (k) {
+                    case "institutions":
+                        for (int i = 0; i < array.length(); i++) {
+                            if (!array.getString(i).contains(context.getString(R.string.server_warning_string)) &&
+                                    !UserVars.AccessLevels.contains(array.getString(i))) {
+                                UserVars.AccessLevels.add(array.getString(i));
+                            }
+                        }
+                        break;
+                    case "tags":
+                        for (int i=0; i<array.length(); i++) {
+                            if (!array.getString(i).contains(context.getString(R.string.server_warning_string))) {
+                                UserVars.Tags.put(array.getString(i), addArray);
+                            }
+                        }
+                        break;
+                    case "species":
+                        for (int i = 0; i < array.length(); i++) {
+                            if (!array.getString(i).contains(context.getString(R.string.server_warning_string))) {
+                                UserVars.Species.put(array.getString(i), addArray);
+                            }
+                        }
+                        break;
+                    case "units":
+                        for (int i = 0; i < array.length(); i++) {
+                            if (!array.getString(i).contains(context.getString(R.string.server_warning_string))) {
+                                UserVars.Units.put(array.getString(i), addArray);
+                            }
+                        }
+                        break;
                 }
             }
 
