@@ -118,18 +118,28 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     
     // Method for populating data in the table view
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // Table view cells are reused and should be dequeued using a cell identifier.
+        let cellIdentifier = "PickerTableViewCell"
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! PickerTableViewCell
         
-        let cell:UITableViewCell = self.tableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
+        cell.itemType = itemType!
         
         if (indexPath as NSIndexPath).section == 0 {
-            cell.textLabel?.text = self.selectedItems[(indexPath as NSIndexPath).row]
+            let rowItem = self.selectedItems[(indexPath as NSIndexPath).row]
+            cell.value = rowItem
+            cell.defaultButton.isHidden = false
+            cell.defaultButton.isEnabled = true
+            
+            cell.isDefault = checkDefault(value: rowItem)
         } else if (indexPath as NSIndexPath).section == 1 {
+            cell.defaultButton.isHidden = true
+            cell.defaultButton.isEnabled = false
             if (searchActive) {
                 if listItems.count > 0 {
-                    cell.textLabel?.text = self.listItems[(indexPath as NSIndexPath).row]
+                    cell.value = self.listItems[(indexPath as NSIndexPath).row]
                 }
             } else {
-                cell.textLabel?.text = self.fullItems[(indexPath as NSIndexPath).row]
+                cell.value = self.fullItems[(indexPath as NSIndexPath).row]
             }
         }
         
@@ -268,6 +278,18 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         self.tableView.reloadData()
     }
     
+    // MARK: Actions
+    
+    @IBAction func cancel(_ sender: UIButton) {
+        self.dismiss(animated: false, completion: nil)
+        print("cancel")
+    }
+    
+    @IBAction func save(_ sender: UIButton) {
+        print("List picker selected: \(selectedItems.joined(separator: ", "))")
+        
+    }
+    
     // MARK: Helper methods
     
     func sortLists () {
@@ -291,15 +313,18 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         }
     }
     
-    // MARK: Actions
-    
-    @IBAction func cancel(_ sender: UIButton) {
-        self.dismiss(animated: false, completion: nil)
-        print("cancel")
-    }
-    
-    @IBAction func save(_ sender: UIButton) {
-        print("List picker selected: \(selectedItems.joined(separator: ", "))")
-        
+    func checkDefault(value: String) -> Bool {
+        switch (itemType!) {
+        case "tags":
+            return UserVars.TagsDefaults.contains(value)
+        case "species":
+            return UserVars.SpecDefault != nil && UserVars.SpecDefault == value
+        case "units":
+            return UserVars.UnitsDefault != nil && UserVars.UnitsDefault == value
+        case "access":
+            return UserVars.AccessDefaults.contains(value)
+        default:
+            return false
+        }
     }
 }

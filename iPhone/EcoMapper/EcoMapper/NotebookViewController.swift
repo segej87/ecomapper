@@ -20,6 +20,9 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var syncButton: UIBarButtonItem!
     @IBOutlet weak var logoutButton: UIBarButtonItem!
     @IBOutlet weak var editButton: UIBarButtonItem!
+    @IBOutlet weak var mediaMonitor: UIView!
+    @IBOutlet weak var mediaProgress: UIActivityIndicatorView!
+    @IBOutlet weak var mediaCounter: UILabel!
     
     /*
      An object to store lists retrieved from the server
@@ -57,6 +60,8 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         
         tableView.delegate = self
         tableView.dataSource = self
+        
+        mediaMonitorManager()
     }
     
     override func didReceiveMemoryWarning() {
@@ -211,8 +216,29 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-    @IBAction func attemptSync(_ sender: UIBarButtonItem) {
+    @IBAction func attemptMediaUpload(_ sender: UITapGestureRecognizer) {
+        // Initialize the class for uploading data
+        let ud = UploadData(tableView: self)!
         
+        NSLog("Attempting to upload medias")
+        ud.uploadMedia()
+    }
+    
+    @IBAction func attemptSync(_ sender: UIBarButtonItem) {
+        if #available(iOS 8.0, *) {
+            let alertVC = UIAlertController(title: "Are you sure?", message: "All records will be removed after syncing.", preferredStyle: .alert)
+            let syncAction = UIAlertAction(title: "Sync", style: .default, handler: self.executeSync)
+            let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
+            alertVC.addAction(syncAction)
+            alertVC.addAction(cancelAction)
+            present(alertVC, animated: true, completion: nil)
+        } else {
+            let alertVC = UIAlertView(title: "No GPS", message: "Can't pinpoint your location, using default", delegate: self, cancelButtonTitle: "OK")
+            alertVC.show()
+        }
+    }
+    
+    func executeSync(action: UIAlertAction) -> Void {
         // Deactivate the buttons while uploading
         activateButtons(enabled: false)
         
@@ -239,6 +265,7 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
             // Move to an asynchronous thread and upload the media from the media array
             let priority = DispatchQoS.QoSClass.default
             DispatchQueue.global(qos: priority).async{
+                self.markMedias()
                 ud.uploadMedia()
             }
         } else {
@@ -257,28 +284,56 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
             // Reactivate the buttons
             activateButtons(enabled: true)
         }
-        
     }
     
     
+    
     // MARK: Navigation
+    
+    // Handle the logout button
+    
+    @IBAction func handleLogout(_ sender: UIBarButtonItem) {
+        if #available(iOS 8.0, *) {
+            let alertVC = UIAlertController(title: "Logout?", message: "Are you sure you want to leave Kora?", preferredStyle: .alert)
+            let leaveAction = UIAlertAction(title: "Logout", style: .default, handler: self.executeLogout)
+            let stayAction = UIAlertAction(title: "Stay", style: .default, handler: nil)
+            alertVC.addAction(leaveAction)
+            alertVC.addAction(stayAction)
+            present(alertVC, animated: true, completion: nil)
+        } else {
+            let alertVC = UIAlertView(title: "No GPS", message: "Can't pinpoint your location, using default", delegate: self, cancelButtonTitle: "OK")
+            alertVC.show()
+        }
+    }
+    
+    func executeLogout(action: UIAlertAction) -> Void {
+        // Clear all of the user variables
+        UserVars.clearUserVars()
+        
+        UserVars.saveLogin(loginInfo: LoginInfo(uuid: UserVars.UUID))
+        
+        self.performSegue(withIdentifier: "LogoutSegue", sender: self)
+    }
+    
     
     // Prepare before navigating away from table view
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         var recordDetailViewController: RecordViewController?
-        switch(segue.identifier!) {
-        case "ShowMeasDetail":
-            recordDetailViewController = segue.destination as! MeasViewController
-            break;
-        case "ShowNoteDetail":
-            recordDetailViewController = segue.destination as! NoteViewController
-            break;
-        case "ShowPhotoDetail":
-            recordDetailViewController = segue.destination as! PhotoViewController
-            break;
-        default:
-            break;
+        if let identifier = segue.identifier {
+            switch(identifier) {
+            case "ShowMeasDetail":
+                recordDetailViewController = segue.destination as! MeasViewController
+                break;
+            case "ShowNoteDetail":
+                recordDetailViewController = segue.destination as! NoteViewController
+                break;
+            case "ShowPhotoDetail":
+                recordDetailViewController = segue.destination as! PhotoViewController
+                break;
+            default:
+                break;
+            }
         }
         
         // Get the cell that generated this segue.
@@ -395,6 +450,35 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     
     
     // MARK: Helper methods
+    
+    func markMedias() {
+        for m in medias {
+            m.marked = true
+        }
+        
+        saveMedia()
+        
+        mediaMonitorManager()
+    }
+    
+    func mediaMonitorManager() {
+        var mmSize = 0
+        for m in medias {
+            if m.marked! {
+                mmSize += 1
+            }
+        }
+        
+        if mmSize == 0 {
+            mediaMonitor.isHidden = true
+        } else {
+            if mediaMonitor.isHidden {
+                mediaMonitor.isHidden = false
+            }
+            
+            mediaCounter.text = String(mmSize)
+        }
+    }
     
     // Find the index of an item in the Media array based on the media name
     func indexOfMedia(_ medianame: String) -> Int {

@@ -38,22 +38,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         
         // Deactivate the login button when username and password are blank
         loginButton.isEnabled = false
-        
-        // If a uuid is already available (user is already logged in) go directly to record table view.
-        if let savedLogin = loadLogin() {
-            UserVars.UUID = savedLogin.uuid
-        }
-        DispatchQueue.main.async {
-            if let uvuuid = UserVars.UUID {
-                if UserVars.loadUserVars(uuid: uvuuid) {
-                    if Reachability.isConnectedToNetwork() {
-                        self.getListsUsingUUID(uvuuid, sender: "saved login")
-                    } else {
-                        self.performSegue(withIdentifier: "Notebook", sender: "saved login")
-                    }
-                }
-            }
-        }
     }
     
     
@@ -100,7 +84,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         // Clear all of the user variables
         UserVars.clearUserVars()
         
-        saveLogin(loginInfo: LoginInfo(uuid: UserVars.UUID))
+        UserVars.saveLogin(loginInfo: LoginInfo(uuid: UserVars.UUID))
     }
     
     
@@ -250,7 +234,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
                         UserVars.meshUserVars(array: responseArray)
                         
                         // Write the user variables to the login object and save
-                        self.saveLogin(loginInfo: LoginInfo(uuid: UserVars.UUID))
+                        UserVars.saveLogin(loginInfo: LoginInfo(uuid: UserVars.UUID))
                         
                         // Save the user variables
                         UserVars.saveUserVars()
@@ -282,22 +266,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         }) 
         task.resume()
     }
-    
-    
-    // MARK: NSCoding
-    
-    func saveLogin(loginInfo: LoginInfo) {
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo, toFile: LoginInfo.ArchiveURL.path)
-        
-        if !isSuccessfulSave {
-            NSLog("Failed to save login info...")
-        }
-    }
-    
-    func loadLogin() -> LoginInfo? {
-        return NSKeyedUnarchiver.unarchiveObject(withFile: LoginInfo.ArchiveURL.path) as? LoginInfo
-    }
-    
     
     // MARK: Helper Methods
     

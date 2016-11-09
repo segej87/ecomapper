@@ -63,14 +63,14 @@ struct UserVars {
      An array of access levels, with the built-in public and private options
      */
     static var AccessLevels = ["Public", "Private"]
-
+    
     /*
      New key-value pairs object for tags
      */
     static var Tags = [String:[AnyObject]]()
     
     /*
-    New key-value pairs object for species
+     New key-value pairs object for species
      */
     static var Species = [String:[AnyObject]]()
     
@@ -82,8 +82,8 @@ struct UserVars {
     /*
      Defaults
      */
-    static var AccessDefaults: [String]?
-    static var TagsDefaults: [String]?
+    static var AccessDefaults = [String]()
+    static var TagsDefaults = [String]()
     static var SpecDefault: String?
     static var UnitsDefault: String?
     
@@ -91,8 +91,8 @@ struct UserVars {
      Location settings
      */
     static let maxUpdateTime = 1
-    static let minGPSAccuracy = 50
-    static let minGPSStability = 50
+    static let minGPSAccuracy = 50 as Double
+    static let minGPSStability = 50 as Double
     
     /*
      Static string server URLs
@@ -112,6 +112,14 @@ struct UserVars {
     
     
     // MARK: functions
+    
+    static func saveLogin(loginInfo: LoginInfo) {
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo, toFile: LoginInfo.ArchiveURL.path)
+        
+        if !isSuccessfulSave {
+            NSLog("Failed to save login info...")
+        }
+    }
     
     static func meshUserVars(array: [String:AnyObject]) {
         // Initialize an array of all keys to read from the server response
@@ -191,8 +199,8 @@ struct UserVars {
         Tags = [String:[AnyObject]]()
         Species = [String:[AnyObject]]()
         Units = [String:[AnyObject]]()
-        AccessDefaults = nil
-        TagsDefaults = nil
+        AccessDefaults = [String]()
+        TagsDefaults = [String]()
         SpecDefault = nil
         UnitsDefault = nil
     }
@@ -201,13 +209,14 @@ struct UserVars {
         // Modify the UserVar lists associated with the record
         let prevArray = record.props["tags"] as? [String]
         for p in prevArray! {
-            var pTag = UserVars.Tags[p]
-            if pTag![0] as! String == "Local" {
-                pTag![1] = ((pTag![1] as! Int - 1) as AnyObject)
-                if pTag![1] as! Int == 0 {
-                    UserVars.Tags.removeValue(forKey: p)
-                } else {
-                    UserVars.Tags[p] = pTag!
+            if var pTag = UserVars.Tags[p] {
+                if pTag[0] as! String == "Local" {
+                    pTag[1] = ((pTag[1] as! Int - 1) as AnyObject)
+                    if pTag[1] as! Int == 0 {
+                        UserVars.Tags.removeValue(forKey: p)
+                    } else {
+                        UserVars.Tags[p] = pTag
+                    }
                 }
             }
         }
@@ -215,26 +224,28 @@ struct UserVars {
         if record.props["datatype"] as! String == "meas" {
             let specArray = record.props["species"]?.components(separatedBy: ", ")
             for s in specArray! {
-                var sTag = UserVars.Species[s]
-                if sTag![0] as! String == "Local" {
-                    sTag![1] = ((sTag![1] as! Int - 1) as AnyObject)
-                    if sTag![1] as! Int == 0 {
-                        UserVars.Species.removeValue(forKey: s)
-                    } else {
-                        UserVars.Species[s] = sTag!
+                if var sTag = UserVars.Species[s] {
+                    if sTag[0] as! String == "Local" {
+                        sTag[1] = ((sTag[1] as! Int - 1) as AnyObject)
+                        if sTag[1] as! Int == 0 {
+                            UserVars.Species.removeValue(forKey: s)
+                        } else {
+                            UserVars.Species[s] = sTag
+                        }
                     }
                 }
             }
             
             let unitArray = record.props["units"]?.components(separatedBy: ", ")
             for u in unitArray! {
-                var uTag = UserVars.Units[u]
-                if uTag![0] as! String == "Local" {
-                    uTag![1] = ((uTag![1] as! Int - 1) as AnyObject)
-                    if uTag![1] as! Int == 0 {
-                        UserVars.Units.removeValue(forKey: u)
-                    } else {
-                        UserVars.Units[u] = uTag!
+                if var uTag = UserVars.Units[u] {
+                    if uTag[0] as! String == "Local" {
+                        uTag[1] = ((uTag[1] as! Int - 1) as AnyObject)
+                        if uTag[1] as! Int == 0 {
+                            UserVars.Units.removeValue(forKey: u)
+                        } else {
+                            UserVars.Units[u] = uTag
+                        }
                     }
                 }
             }

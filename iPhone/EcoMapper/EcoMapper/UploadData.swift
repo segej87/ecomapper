@@ -110,13 +110,17 @@ open class UploadData {
     
     func uploadMedia() {
         
+        tableView?.mediaProgress.startAnimating()
+        
         // Get the container for the user, and create on server if necessary
         let container = getContainer()
         
         // Create a dictionary of media names and paths for upload loop
         var mediaList = [String:URL]()
         for i in tableView!.medias.indices {
-            mediaList[tableView!.medias[i].mediaName!] = tableView!.medias[i].mediaPath as URL?
+            if tableView!.medias[i].marked == true {
+                mediaList[tableView!.medias[i].mediaName!] = tableView!.medias[i].mediaPath as URL?
+            }
         }
         
         // Loop through media dictionary and attempt to upload
@@ -164,6 +168,8 @@ open class UploadData {
                 // TODO: Fallback on earlier versions
             }
         }
+        
+        tableView?.mediaProgress.stopAnimating()
     }
     
     // MARK: Media helper methods

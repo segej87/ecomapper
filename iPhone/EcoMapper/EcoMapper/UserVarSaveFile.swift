@@ -17,8 +17,8 @@ class UserVarsSaveFile: NSObject, NSCoding {
     var tags: [String:[AnyObject]]?
     var species: [String:[AnyObject]]?
     var units: [String:[AnyObject]]?
-    var accessDefaults: [String]?
-    var tagDefaults: [String]?
+    var accessDefaults = [String]()
+    var tagDefaults = [String]()
     var speciesDefault: String?
     var unitsDefault: String?
     
@@ -38,7 +38,7 @@ class UserVarsSaveFile: NSObject, NSCoding {
     
     // MARK: Initialization
     
-    init(userName: String?, accessLevels: [String]?, tags: [String:[AnyObject]]?, species: [String:[AnyObject]]?, units: [String:[AnyObject]]?, accessDefaults: [String]?, tagDefaults: [String]?, speciesDefault: String?, unitsDefault: String?){
+    init(userName: String?, accessLevels: [String]?, tags: [String:[AnyObject]]?, species: [String:[AnyObject]]?, units: [String:[AnyObject]]?, accessDefaults: [String], tagDefaults: [String], speciesDefault: String?, unitsDefault: String?){
         self.userName = userName
         self.accessLevels = accessLevels
         self.tags = tags
@@ -72,8 +72,8 @@ class UserVarsSaveFile: NSObject, NSCoding {
         let tags = aDecoder.decodeObject(forKey: PropertyKey.tagsKey) as? [String:[AnyObject]]
         let species = aDecoder.decodeObject(forKey: PropertyKey.speciesKey) as? [String:[AnyObject]]
         let units = aDecoder.decodeObject(forKey: PropertyKey.unitsKey) as? [String:[AnyObject]]
-        let accessDefaults = aDecoder.decodeObject(forKey: PropertyKey.accessDefaultsKey) as? [String]
-        let tagDefaults = aDecoder.decodeObject(forKey: PropertyKey.tagDefaultsKey) as? [String]
+        let accessDefaults = aDecoder.decodeObject(forKey: PropertyKey.accessDefaultsKey) as! [String]
+        let tagDefaults = aDecoder.decodeObject(forKey: PropertyKey.tagDefaultsKey) as! [String]
         let speciesDefault = aDecoder.decodeObject(forKey: PropertyKey.speciesDefaultKey) as? String
         let unitsDefault = aDecoder.decodeObject(forKey: PropertyKey.unitsDefaultKey) as? String
         

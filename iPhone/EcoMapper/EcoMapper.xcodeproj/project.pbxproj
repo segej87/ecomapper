@@ -10,8 +10,11 @@
 		FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */; };
 		FC052F531D2EA1F5003DCD19 /* NewPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */; };
 		FC0756D21DCD61D20011B9B6 /* RecordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0756D11DCD61D20011B9B6 /* RecordViewController.swift */; };
+		FC0EC1B51DD2B4420050BDF1 /* NotebookViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0EC1B41DD2B4420050BDF1 /* NotebookViewController.swift */; };
+		FC0EC1B71DD2C2E70050BDF1 /* LogoutSegue.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0EC1B61DD2C2E70050BDF1 /* LogoutSegue.swift */; };
+		FC306E921DD282F300DCC02A /* PickerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC306E911DD282F300DCC02A /* PickerTableViewCell.swift */; };
+		FC306E941DD2A6A200DCC02A /* StartScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC306E931DD2A6A200DCC02A /* StartScreenViewController.swift */; };
 		FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3349DB1D1B365F00D112EA /* Reachability.swift */; };
-		FC42C25A1DCBFE3600D442B9 /* NotebookViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC42C2591DCBFE3600D442B9 /* NotebookViewController.swift */; };
 		FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4E22221D21B93F00A57ED6 /* Media.swift */; };
 		FC53E2FE1DCBD86F00AD9B92 /* UserVarSaveFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC53E2FD1DCBD86F00AD9B92 /* UserVarSaveFile.swift */; };
 		FC546EAA1D26C95200E62B6C /* UploadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC546EA91D26C95200E62B6C /* UploadData.swift */; };
@@ -48,8 +51,11 @@
 		FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
 		FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewPhoto.swift; sourceTree = "<group>"; };
 		FC0756D11DCD61D20011B9B6 /* RecordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordViewController.swift; sourceTree = "<group>"; };
+		FC0EC1B41DD2B4420050BDF1 /* NotebookViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotebookViewController.swift; sourceTree = "<group>"; };
+		FC0EC1B61DD2C2E70050BDF1 /* LogoutSegue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogoutSegue.swift; sourceTree = "<group>"; };
+		FC306E911DD282F300DCC02A /* PickerTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerTableViewCell.swift; sourceTree = "<group>"; };
+		FC306E931DD2A6A200DCC02A /* StartScreenViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartScreenViewController.swift; sourceTree = "<group>"; };
 		FC3349DB1D1B365F00D112EA /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
-		FC42C2591DCBFE3600D442B9 /* NotebookViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotebookViewController.swift; sourceTree = "<group>"; };
 		FC4E22221D21B93F00A57ED6 /* Media.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
 		FC53E2FD1DCBD86F00AD9B92 /* UserVarSaveFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserVarSaveFile.swift; sourceTree = "<group>"; };
 		FC546EA91D26C95200E62B6C /* UploadData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadData.swift; sourceTree = "<group>"; };
@@ -123,8 +129,9 @@
 			isa = PBXGroup;
 			children = (
 				FC84B3A51D18EFE800251003 /* AppDelegate.swift */,
+				FC306E931DD2A6A200DCC02A /* StartScreenViewController.swift */,
 				FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */,
-				FC42C2591DCBFE3600D442B9 /* NotebookViewController.swift */,
+				FC0EC1B41DD2B4420050BDF1 /* NotebookViewController.swift */,
 				FC0756D11DCD61D20011B9B6 /* RecordViewController.swift */,
 				FC84B3A71D18EFE800251003 /* MeasViewController.swift */,
 				FCCE99311D1A23C300A675BE /* NoteViewController.swift */,
@@ -139,12 +146,14 @@
 				FC546EA91D26C95200E62B6C /* UploadData.swift */,
 				FC3349DB1D1B365F00D112EA /* Reachability.swift */,
 				FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */,
+				FC306E911DD282F300DCC02A /* PickerTableViewCell.swift */,
 				FC84B3A91D18EFE800251003 /* Main.storyboard */,
 				FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */,
 				FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */,
 				FC5DFFDA1D22E6CE00C31A31 /* EcoMapper-Bridging-Header.h */,
 				FC84B3B11D18EFE800251003 /* Info.plist */,
 				FC84B3AC1D18EFE800251003 /* Assets.xcassets */,
+				FC0EC1B61DD2C2E70050BDF1 /* LogoutSegue.swift */,
 			);
 			path = EcoMapper;
 			sourceTree = "<group>";
@@ -263,6 +272,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC306E941DD2A6A200DCC02A /* StartScreenViewController.swift in Sources */,
 				FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */,
 				FC84B3A81D18EFE800251003 /* MeasViewController.swift in Sources */,
 				FCEBA25A1D258F1700AB6A9F /* UserVars.swift in Sources */,
@@ -271,15 +281,17 @@
 				FC6930151D74F2E6001407A0 /* ListPickerViewController.swift in Sources */,
 				FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */,
 				FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */,
+				FC0EC1B51DD2B4420050BDF1 /* NotebookViewController.swift in Sources */,
 				FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */,
 				FC0756D21DCD61D20011B9B6 /* RecordViewController.swift in Sources */,
 				FC546EAA1D26C95200E62B6C /* UploadData.swift in Sources */,
-				FC42C25A1DCBFE3600D442B9 /* NotebookViewController.swift in Sources */,
 				FC84B3C61D1919D400251003 /* Record.swift in Sources */,
+				FC306E921DD282F300DCC02A /* PickerTableViewCell.swift in Sources */,
 				FC052F531D2EA1F5003DCD19 /* NewPhoto.swift in Sources */,
 				FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */,
 				FCEBA2581D24E6AE00AB6A9F /* LoginViewController.swift in Sources */,
 				FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */,
+				FC0EC1B71DD2C2E70050BDF1 /* LogoutSegue.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,7 +372,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -402,7 +414,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
