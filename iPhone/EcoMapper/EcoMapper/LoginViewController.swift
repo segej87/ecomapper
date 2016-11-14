@@ -27,6 +27,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if NetworkTests.reachability == nil {
+            NetworkTests.setupReachability(nil)
+        }
+        
         // Set up the login form.
         usernameView.delegate = self
         passwordView.delegate = self
@@ -75,18 +79,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         NSLog("Logging in to username \(UserVars.UName!) with \(sender!)")
     }
     
-    // When the app returns to the login page, clear key variables
-    @IBAction func unwindToLogin(_ sender: UIStoryboardSegue) {
-        // Make sure the text fields and login result are blank
-        usernameView.text = ""
-        passwordView.text = ""
-        
-        // Clear all of the user variables
-        UserVars.clearUserVars()
-        
-        UserVars.saveLogin(loginInfo: LoginInfo(uuid: UserVars.UUID))
-    }
-    
     
     // MARK: Actions
 
@@ -107,7 +99,13 @@ class LoginViewController: UIViewController, UITextFieldDelegate, UINavigationCo
         let pword = passwordView.text
         
         // Check if the device is connected. If not, stop and present an error
-        if Reachability.isConnectedToNetwork() {
+        guard let reach = NetworkTests.reachability
+            else {
+                NetworkTests.setupReachability(nil)
+                return
+        }
+        
+        if reach.isReachable() {
             checkCredentialsAndGetUUID(uname!, pword: pword!)
         } else {
             // Stop the activity indicator

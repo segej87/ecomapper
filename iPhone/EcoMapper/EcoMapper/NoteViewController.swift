@@ -31,19 +31,11 @@ class NoteViewController: RecordViewController, UINavigationControllerDelegate {
         super.viewDidLoad()
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
     
     // MARK: UI Methods
     
     override func setUpFields() {
-        if mode == "new" {
-            accessTextField.text = accessArray.joined(separator: ", ")
-            tagTextField.text = tagArray.joined(separator: ", ")
-        } else {
+        if mode == "old" {
             if let record = record {
                 navigationItem.title = "Editing Note"
                 nameTextField.text = record.props["name"] as? String
@@ -57,6 +49,10 @@ class NoteViewController: RecordViewController, UINavigationControllerDelegate {
                 gpsReportArea.isHidden = true
             }
         }
+        
+        // Fill data into text fields
+        accessTextField.text = accessArray.joined(separator: ", ")
+        tagTextField.text = tagArray.joined(separator: ", ")
         
         // Add border to text view
         self.notesTextField.layer.borderWidth = 0.5
@@ -101,6 +97,7 @@ class NoteViewController: RecordViewController, UINavigationControllerDelegate {
         }
     }
     
+    
     // MARK: Navigation
     
     @IBAction func cancel(_ sender: UIBarButtonItem) {
@@ -138,6 +135,7 @@ class NoteViewController: RecordViewController, UINavigationControllerDelegate {
         }
     }
     
+    // Handle returns from list pickers
     @IBAction func unwindFromListPicker(_ segue: UIStoryboardSegue) {
         // The view controller that initiated the segue
         let secondVC : ListPickerViewController = segue.source as! ListPickerViewController

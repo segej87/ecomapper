@@ -35,18 +35,18 @@ class PickerTableViewCell: UITableViewCell {
     }
     
     // MARK: Initialization
-
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
     }
-
+    
     
     // MARK: UITableView Methods
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
+        
         // Configure the view for the selected state
     }
     
@@ -61,17 +61,25 @@ class PickerTableViewCell: UITableViewCell {
             } else {
                 let ind = UserVars.TagsDefaults.index(of: value)
                 if ind != -1 {
-                UserVars.TagsDefaults.remove(at: ind!)
+                    UserVars.TagsDefaults.remove(at: ind!)
                 }
             }
             isDefault = !isDefault
             break
         case "species":
-            UserVars.SpecDefault = itemLabel.text!
+            if !isDefault {
+                UserVars.SpecDefault = value
+            } else {
+                UserVars.SpecDefault = nil
+            }
             isDefault = !isDefault
             break
         case "units":
-            UserVars.UnitsDefault = itemLabel.text!
+            if !isDefault {
+                UserVars.UnitsDefault = value
+            } else {
+                UserVars.UnitsDefault = nil
+            }
             isDefault = !isDefault
             break
         case "access":
@@ -92,5 +100,5 @@ class PickerTableViewCell: UITableViewCell {
         }
     }
     
-
+    
 }

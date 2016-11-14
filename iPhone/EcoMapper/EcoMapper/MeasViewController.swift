@@ -38,38 +38,31 @@ class MeasViewController: RecordViewController, UINavigationControllerDelegate {
         super.viewDidLoad()
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
     // MARK: UI Methods
     
     override func setUpFields() {
-        if mode == "new" {
-            accessTextField.text = accessArray.joined(separator: ", ")
-            measTextField.text = species
-            unitsTextField.text = units
-            tagTextField.text = tagArray.joined(separator: ", ")
-        } else {
+        if mode == "old" {
             if let record = record {
                 navigationItem.title = "Editing Measurement"
                 nameTextField.text = record.props["name"] as? String
-                accessTextField.text = (record.props["access"] as? [String])?.joined(separator: ", ")
                 accessArray = record.props["access"] as! [String]
-                measTextField.text = record.props["species"] as? String
                 species = record.props["species"] as? String
                 valTextField.text = record.props["value"] as? String
-                unitsTextField.text = record.props["units"] as? String
                 units = record.props["units"] as? String
                 notesTextField.text = record.props["text"] as? String
-                tagTextField.text = (record.props["tags"] as? [String])?.joined(separator: ", ")
                 tagArray = record.props["tags"] as! [String]
                 dateTime = record.props["datetime"] as? String
                 userLoc = record.coords
                 gpsReportArea.isHidden = true
             }
         }
+        
+        // Fill data into text fields
+        accessTextField.text = accessArray.joined(separator: ", ")
+        measTextField.text = species
+        unitsTextField.text = units
+        tagTextField.text = tagArray.joined(separator: ", ")
         
         // Add border to text view
         self.notesTextField.layer.borderWidth = 0.5
@@ -184,6 +177,7 @@ class MeasViewController: RecordViewController, UINavigationControllerDelegate {
         }
     }
     
+    // Handle returns from list pickers
     @IBAction func unwindFromListPicker(_ segue: UIStoryboardSegue) {
         // The view controller that initiated the segue
         let secondVC : ListPickerViewController = segue.source as! ListPickerViewController
@@ -272,7 +266,7 @@ class MeasViewController: RecordViewController, UINavigationControllerDelegate {
         return errorString == nil && dateCheck && locCheck
     }
     
-    // TODO: Improve this check (if string starts with valid float it will pass, even if letter is in there)
+    // Check that the supplied measurement is a valid float value
     func checkMeasFloatVal() -> Bool {
         let charset = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyz/\\!@#$%^&*()")
         if valTextField.text?.lowercased().rangeOfCharacter(from: charset) != nil {
@@ -286,6 +280,7 @@ class MeasViewController: RecordViewController, UINavigationControllerDelegate {
         return true
     }
     
+    // Write the properties array for the record
     override func setItemsOut() -> [String:AnyObject] {
         return ["name": nameTextField.text! as AnyObject, "tags": tagArray as AnyObject, "datatype": "meas" as AnyObject, "datetime": dateTime! as AnyObject, "access": accessArray as AnyObject, "accuracy": gpsAcc as AnyObject, "text": notesTextField.text as AnyObject, "value": valTextField.text! as AnyObject, "species": measTextField.text! as AnyObject, "units": unitsTextField.text! as AnyObject] as [String:AnyObject]
     }

@@ -25,11 +25,6 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var mediaCounter: UILabel!
     
     /*
-     An object to store lists retrieved from the server
-     */
-    var listString : NSString?
-    
-    /*
      An array to hold saved records.
      */
     var records = [Record]()
@@ -44,6 +39,11 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Start the reachability class
+        if NetworkTests.reachability == nil {
+            NetworkTests.setupReachability(nil)
+        }
         
         // Style the navigation bar's background color and button colors.
         styleNavigationBar()
@@ -62,11 +62,6 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         tableView.dataSource = self
         
         mediaMonitorManager()
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     
@@ -128,7 +123,7 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         return cell
     }
     
-    // Override to support selection of cells in the table view.
+    // If a row is selected, begin editing the record for that row.
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // Get the selected record, and determine its datatype.
         let selectedRecord = records[(indexPath as NSIndexPath).row]
@@ -153,9 +148,7 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         
         if editingStyle == .delete {
             
-            // Before deleting a photo, the corresponding item in the media list needs to be found and deleted.
-            
-            // If the record is a photo, delete the photo, too.
+            // Before deleting a photo, the corresponding item in the media list needs to be found and deleted, along with the photo itself in the device's storage.
             if selectedRecord.props["datatype"] as! String == "photo" {
                 
                 // Get the filepath of the photo record.
@@ -167,6 +160,8 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
                 // Find the index in the media array corresponding to the media name.
                 let oldMediaIndex = indexOfMedia(oldMediaName)
                 
+                let oldLocalPath = medias[oldMediaIndex].mediaPath!
+                
                 // Before deleting the record row, delete the media reference.
                 if oldMediaIndex != -1 {
                     medias.remove(at: oldMediaIndex)
@@ -174,10 +169,10 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
                 
                 // Try to delete the photo file
                 do {
-                    try FileManager.default.removeItem(atPath: oldMediaPath)
-                    NSLog("Deleted photo \(oldMediaPath)")
+                    try FileManager.default.removeItem(at: oldLocalPath)
+                    NSLog("Deleted photo \(oldLocalPath)")
                 } catch let error as NSError {
-                    NSLog("Could not delete photo \(oldMediaPath): \(error.localizedDescription)")
+                    NSLog("Could not delete photo \(oldLocalPath): \(error.localizedDescription)")
                 }
             }
             
@@ -187,11 +182,9 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
             // Delete the record from the data source.
             records.remove(at: selectedRow)
             
-            // Save the modified data.
+            // Save the modified data and user variables
             saveRecords()
             saveMedia()
-            
-            // Save the lists for logins.
             UserVars.saveUserVars()
             
             // Delete the row from the table.
@@ -218,9 +211,10 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBAction func attemptMediaUpload(_ sender: UITapGestureRecognizer) {
         // Initialize the class for uploading data
-        let ud = UploadData(tableView: self)!
+        let ud = UploadData(tableView: self)
         
         NSLog("Attempting to upload medias")
+        mediaProgress.startAnimating()
         ud.uploadMedia()
     }
     
@@ -240,32 +234,23 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func executeSync(action: UIAlertAction) -> Void {
         // Deactivate the buttons while uploading
-        activateButtons(enabled: false)
+        toggleButtons(enabled: false)
         
         // Initialize the class for uploading data
-        let ud = UploadData(tableView: self)!
+        let ud = UploadData(tableView: self)
         
         // Check if the device is connected to a network
-        if Reachability.isConnectedToNetwork() {
+        guard let reach = NetworkTests.reachability
+            else { return }
+        if reach.isReachable() {
             
-            // Loop through all records and add to features array
-            var features = [AnyObject]()
-            for i in 0..<records.count {
-                let record = records[i]
-                
-                // Prepare the record to be written in JSON format and add to features array
-                let dictItem = record.prepareForJSON()
-                features.append(dictItem as AnyObject)
-            }
-            
-            // Add requred formatting for geojson, and start uploading procedure
-            let biggerDict = ["type":"FeatureCollection", "features": features] as [String : Any]
+            let biggerDict = recordsToJson()
             ud.uploadRecords(biggerDict as NSDictionary)
+            self.markMedias()
             
             // Move to an asynchronous thread and upload the media from the media array
             let priority = DispatchQoS.QoSClass.default
             DispatchQueue.global(qos: priority).async{
-                self.markMedias()
                 ud.uploadMedia()
             }
         } else {
@@ -282,16 +267,14 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             
             // Reactivate the buttons
-            activateButtons(enabled: true)
+            toggleButtons(enabled: true)
         }
     }
-    
     
     
     // MARK: Navigation
     
     // Handle the logout button
-    
     @IBAction func handleLogout(_ sender: UIBarButtonItem) {
         if #available(iOS 8.0, *) {
             let alertVC = UIAlertController(title: "Logout?", message: "Are you sure you want to leave Kora?", preferredStyle: .alert)
@@ -309,9 +292,7 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     func executeLogout(action: UIAlertAction) -> Void {
         // Clear all of the user variables
         UserVars.clearUserVars()
-        
         UserVars.saveLogin(loginInfo: LoginInfo(uuid: UserVars.UUID))
-        
         self.performSegue(withIdentifier: "LogoutSegue", sender: self)
     }
     
@@ -361,24 +342,13 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
             
             // Save the records.
             saveRecords()
-        } else if let sourceViewController = sender.source as? PhotoViewController, let record = sourceViewController.record, let media = sourceViewController.media {
+        } else if let sourceViewController = sender.source as? PhotoViewController, let record = sourceViewController.record {
             if let selectedIndexPath = tableView.indexPathForSelectedRow {
-                
-                // Before updating the photo, find its corresponding record in the media list.
-                let oldMediaPath = records[(selectedIndexPath as NSIndexPath).row].props["filepath"] as! String
-                let oldMediaName = oldMediaPath.replacingOccurrences(of: "\(UserVars.blobRootURLString)\(UserVars.UUID!)/", with: "")
-                let oldMediaIndex = indexOfMedia(oldMediaName)
-                if oldMediaIndex != -1 {
-                    medias[oldMediaIndex] = media
-                }
-                
-                record.props["filepath"] = "\(UserVars.blobRootURLString)\(UserVars.UUID!)/\(media.mediaName!)" as AnyObject?
                 
                 // Update the existing record.
                 records[(selectedIndexPath as NSIndexPath).row] = record
-                
                 tableView.reloadRows(at: [selectedIndexPath], with: .none)
-            } else {
+            } else if let media = sourceViewController.media {
                 // Add a new record
                 let newIndexPath = IndexPath(row: records.count, section: 0)
                 record.props["filepath"] = "\(UserVars.blobRootURLString)\(UserVars.UUID!)/\(media.mediaName!)" as AnyObject?
@@ -451,6 +421,21 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // MARK: Helper methods
     
+    func recordsToJson() -> [String : Any] {
+        // Loop through all records and add to features array
+        var features = [AnyObject]()
+        for i in 0..<records.count {
+            let record = records[i]
+            
+            // Prepare the record to be written in JSON format and add to features array
+            let dictItem = record.prepareForJSON()
+            features.append(dictItem as AnyObject)
+        }
+        
+        // Add requred formatting for geojson, and return
+        return ["type":"FeatureCollection", "features": features] as [String : Any]
+    }
+    
     func markMedias() {
         for m in medias {
             m.marked = true
@@ -499,7 +484,7 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         self.navigationController?.navigationBar.tintColor = UIColor.lightGray
     }
     
-    func activateButtons (enabled: Bool) {
+    func toggleButtons (enabled: Bool) {
         for b in [syncButton, logoutButton, editButtonItem] {
             b!.isEnabled = enabled
         }

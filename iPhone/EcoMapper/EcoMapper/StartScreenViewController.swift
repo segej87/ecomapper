@@ -13,6 +13,8 @@ class StartScreenViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        NetworkTests.setupReachability(nil)
+        
         checkAndSegue()
     }
 
@@ -42,7 +44,14 @@ class StartScreenViewController: UIViewController {
         DispatchQueue.main.async {
             if let uvuuid = UserVars.UUID {
                 if UserVars.loadUserVars(uuid: uvuuid) {
-                    if Reachability.isConnectedToNetwork() {
+                    guard let reach = NetworkTests.reachability
+                        else {
+                            NSLog("Could not use Reachability")
+                            self.performSegue(withIdentifier: "Notebook", sender: "saved login")
+                            return
+                    }
+                    
+                    if reach.isReachable() {
                         self.getListsUsingUUID(uvuuid, sender: "saved login")
                     } else {
                         self.performSegue(withIdentifier: "Notebook", sender: "saved login")
@@ -124,10 +133,11 @@ class StartScreenViewController: UIViewController {
                     } else {
                         errorString = "Network Error - check your Internet connection"
                     }
+                    
+                    NSLog("Error retrieving user variables: \(errorString)")
                 }
             }
         })
         task.resume()
     }
-
 }

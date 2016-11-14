@@ -10,11 +10,13 @@ import UIKit
 
 class Media: NSObject, NSCoding {
     
+    
     // MARK: Properties
     
     var mediaName: String?
     var mediaPath: URL?
     var marked: Bool?
+    
     
     // MARK: Types
     
@@ -23,6 +25,7 @@ class Media: NSObject, NSCoding {
         static let pathKey = "path"
         static let markKey = "mark"
     }
+    
     
     // MARK: Initialization
     

@@ -10,15 +10,18 @@ import UIKit
 
 class NewPhoto: NSObject, NSCoding {
     
+    
     // MARK: Properties
     
     var photo: UIImage?
+    
     
     // MARK: Types
     
     struct PropertyKey {
         static let photoKey = "photo"
     }
+    
     
     // MARK: Initialization
     
@@ -32,6 +35,7 @@ class NewPhoto: NSObject, NSCoding {
             return nil
         }
     }
+    
     
     // MARK: NSCoding
     

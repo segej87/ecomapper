@@ -8,8 +8,10 @@
 
 import UIKit
 import CoreLocation
+import Photos
 
 class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
     
     // MARK: Properties
     
@@ -33,6 +35,7 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
     
     var medOutName: String?
     
+    
     // MARK: Initialization
     
     override func viewDidLoad() {
@@ -43,20 +46,16 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
     // MARK: UI Methods
     
     override func setUpFields() {
-        if mode == "new" {
-            accessTextField.text = accessArray.joined(separator: ", ")
-            tagTextField.text = tagArray.joined(separator: ", ")
-            
-            //TODO: delete after testing
-            medOutName = "Photo_\(dateTime!.replacingOccurrences(of: "-", with: "").replacingOccurrences(of: ":", with: "").replacingOccurrences(of: " ", with: "_")).jpg"
-            photoURL = URL(fileURLWithPath: "fake://path/\(medOutName)")
-        } else {
+        if mode == "old" {
             if let record = record {
                 navigationItem.title = "Editing Photo"
                 nameTextField.text = record.props["name"] as? String
                 accessTextField.text = (record.props["access"] as? [String])?.joined(separator: ", ")
                 accessArray = record.props["access"] as! [String]
-                photoImageView.image = record.photo
+                photoURL = URL(fileURLWithPath: record.props["filepath"] as! String)
+                selectedImage = record.photo
+                photoImageView.image = selectedImage
+                photoImageView.isUserInteractionEnabled = false
                 notesTextField.text = record.props["text"] as? String
                 tagTextField.text = (record.props["tags"] as? [String])?.joined(separator: ", ")
                 tagArray = record.props["tags"] as! [String]
@@ -65,6 +64,10 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
                 gpsReportArea.isHidden = true
             }
         }
+        
+        // Fill data into text fields
+        accessTextField.text = accessArray.joined(separator: ", ")
+        tagTextField.text = tagArray.joined(separator: ", ")
         
         // Add border to text view
         self.notesTextField.layer.borderWidth = 0.5
@@ -79,6 +82,7 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
         // Handle the notes field's user input through delegate callbacks.
         notesTextField.delegate = self
     }
+    
     
     // MARK: Camera alert
     
@@ -103,36 +107,13 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         // The info dictionary contains multiple representations of the image, and this uses the original.
-        let selectedImage = info[UIImagePickerControllerOriginalImage] as! UIImage
-        
-        // Save the image if it was taken from the camera.
-            
-        // Set the name of the photo
-        medOutName = "Photo_\(dateTime!.replacingOccurrences(of: "-", with: "").replacingOccurrences(of: ":", with: "").replacingOccurrences(of: " ", with: "_")).jpg"
-        
-        // Set path of photo to be saved
-        photoURL = UserVars.PhotosURL.appendingPathComponent(medOutName!)
-        
-        // Create an NSCoded photo object
-        let outPhoto = NewPhoto(photo: selectedImage)
-        
-        // Save the photo to the photos directory
-        savePhoto(outPhoto!)
-        
-        // Set the aspect ratio of the image in the view
-        photoImageView.contentMode = .scaleAspectFit
-        
-        // Set photoImageView to display the selected image.
-        photoImageView.image = selectedImage
+        let outImage = info[UIImagePickerControllerOriginalImage] as? UIImage
         
         // Dismiss the picker.
         dismiss(animated: true, completion: nil)
-    }
-
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        
+        // Segue to the crop view
+        self.performSegue(withIdentifier: "CropSegue", sender: outImage)
     }
     
     
@@ -175,8 +156,12 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         locationManager.stopUpdatingLocation()
         
-        if sender is UIBarButtonItem && saveButton === (sender as! UIBarButtonItem) {
+        if segue.identifier == "CropSegue" {
+            let secondVC = segue.destination as! CropImageViewController
             
+            if let imageOut = sender as? UIImage {
+                secondVC.inputImage = imageOut
+            }
         }
         
         // If the add access button was pressed, present the item picker with an access item type
@@ -206,6 +191,7 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
         }
     }
     
+    // Handle returns from list pickers
     @IBAction func unwindFromListPicker(_ segue: UIStoryboardSegue) {
         // The view controller that initiated the segue
         let secondVC : ListPickerViewController = segue.source as! ListPickerViewController
@@ -234,8 +220,47 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
         targetField!.text = secondVC.selectedItems.joined(separator: ", ")
     }
     
-    @IBAction func captureImage(_ sender: UITapGestureRecognizer) {
+    @IBAction func unwindFromCropView(_ segue: UIStoryboardSegue) {
+        let secondVC = segue.source as! CropImageViewController
         
+        if let outImage = secondVC.outputImage {
+            selectedImage = outImage
+            
+            // Set the aspect ratio of the image in the view
+            photoImageView.contentMode = .scaleAspectFit
+            
+            // Set photoImageView to display the selected image.
+            photoImageView.image = selectedImage
+            
+            // Set the name of the photo
+            medOutName = "Photo_\(dateTime!.replacingOccurrences(of: "-", with: "").replacingOccurrences(of: ":", with: "").replacingOccurrences(of: " ", with: "_")).jpg"
+            
+            // Set path of photo to be saved
+            photoURL = UserVars.PhotosURL.appendingPathComponent(medOutName!)
+        }
+    }
+    
+    @IBAction func captureImage(_ sender: UITapGestureRecognizer) {
+        if PHPhotoLibrary.authorizationStatus() == .notDetermined {
+            PHPhotoLibrary.requestAuthorization(requestAuthorizationHandler)
+        }
+        
+        startImageCapture()
+    }
+    
+    func requestAuthorizationHandler(status: PHAuthorizationStatus)
+    {
+        if PHPhotoLibrary.authorizationStatus() == PHAuthorizationStatus.authorized
+        {
+            self.startImageCapture()
+        }
+        else
+        {
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    func startImageCapture() {
         if UIImagePickerController.availableCaptureModes(for: .rear) != nil {
             // Create a controller for handling the camera action
             let imageTakerController = UIImagePickerController()
@@ -250,7 +275,8 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
             imageTakerController.delegate = self
             present(imageTakerController, animated: true, completion: nil)
         } else {
-            noCamera()
+//            noCamera()
+            self.performSegue(withIdentifier: "CropSegue", sender: #imageLiteral(resourceName: "samplePhoto"))
         }
     }
     
@@ -262,31 +288,44 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
     }
     
     @IBAction func attemptSave(_ sender: UIBarButtonItem) {
+        print("Saving record?: \(saveRecord())")
         if saveRecord() {
-            // Set the media reference to be passed to RecordTableViewController after the unwind segue.
-            media = Media(name: medOutName!, path: photoURL, marked: false)
-            
-            print("Media marked?: \(media?.marked)")
+            if mode == "new" {
+                // Set the media reference to be passed to NotebookViewController after the unwind segue.
+                media = Media(name: medOutName!, path: photoURL, marked: false)
+                
+                //Save the photo
+                
+                // Create an NSCoded photo object
+                let outPhoto = NewPhoto(photo: selectedImage)
+                
+                // Save the photo to the photos directory
+                savePhoto(outPhoto!)
+            }
             
             self.performSegue(withIdentifier: "exitSegue", sender: self)
         }
     }
-
+    
     
     // MARK: NSCoding
     
     func savePhoto(_ photo: NewPhoto) {
-
-        do {
-            try FileManager.default.createDirectory(atPath: UserVars.PhotosURL.path, withIntermediateDirectories: false, attributes: nil)
-        } catch let error as NSError {
-            print(error.localizedDescription);
+        
+        if !FileManager.default.fileExists(atPath: UserVars.PhotosURL.path) {
+            do {
+                try FileManager.default.createDirectory(atPath: UserVars.PhotosURL.path, withIntermediateDirectories: false, attributes: nil)
+            } catch let error as NSError {
+                print(error.localizedDescription);
+            }
         }
         
         let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(photo, toFile: photoURL!.path)
         
         if !isSuccessfulSave {
-            print("Failed to save records...")
+            NSLog("Failed to save photo...")
+        } else {
+            NSLog("Saving photo to \(photoURL!.path)")
         }
     }
     

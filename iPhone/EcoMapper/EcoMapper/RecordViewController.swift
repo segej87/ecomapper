@@ -31,7 +31,7 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
     let locationManager = CLLocationManager()
     
     /*
-     This value will be filled with the user's location by the CLLocationManager delegate
+     These values will be filled with the user's location by the CLLocationManager delegate
      */
     var userLoc: [Double]?
     var gpsAcc = -1 as Double
@@ -55,6 +55,11 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
      */
     var species : String?
     var units : String?
+    
+    /*
+     An image for photos
+     */
+    var selectedImage : UIImage?
     
     
     //MARK: Initialization
@@ -83,16 +88,9 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
             locationManager.delegate = self
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
             locationManager.requestWhenInUseAuthorization()
-            
             locationManager.startUpdatingLocation()
         }
-        
         setUpFields()
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     
@@ -102,10 +100,6 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
         //Hide the keyboard.
         textField.resignFirstResponder()
         return true
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        
     }
     
     
@@ -163,40 +157,7 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
     func checkLocationOK() -> Bool {
         var staleLoc : Bool
         
-        if let loc = latestLoc {
-            let elapsedTime = Date().compare(loc.timestamp).rawValue/60
-            
-            staleLoc = elapsedTime > UserVars.maxUpdateTime || (gpsAcc == -1 || gpsAcc > UserVars.minGPSAccuracy) || (gpsStab == -1 || gpsStab > UserVars.minGPSStability)
-            
-            if staleLoc {
-                var outString = ""
-                
-                if elapsedTime > UserVars.maxUpdateTime {
-                    outString.append("Last location update: \(String(elapsedTime)) minutes ago.\n\n")
-                }
-                
-                if gpsAcc == -1 {
-                    outString.append("Current accuracy: Locking\n\n")
-                } else if gpsAcc > UserVars.minGPSAccuracy {
-                    outString.append("Current accuracy: \(gpsAcc) m\n\n")
-                }
-                
-                if gpsStab == -1 {
-                    outString.append("Current stability: Locking\n\n")
-                } else if gpsStab > UserVars.minGPSStability {
-                    outString.append("Current stability: \(gpsStab) m\n\n")
-                }
-                
-                outString.append("Please wait until the GPS is stable")
-                
-                let alertVC = UIAlertController(title: "Your location may not be accurate.", message: outString, preferredStyle: .alert)
-                let waitAction = UIAlertAction(title: "Wait", style: .default, handler: nil)
-                let ignoreAction = UIAlertAction(title: "Ignore", style: .default, handler: ignoreLocWarning)
-                alertVC.addAction(waitAction)
-                alertVC.addAction(ignoreAction)
-                present(alertVC, animated: true, completion: nil)
-            }
-        } else {
+        guard let loc = latestLoc else {
             let alertVC = UIAlertController(title: "Your location was not found", message: "Please wait until the GPS is stable", preferredStyle: .alert)
             let waitAction = UIAlertAction(title: "Wait", style: .default, handler: nil)
             let ignoreAction = UIAlertAction(title: "Ignore", style: .default, handler: ignoreLocWarning)
@@ -205,6 +166,39 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
             present(alertVC, animated: true, completion: nil)
             
             return false
+        }
+        
+        let elapsedTime = Date().compare(loc.timestamp).rawValue/60
+        
+        staleLoc = elapsedTime > UserVars.maxUpdateTime || (gpsAcc == -1 || gpsAcc > UserVars.minGPSAccuracy) || (gpsStab == -1 || gpsStab > UserVars.minGPSStability)
+        
+        if staleLoc {
+            var outString = ""
+            
+            if elapsedTime > UserVars.maxUpdateTime {
+                outString.append("Last location update: \(String(elapsedTime)) minutes ago.\n\n")
+            }
+            
+            if gpsAcc == -1 {
+                outString.append("Current accuracy: Locking\n\n")
+            } else if gpsAcc > UserVars.minGPSAccuracy {
+                outString.append("Current accuracy: \(gpsAcc) m\n\n")
+            }
+            
+            if gpsStab == -1 {
+                outString.append("Current stability: Locking\n\n")
+            } else if gpsStab > UserVars.minGPSStability {
+                outString.append("Current stability: \(gpsStab) m\n\n")
+            }
+            
+            outString.append("Please wait until the GPS is stable")
+            
+            let alertVC = UIAlertController(title: "Your location may not be accurate.", message: outString, preferredStyle: .alert)
+            let waitAction = UIAlertAction(title: "Wait", style: .default, handler: nil)
+            let ignoreAction = UIAlertAction(title: "Ignore", style: .default, handler: ignoreLocWarning)
+            alertVC.addAction(waitAction)
+            alertVC.addAction(ignoreAction)
+            present(alertVC, animated: true, completion: nil)
         }
         
         return !staleLoc
@@ -262,7 +256,7 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
             for t in secondVC.selectedItems {
                 if !UserVars.Tags.keys.contains(t) {
                     UserVars.Tags[t] = ["Local" as AnyObject,1 as AnyObject]
-                } else {
+                } else if !tagArray.contains(t) {
                     var tagInfo = UserVars.Tags[t]
                     if tagInfo![0] as! String == "Local" {
                         tagInfo![1] = ((tagInfo![1] as! Int + 1) as AnyObject)
@@ -292,7 +286,7 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
             for t in secondVC.selectedItems {
                 if !UserVars.Species.keys.contains(t) {
                     UserVars.Species[t] = ["Local" as AnyObject,1 as AnyObject]
-                } else {
+                } else if species != t{
                     var tagInfo = UserVars.Species[t]
                     if tagInfo![0] as! String == "Local" {
                         tagInfo![1] = ((tagInfo![1] as! Int + 1) as AnyObject)
@@ -326,7 +320,7 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
             for t in secondVC.selectedItems {
                 if !UserVars.Units.keys.contains(t) {
                     UserVars.Units[t] = ["Local" as AnyObject,1 as AnyObject]
-                } else {
+                } else if units != t {
                     var tagInfo = UserVars.Units[t]
                     if tagInfo![0] as! String == "Local" {
                         tagInfo![1] = ((tagInfo![1] as! Int + 1) as AnyObject)
@@ -354,7 +348,7 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
             let props = setItemsOut()
             
             // Set the record to be passed to RecordTableViewController after the unwind segue.
-            record = Record(coords: self.userLoc!, photo: nil, props: props)
+            record = Record(coords: self.userLoc!, photo: selectedImage, props: props)
             
             return true
         } else {

@@ -110,8 +110,7 @@ struct UserVars {
     // URL to blob storage Account.
     static let blobRootURLString = "https://ecomapper.blob.core.windows.net/"
     
-    
-    // MARK: functions
+    // MARK: General functions
     
     static func saveLogin(loginInfo: LoginInfo) {
         let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo, toFile: LoginInfo.ArchiveURL.path)
