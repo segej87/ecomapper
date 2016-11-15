@@ -5,8 +5,10 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -101,6 +103,11 @@ public class Notebook extends AppCompatActivity
     private static final int RECORDS_REQUEST = 1000;
     private static final int MEDIAS_REQUEST = 1001;
 
+    /**
+     * A shared preferences object
+     */
+    private SharedPreferences sharedPref;
+
     //endregion
 
     //region Initialization
@@ -136,6 +143,9 @@ public class Notebook extends AppCompatActivity
 
         // Register the list view for context menu.
         registerForContextMenu(listView);
+
+        // Get the shared preferences object
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override
@@ -178,12 +188,19 @@ public class Notebook extends AppCompatActivity
                 return true;
             case R.id.sync:
                 if (DataIO.isNetworkConnected(Notebook.this)) {
-                    showConfirmDialog(SYNC_REQUEST,
-                            getString(R.string.sync_confirmation_message),
-                            getString(R.string.sync_positive_string),
-                            getString(R.string.sync_negative_string));
+                    if (sharedPref.getBoolean(SettingsActivity.SYNC_REMOVE_KEY, false))
+                        showConfirmDialog(SYNC_REQUEST,
+                                getString(R.string.sync_confirmation_message),
+                                getString(R.string.sync_positive_string),
+                                getString(R.string.sync_negative_string));
+                    else
+                        attemptSync();
                 } else
                     showError(R.string.internet_failure_title);
+                return true;
+            case R.id.settings:
+                Intent intent = new Intent(Notebook.this, SettingsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -622,14 +639,14 @@ public class Notebook extends AppCompatActivity
                 success = DataIO.setLists(Notebook.this, result);
             }
 
-            if (success)
-                DataIO.saveUserVars(Notebook.this);
-            else
+            if (!success)
                 Toast.makeText(Notebook.this,
                         getString(R.string.load_user_vars_failure),
                         Toast.LENGTH_SHORT).show();
 
             boolean mediaMark = markMedias();
+
+            DataIO.saveUserVars(Notebook.this);
             mediaMonitorManager();
 
             if (mediaMark)
@@ -780,33 +797,15 @@ public class Notebook extends AppCompatActivity
     }
 
     private boolean markMedias() {
-        List<Record> records = app.getRecords();
-        int numPhotos = 0;
-
-        try {
-            if (records.size() > 0) {
-                for (Record record : records) {
-                    if (record != null) {
-                        if (record.props.get("datatype").equals("photo")) {
-                            numPhotos++;
-                            String fp = record.props.get("filepath").toString();
-                            if (!UserVars.MarkedMedia.contains(fp)) {
-                                UserVars.MarkedMedia.add(fp);
-                            }
-                        }
-                    }
+        if (UserVars.Medias.size() > 0) {
+            for (String m : UserVars.Medias.keySet()) {
+                if (!UserVars.MarkedMedia.contains(m)) {
+                    UserVars.MarkedMedia.add(m);
                 }
-
-                if (UserVars.MarkedMedia != null && UserVars.MarkedMedia.size() == numPhotos)
-                    return true;
-            } else if (records.size() == 0) {
-                return true;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
-        return false;
+        return UserVars.MarkedMedia.size() == UserVars.Medias.size();
     }
 
     //endregion

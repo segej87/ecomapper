@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -44,7 +45,7 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
      * Location request objects
      */
     private LocationRequest mLocationRequest;
-    private static final int LOCATION_REQUEST_INTERVAL = 10000;
+    private static final int LOCATION_REQUEST_INTERVAL = 5000;
     private static final int LOCATION_REQUEST_FASTEST_INTERVAL = 5000;
     private static final int LOCATION_REQUEST_PRIORITY = LocationRequest.PRIORITY_HIGH_ACCURACY;
     private boolean mRequestingLocationUpdates = false;
@@ -80,13 +81,32 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
      * Helper method to build the Google API client
      */
     synchronized void buildGoogleApiClient() {
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(context)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
+        boolean googlePlayCheck = checkGooglePlayVersion();
+
+        if (googlePlayCheck) {
+            if (mGoogleApiClient == null) {
+                mGoogleApiClient = new GoogleApiClient.Builder(context)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .build();
+            }
+        } else {
+            context.finish();
         }
+    }
+
+    private boolean checkGooglePlayVersion() {
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+        int googlePlayServicesAvailable = googleApiAvailability.isGooglePlayServicesAvailable(context);
+
+        if ((googlePlayServicesAvailable == ConnectionResult.SERVICE_MISSING) || (googlePlayServicesAvailable == ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED) || (googlePlayServicesAvailable == ConnectionResult.SERVICE_DISABLED)) {
+            if (googleApiAvailability.isUserResolvableError(googlePlayServicesAvailable)) {
+                googleApiAvailability.getErrorDialog(context, googlePlayServicesAvailable, 1051).show();
+            }
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -199,35 +219,6 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
     }
 
     /**
-     * Gets the user's last known location from Play Services
-     */
-    private void getLastLocation() {
-        try {
-
-            // Request the last known location from Play Services.
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                    mGoogleApiClient);
-        } catch (SecurityException e) {
-
-            // Log the error preventing last location reading.
-            Log.i(context.TAG,context.getString(R.string.last_location_retrieve_failure, e.getLocalizedMessage()));
-
-            // Check the user's location settings.
-            checkLocationSettings();
-        }
-
-        // If the last location is not null, update the calling context's location array.
-        if (mLastLocation != null) {
-            context.latestLoc = mLastLocation;
-        } else {
-
-            // Log an error if the last location is null.
-            Log.i(context.TAG,context.getString(R.string.last_location_retrieve_failure,
-                    context.getString(R.string.last_location_null)));
-        }
-    }
-
-    /**
      * Constructs the location request from class variables
      */
     private void createLocationRequest() {
@@ -279,6 +270,35 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
         }
     }
 
+    /**
+     * Gets the user's last known location from Play Services
+     */
+    private void getLastLocation() {
+        try {
+
+            // Request the last known location from Play Services.
+            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    mGoogleApiClient);
+        } catch (SecurityException e) {
+
+            // Log the error preventing last location reading.
+            Log.i(context.TAG,context.getString(R.string.last_location_retrieve_failure, e.getLocalizedMessage()));
+
+            // Check the user's location settings.
+            checkLocationSettings();
+        }
+
+        // If the last location is not null, update the calling context's location array.
+        if (mLastLocation != null) {
+            context.latestLoc = mLastLocation;
+        } else {
+
+            // Log an error if the last location is null.
+            Log.i(context.TAG,context.getString(R.string.last_location_retrieve_failure,
+                    context.getString(R.string.last_location_null)));
+        }
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         //TODO: warn user if location changes by more than accuracy
@@ -322,7 +342,7 @@ class UserLocation implements GoogleApiClient.ConnectionCallbacks,
         int stabListSize = stabList.size();
 
         float stabAdd;
-        int numAv = 5;
+        int numAv = 3;
         int counter = 0;
         if (stabListSize < numAv) {
             stabAdd = stabList.get(0);

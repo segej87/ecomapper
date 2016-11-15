@@ -12,6 +12,7 @@ android {
 
         // Enabling multidex support.
         multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -32,11 +33,13 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:appcompat-v7:25.0.1'
     compile 'com.google.android.gms:play-services:9.8.0'
     compile 'com.android.support:multidex:1.0.1'
     compile 'org.jetbrains:annotations-java5:15.0'
     compile 'com.microsoft.azure.android:azure-storage-android:0.7.0@aar'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
+    compile 'com.android.support:support-v4:25.0.1'
+    compile 'com.android.support:support-vector-drawable:25.0.1'
+    testCompile 'junit:junit:4.12'
 }

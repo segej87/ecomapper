@@ -1,11 +1,16 @@
 package com.kora.android;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -145,6 +150,11 @@ public abstract class NewRecord extends AppCompatActivity
     final static int CANCEL_REQUEST = 501;
     final static int PHOTO_CANCEL_REQUEST = 502;
 
+    /**
+     * A request code for checking location permissions
+     */
+    final static int LOCATION_PERMISSIONS_CHECK = 11051;
+
     //endregion
 
     //region Initialization
@@ -219,7 +229,7 @@ public abstract class NewRecord extends AppCompatActivity
         super.onStart();
 
         // Connect to Play Services and track location.
-        userLocation.connectToGoogleApi();
+        checkLocationPermissions();
     }
 
     @Override
@@ -520,6 +530,41 @@ public abstract class NewRecord extends AppCompatActivity
     //endregion
 
     //region Helper Methods
+
+    private void checkLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(NewRecord.this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(NewRecord.this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                ActivityCompat.requestPermissions(NewRecord.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        LOCATION_PERMISSIONS_CHECK);
+
+            } else {
+                ActivityCompat.requestPermissions(NewRecord.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        LOCATION_PERMISSIONS_CHECK);
+            }
+        } else {
+            userLocation.connectToGoogleApi();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case LOCATION_PERMISSIONS_CHECK: {
+
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    userLocation.connectToGoogleApi();
+                break;
+            }
+        }
+    }
 
     /**
      * Adds a single string to an ArrayList for use by the list picker
