@@ -28,7 +28,7 @@ public class MapDisplay extends PApplet {
 	private static final long serialVersionUID = 1L;
 	
 	//flag indicating whether the user is offline
-	private static final boolean offline = false;
+	private static final boolean offline = true;
 	//flag indicating whether states should be included in geofilter
 	private static final boolean stateson = true;
 	
@@ -61,10 +61,10 @@ public class MapDisplay extends PApplet {
 	
 	public void setup(){
 		//get the current graphics device, get its size, and size the map at full screen
-		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-		int screenWidth = gd.getDisplayMode().getWidth();
-		int screenHeight = gd.getDisplayMode().getHeight();
-		size(screenWidth, screenHeight, OPENGL);
+//		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+//		int screenWidth = gd.getDisplayMode().getWidth();
+//		int screenHeight = gd.getDisplayMode().getHeight();
+		size(1366, 768, OPENGL);
 		
 		//set up toolbars
 		ttb = new TopToolbar(this, 0, 0, this.width, 50, 250);
@@ -107,8 +107,10 @@ public class MapDisplay extends PApplet {
 		SQLReader sqr = new SQLReader("segej87", "J5e14s87!");
 //		SQLReader sqr = new SQLReader("mruth", "M@rty9!");
 		//SQLReader sqr = new SQLReader("ctsege", "ctsege85");
-//		SQLReader sqr = new SQLReader("rsege", "redbird5");
 		List<Feature> personFeats = GeoJSONReader.loadDataFromJSON(this, sqr.jsonString);
+		//List<Feature> personFeats = GeoJSONReader.loadData(this, "c:/users/jon sege/dropbox/kumpi mayu/mapdev/geojson/personal.json");
+		//List<Feature> institFeats = GeoJSONReader.loadData(this, institJsonPath);
+		//List<Feature> publicFeats = GeoJSONReader.loadData(this, personJsonPath);
 		
 		//loop through features and find which country they're in by comparing to countryMarkers
 		//TODO: write this info to json file, then only do for data that doesn't have this prop
@@ -363,11 +365,11 @@ public class MapDisplay extends PApplet {
 		pops.add(new MapTags(map, this, pops.get(pops.size()-1)));
 		
 		//If this is moved above the other popup objects, the order will be changed
-		if (mapKey.getStringProp("datatype").equals("photo")){
+		if (mapKey.getProp("datatype").equals("photo")){
 			pops.add(new MapPhoto(map, this, pops.get(pops.size()-1)));
-		} else if (mapKey.getStringProp("datatype").equals("note")){
+		} else if (mapKey.getProp("datatype").equals("note")){
 			pops.add(new MapNote(map, this, pops.get(pops.size()-1)));
-		} else if (mapKey.getStringProp("datatype").equals("meas")){
+		} else if (mapKey.getProp("datatype").equals("meas")){
 			pops.add(new MapMeas(map, this, pops.get(pops.size()-1)));
 		}
 	}

@@ -61,7 +61,7 @@ public class MapNote extends MapPopups {
 		float textLine = getIntX() + 5;
 		p.fill(color(36,49,168));
 		p.textAlign(LEFT,TOP);
-		p.text("Note: " + getStringProp("text"), textLine, getIntY() + 10, getIntWidth() - 10, getIntHeight());
+		p.text("Note: " + getProp("text"), textLine, getIntY() + 10, getIntWidth() - 10, getIntHeight());
 		p.textSize(this.fontSize);
 	}
 }
