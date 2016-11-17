@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group
+        android:id="@+id/opMenuGroup"
+        >
+
+        <item android:id="@+id/sync"
+            android:title="@string/sync_string"
+            android:icon="@android:drawable/ic_popup_sync"
+            app:showAsAction="ifRoom"/>
+
+        <item android:id="@+id/settings"
+            android:title="@string/settings_string"
+            android:icon="@mipmap/settings_icon"
+            app:showAsAction="ifRoom"/>
+
+        <item android:id="@+id/logout"
+            android:title="@string/logout_flag"
+            android:icon="@mipmap/logout_icon"
+            app:showAsAction="ifRoom"/>
+
+    </group>
+
+</menu>

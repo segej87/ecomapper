@@ -1,0 +1,27 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:defaultValue="@string/pref_default_min_accuracy"
+        android:entries="@array/pref_min_accuracy_titles"
+        android:entryValues="@array/pref_min_accuracy_values"
+        android:key="min_location_accuracy"
+        android:title="@string/pref_title_min_accuracy"
+        android:summary="@string/pref_description_min_accuracy" />
+
+    <ListPreference
+        android:defaultValue="@string/pref_default_min_stability"
+        android:entries="@array/pref_min_stability_titles"
+        android:entryValues="@array/pref_min_stability_values"
+        android:key="min_location_stability"
+        android:title="@string/pref_title_min_stability"
+        android:summary="@string/pref_description_min_stability" />
+
+    <ListPreference
+        android:defaultValue="@string/pref_max_update_default"
+        android:entries="@array/pref_max_update_titles"
+        android:entryValues="@array/pref_max_update_values"
+        android:key="max_location_update"
+        android:title="@string/pref_title_max_update"
+        android:summary="@string/pref_description_max_update"/>
+
+</PreferenceScreen>

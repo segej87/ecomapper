@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_notebook"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.kora.android.Notebook" >
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/notebook_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+    <!-- Sync progress -->
+
+    <ProgressBar
+        android:id="@+id/sync_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/notebook_toolbar"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/notebook_toolbar"
+        android:layout_above="@+id/footer_layout"
+        android:id="@+id/recordsList" />
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/footer_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:orientation="horizontal"
+        android:background="@color/background_grey"
+        android:gravity="center" >
+
+        <ImageButton
+            android:id="@+id/meas_button"
+            android:contentDescription="@string/new_meas"
+            android:src="@mipmap/meas_icon"
+            android:scaleType="fitCenter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            style="?attr/buttonBarButtonStyle"/>
+
+        <ImageButton
+            android:id="@+id/note_button"
+            android:contentDescription="@string/new_note"
+            android:src="@mipmap/note_icon"
+            android:scaleType="fitCenter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            style="?attr/buttonBarButtonStyle"/>
+
+        <ImageButton
+            android:id="@+id/photo_button"
+            android:contentDescription="@string/new_photo"
+            android:src="@mipmap/photo_icon"
+            android:scaleType="fitCenter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            style="?attr/buttonBarButtonStyle"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/media_monitor"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignBottom="@+id/footer_layout"
+        android:layout_alignEnd="@+id/footer_layout"
+        android:layout_marginEnd="10dp"
+        android:padding="5dp"
+        android:orientation="vertical"
+        android:clickable="true"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/media_counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textColor="@color/off_white"/>
+
+        <ProgressBar
+            android:id="@+id/media_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:attr/progressBarStyleSmall"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/media_placeholder"
+            android:contentDescription="@string/upload_media"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="-5dp"
+            android:src="@drawable/cast_ic_stop_circle_filled_white"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

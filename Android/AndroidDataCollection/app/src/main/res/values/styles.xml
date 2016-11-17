@@ -6,15 +6,65 @@
         <item name="colorPrimary">@color/darkBlue</item>
         <item name="colorPrimaryDark">@color/darkBlue</item>
         <item name="colorAccent">@color/darkBlue</item>
+        <item name="actionOverflowMenuStyle">@style/MyOverflowStyle</item>
+        <item name="actionOverflowButtonStyle">@style/MyOverflowButtonStyle</item>
+        <item name="android:windowBackground">@android:color/background_light</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:colorBackground">@android:color/background_light</item>
+        <item name="android:windowBackground">@android:color/background_light</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="MyTitleStyle" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textColor">@color/off_white</item>
+    </style>
+
+    <style name="MyOverflowStyle" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:textColor">@color/white</item>
+        <item name="overlapAnchor">false</item>
+        <item name="android:dropDownVerticalOffset">-4.0dip</item>
+        <item name="android:itemTextAppearance">@style/MyOverflowTextStyle</item>
+    </style>
+
+    <style name="MyOverflowTextStyle" parent="android:Theme.Holo.Light">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="MyOverflowButtonStyle" parent="android:Widget.Holo.ActionButton.Overflow">
+        <item name="android:color">@color/white</item>
+    </style>
+
+    <style name="MyTheme" parent="android:Theme.Holo.Light">
+        <item name="actionButtonStyle">@style/MyActionButtonStyle</item>
+        <item name="android:titleTextStyle">@style/MyTitleStyle</item>
+    </style>
+
+    <style name="MyActionButtonStyle" parent="Base.Widget.AppCompat.ActionButton">
+        <item name="android:minWidth">28dip</item>
+    </style>
+
+    <style name="ActionBarButton">
+        <item name="android:layout_width">35dip</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@null</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">@dimen/text_size_small</item>
+    </style>
+
+    <style name="ActionBarButtonWhite" parent="@style/ActionBarButton">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="ActionBarButtonOffWhite" parent="@style/ActionBarButton">
+        <item name="android:textColor">@color/off_white</item>
+    </style>
 
 </resources>
