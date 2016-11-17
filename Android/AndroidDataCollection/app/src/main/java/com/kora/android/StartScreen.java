@@ -1,8 +1,10 @@
 package com.kora.android;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -41,7 +43,16 @@ public class StartScreen extends AppCompatActivity {
 
                 Log.i(TAG,getString(R.string.load_user_vars_report,userVarsResult));
 
-                if (DataIO.isNetworkConnected(this)) {
+                int syncPref = Integer.valueOf(PreferenceManager
+                        .getDefaultSharedPreferences(this)
+                        .getString(SettingsActivity.SYNC_STARTUP_KEY, "1"));
+
+                boolean shouldSyncLists = (syncPref == 1 &&
+                        DataIO.isNetworkConnected(this)) ||
+                        (syncPref == 0 &&
+                        DataIO.isWiFiConnected(this));
+
+                if (shouldSyncLists) {
                     UserListsTask ult = new UserListsTask(savedUUID);
                     ult.execute((Void) null);
                 } else {

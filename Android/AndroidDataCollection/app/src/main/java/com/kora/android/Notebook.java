@@ -188,7 +188,7 @@ public class Notebook extends AppCompatActivity
                 return true;
             case R.id.sync:
                 if (DataIO.isNetworkConnected(Notebook.this)) {
-                    if (sharedPref.getBoolean(SettingsActivity.SYNC_REMOVE_KEY, false))
+                    if (sharedPref.getBoolean(SettingsActivity.SYNC_REMOVE_KEY, true))
                         showConfirmDialog(SYNC_REQUEST,
                                 getString(R.string.sync_confirmation_message),
                                 getString(R.string.sync_positive_string),
@@ -690,7 +690,10 @@ public class Notebook extends AppCompatActivity
         protected void onPostExecute(Boolean result) {
             if (result) {
                 if (app.getRecords().size() > 0) {
-                    app.deleteRecordsOnly();
+                    if (sharedPref.getBoolean(SettingsActivity.SYNC_REMOVE_KEY, true))
+                        app.deleteRecordsOnly();
+
+                    //TODO: Add server ID to synced records
                     DataIO.saveRecords(Notebook.this, app.getRecords());
                     adapter.notifyDataSetChanged();
                 }
@@ -725,8 +728,12 @@ public class Notebook extends AppCompatActivity
      */
     private class UploadMediasTask extends AsyncTask<Void, Void, Boolean> {
 
-        UploadMediasTask() {
+        boolean shouldUpload;
 
+        UploadMediasTask() {
+            boolean photoPref = sharedPref.getBoolean(SettingsActivity.PHOTOS_WIFI_KEY,true);
+            shouldUpload = (photoPref && DataIO.isWiFiConnected(Notebook.this)) ||
+                    (photoPref && DataIO.isNetworkConnected(Notebook.this));
         }
 
         @Override
@@ -734,14 +741,17 @@ public class Notebook extends AppCompatActivity
             for (Iterator<String> iter = UserVars.MarkedMedia.iterator(); iter.hasNext(); ) {
                 String m = iter.next();
                 String filePath = UserVars.Medias.get(m);
-                boolean res = DataIO.isWiFiConnected(Notebook.this) && DataIO.uploadBlob(filePath);
+
+                boolean res = shouldUpload && DataIO.uploadBlob(filePath, Notebook.this);
                 if (res) {
-                    UserVars.Medias.remove(m);
-                    String cacheKey = m.substring(m.lastIndexOf('/') + 1).
-                            replaceAll(".jpg","").
-                            replaceAll("_","");
-                    app.removeBitmapFromMemCache(cacheKey);
-                    iter.remove();
+                    if (sharedPref.getBoolean(SettingsActivity.SYNC_REMOVE_KEY, true)) {
+                        UserVars.Medias.remove(m);
+                        String cacheKey = m.substring(m.lastIndexOf('/') + 1).
+                                replaceAll(".jpg", "").
+                                replaceAll("_", "");
+                        app.removeBitmapFromMemCache(cacheKey);
+                        iter.remove();
+                    }
                 } else {
                     this.cancel(true);
                 }

@@ -3,10 +3,12 @@ package com.kora.android;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -99,18 +101,21 @@ public abstract class NewRecord extends AppCompatActivity
      */
     private static final String LOCATION = "latestLoc";
     Location latestLoc;
+    float maxUpdateTime;
 
     /**
      * The most recent location's accuracy (reported by Play Services)
      */
     private static final String ACCURACY = "gpsAcc";
     double gpsAcc = -1;
+    float minGPSAccuracy;
 
     /**
      * The current location stability (calculated by the UserLocation class)
      */
     private static final String STABILITY = "gpsStab";
     double gpsStab = -1;
+    float minGPSStability;
 
     Double[] userLoc = new Double[3];
     final Map<String, Object> itemsOut = new HashMap<>();
@@ -222,6 +227,21 @@ public abstract class NewRecord extends AppCompatActivity
 
                 break;
         }
+
+        // Set up the location accuracy variables
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        maxUpdateTime = Float.valueOf(sharedPref
+                .getString(SettingsActivity.MAX_LOCATION_UPDATE_KEY,
+                        getString(R.string.pref_max_update_default)));
+
+        minGPSAccuracy = Float.valueOf(sharedPref
+                .getString(SettingsActivity.MIN_LOCATION_ACCURACY_KEY,
+                        getString(R.string.pref_default_min_accuracy)));
+
+        minGPSStability = Float.valueOf(sharedPref
+                .getString(SettingsActivity.MIN_LOCATION_STABILITY_KEY,
+                        getString(R.string.pref_default_min_stability)));
     }
 
     @Override
@@ -621,13 +641,13 @@ public abstract class NewRecord extends AppCompatActivity
         Long elapsedTime = ((new Date()).getTime() - latestLoc.getTime())/60000;
         String numMin = String.valueOf((elapsedTime.intValue()));
 
-        staleLoc = elapsedTime > UserVars.maxUpdateTime ||
-                (gpsAcc == -1 || gpsAcc > UserVars.minGPSAccuracy) ||
-                (gpsStab == -1 || gpsStab > UserVars.minGPSStability);
+        staleLoc = elapsedTime > maxUpdateTime ||
+                (gpsAcc == -1 || gpsAcc > minGPSAccuracy) ||
+                (gpsStab == -1 || gpsStab > minGPSStability);
 
         if (staleLoc) {
             String minOutString;
-            if (elapsedTime > UserVars.maxUpdateTime)
+            if (elapsedTime > maxUpdateTime)
                 minOutString = numMin;
             else
                 minOutString = "none";
@@ -635,7 +655,7 @@ public abstract class NewRecord extends AppCompatActivity
             String accOutString;
             if (gpsAcc == -1)
                 accOutString = getString(R.string.gps_locking);
-            else if (gpsAcc > UserVars.minGPSAccuracy)
+            else if (gpsAcc > minGPSAccuracy)
                 accOutString = getString(R.string.gps_w_unit,
                         String.format(Locale.getDefault(), "%.2f", gpsAcc));
             else
@@ -644,7 +664,7 @@ public abstract class NewRecord extends AppCompatActivity
             String stabOutString;
             if (gpsStab == -1)
                 stabOutString = getString(R.string.gps_locking);
-            else if (gpsStab > UserVars.minGPSStability)
+            else if (gpsStab > minGPSStability)
                 stabOutString = getString(R.string.gps_w_unit,
                         String.format(Locale.getDefault(), "%.2f", gpsStab));
             else

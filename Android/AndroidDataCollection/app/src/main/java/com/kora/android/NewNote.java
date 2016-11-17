@@ -269,7 +269,7 @@ public class NewNote extends NewRecord {
             accOutString = getString(R.string.gps_w_unit,String.format(Locale.getDefault(),"%.2f",gpsAcc));
 
         mGPSAccField.setText(accOutString);
-        if (gpsAcc == -1 || gpsAcc > UserVars.minGPSAccuracy) {
+        if (gpsAcc == -1 || gpsAcc > minGPSAccuracy) {
             mGPSAccField.setTextColor(ContextCompat.getColor(this, R.color.dark_red));
         } else {
             mGPSAccField.setTextColor(ContextCompat.getColor(this, R.color.dark_green));
@@ -282,7 +282,7 @@ public class NewNote extends NewRecord {
             stabOutString = getString(R.string.gps_w_unit,String.format(Locale.getDefault(),"%.2f",gpsStab));
 
         mGPSStabField.setText(stabOutString);
-        if (gpsStab == -1 || gpsStab > UserVars.minGPSStability) {
+        if (gpsStab == -1 || gpsStab > minGPSStability) {
             mGPSStabField.setTextColor(ContextCompat.getColor(this, R.color.dark_red));
         } else {
             mGPSStabField.setTextColor(ContextCompat.getColor(this, R.color.dark_green));

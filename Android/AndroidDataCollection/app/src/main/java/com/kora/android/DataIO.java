@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -891,7 +892,7 @@ final class DataIO {
      * @return
      *      True if the file was uploaded, false if otherwise
      */
-    static boolean uploadBlob(String filePath) {
+    static boolean uploadBlob(String filePath, Context context) {
         try
         {
             // Retrieve storage account from connection-string.
@@ -907,7 +908,6 @@ final class DataIO {
             String name = filePath.substring(filePath.lastIndexOf('/') + 1);
 
             if (container != null) {
-                // Create or overwrite the "myimage.jpg" blob with contents from a local file.
                 CloudBlockBlob blob = container.getBlockBlobReference(name);
                 File source = new File(filePath);
 
@@ -915,7 +915,8 @@ final class DataIO {
 
                 blob.upload(new FileInputStream(source), source.length());
 
-                deleteFile(filePath);
+                if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SettingsActivity.SYNC_REMOVE_KEY, true))
+                    deleteFile(filePath);
 
                 return true;
             } else {

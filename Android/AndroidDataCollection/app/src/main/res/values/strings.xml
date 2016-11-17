@@ -172,38 +172,86 @@
     <string name="parse_success">Parsed value %1$s</string>
     <string name="title_activity_settings">Settings</string>
 
+
     <!-- Strings related to Settings -->
 
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
+    <!-- Settings for Location -->
+    <string name = "pref_header_location">Location</string>
 
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
+    <string name="pref_title_min_accuracy">Minimum location accuracy</string>
+    <string name="pref_description_min_accuracy">The minimum location accuracy to allow</string>
+    <string name="pref_default_min_accuracy">50</string>
+    <string-array name="pref_min_accuracy_titles">
+        <item>15 meters</item>
+        <item>25 meters</item>
+        <item>50 meters</item>
+        <item>75 meters</item>
+        <item>100 meters</item>
+    </string-array>
+    <string-array name="pref_min_accuracy_values">
+        <item>15</item>
+        <item>25</item>
+        <item>50</item>
+        <item>75</item>
+        <item>100</item>
+    </string-array>
 
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
+    <string name="pref_title_min_stability">Minimum location stability</string>
+    <string name="pref_description_min_stability">The minimum location stability to allow</string>
+    <string name="pref_default_min_stability">50</string>
+    <string-array name="pref_min_stability_titles">
+        <item>15 meters</item>
+        <item>25 meters</item>
+        <item>50 meters</item>
+        <item>75 meters</item>
+        <item>100 meters</item>
+    </string-array>
+    <string-array name="pref_min_stability_values">
+        <item>15</item>
+        <item>25</item>
+        <item>50</item>
+        <item>75</item>
+        <item>100</item>
+    </string-array>
 
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
+    <string name="pref_title_max_update">Maximum location update time</string>
+    <string name="pref_description_max_update">The longest time to allow between location updates</string>
+    <string name="pref_max_update_default">1</string>
+    <string-array name="pref_max_update_titles">
+        <item>One minute</item>
+        <item>Two minutes</item>
+        <item>Three minutes</item>
+    </string-array>
+    <string-array name="pref_max_update_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <!-- Settings for Data & Sync -->
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_startup">Sync list options on startup</string>
+    <string name="pref_sync_startup_default">0</string>
+    <string-array name="pref_sync_startup_titles">
         <item>Always</item>
-        <item>When possible</item>
+        <item>WiFi Only</item>
         <item>Never</item>
     </string-array>
-    <string-array name="pref_example_list_values">
+    <string-array name="pref_sync_startup_values">
         <item>1</item>
         <item>0</item>
         <item>-1</item>
     </string-array>
 
-    <!-- Example settings for Data & Sync -->
+    <string name="pref_title_photos_wifi">Upload photos on WiFi</string>
+    <string name="pref_description_photos_wifi">Only upload photos when WiFi is available</string>
+
     <string name="pref_title_sync_remove">Clear records after sync</string>
     <string name="pref_description_sync_remove">Always remove records after syncing manually</string>
 
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-
     <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string name="pref_sync_frequency_default">-1</string>
     <string-array name="pref_sync_frequency_titles">
         <item>Manual</item>
     </string-array>
@@ -211,29 +259,5 @@
         <item>-1</item>
     </string-array>
 
-    <string-array name="list_preference_entries">
-        <item>Entry 1</item>
-        <item>Entry 2</item>
-        <item>Entry 3</item>
-    </string-array>
-
-    <string-array name="list_preference_entry_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-
-    <string-array name="multi_select_list_preference_default_value" />
-
-    <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
-
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="pref_ringtone_silent"></string>
 </resources>

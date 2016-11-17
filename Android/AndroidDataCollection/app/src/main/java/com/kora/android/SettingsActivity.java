@@ -37,7 +37,20 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     //region Preference Keys
 
+    /**
+     * Keys for location
+     */
+    static final String MIN_LOCATION_ACCURACY_KEY = "min_location_accuracy";
+    static final String MIN_LOCATION_STABILITY_KEY = "min_location_stability";
+    static final String MAX_LOCATION_UPDATE_KEY = "max_location_update";
+
+    /**
+     * Keys for data sync
+     */
     static final String SYNC_REMOVE_KEY = "sync_remove";
+    static final String SYNC_STARTUP_KEY = "sync_startup";
+    static final String SYNC_FREQUENCY_KEY = "sync_frequency";
+    static final String PHOTOS_WIFI_KEY = "photos_wifi";
 
     //endregion
 
@@ -163,55 +176,27 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
-                || GeneralPreferenceFragment.class.getName().equals(fragmentName)
                 || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
-                || NotificationPreferenceFragment.class.getName().equals(fragmentName);
+                || LocationPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     /**
-     * This fragment shows general preferences only. It is used when the
+     * This fragment shows location preferences only. It is used when the
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
+    public static class LocationPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_general);
+            addPreferencesFromResource(R.xml.pref_location);
             setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-    /**
-     * This fragment shows notification preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class NotificationPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_notification);
-            setHasOptionsMenu(true);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values.
-            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
+            bindPreferenceSummaryToValue(findPreference(MIN_LOCATION_ACCURACY_KEY));
+            bindPreferenceSummaryToValue(findPreference(MIN_LOCATION_STABILITY_KEY));
+            bindPreferenceSummaryToValue(findPreference(MAX_LOCATION_UPDATE_KEY));
         }
 
         @Override
@@ -239,7 +224,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+            bindPreferenceSummaryToValue(findPreference(SYNC_STARTUP_KEY));
+            bindPreferenceSummaryToValue(findPreference(SYNC_FREQUENCY_KEY));
         }
 
         @Override
