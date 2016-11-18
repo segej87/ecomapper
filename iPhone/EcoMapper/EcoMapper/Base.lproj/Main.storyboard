@@ -10,7 +10,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Notebook-->
+        <!--Notebook View Controller-->
         <scene sceneID="TSI-xH-dWK">
             <objects>
                 <viewController automaticallyAdjustsScrollViewInsets="NO" id="xke-r5-FdW" customClass="NotebookViewController" customModule="EcoMapper" customModuleProvider="target" sceneMemberID="viewController">
@@ -32,7 +32,7 @@
                                             <frame key="frameInset" width="375" height="89"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="defaultPhoto" translatesAutoresizingMaskIntoConstraints="NO" id="yqb-DJ-jyM">
+                                                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yqb-DJ-jyM">
                                                     <frame key="frameInset" width="89" height="89"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 </imageView>
@@ -72,8 +72,8 @@
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wyb-7X-ozC">
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="40" id="YVe-8p-FUZ"/>
-                                            <constraint firstAttribute="height" constant="40" id="yru-fM-gUv"/>
+                                            <constraint firstAttribute="width" secondItem="Wyb-7X-ozC" secondAttribute="height" multiplier="1:1" id="Wl1-It-Avi"/>
+                                            <constraint firstAttribute="height" constant="50" id="yru-fM-gUv"/>
                                         </constraints>
                                         <state key="normal" image="noteButton"/>
                                         <connections>
@@ -82,8 +82,8 @@
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vqc-rF-71a">
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="40" id="tlp-dP-DZK"/>
-                                            <constraint firstAttribute="height" constant="40" id="zdY-Zj-Zyy"/>
+                                            <constraint firstAttribute="width" secondItem="vqc-rF-71a" secondAttribute="height" multiplier="1:1" id="HbR-d0-yJB"/>
+                                            <constraint firstAttribute="height" constant="50" id="zdY-Zj-Zyy"/>
                                         </constraints>
                                         <state key="normal" image="photoButton"/>
                                         <connections>
@@ -92,8 +92,8 @@
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TaO-AL-orS">
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="25" id="ZoV-D7-JDR"/>
-                                            <constraint firstAttribute="height" constant="40" id="zAG-Px-jfH"/>
+                                            <constraint firstAttribute="width" secondItem="TaO-AL-orS" secondAttribute="height" multiplier="1:1" id="TDa-0c-T7e"/>
+                                            <constraint firstAttribute="height" constant="50" id="zAG-Px-jfH"/>
                                         </constraints>
                                         <state key="normal" image="measButton"/>
                                         <connections>
@@ -127,7 +127,7 @@
                                 <color key="backgroundColor" red="0.2627450980392157" green="0.27450980392156865" blue="0.29411764705882354" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstItem="vqc-rF-71a" firstAttribute="leading" secondItem="Wyb-7X-ozC" secondAttribute="trailing" constant="30" id="0aa-fr-QIw"/>
-                                    <constraint firstAttribute="height" constant="50" id="6Lm-0e-Qze"/>
+                                    <constraint firstAttribute="height" constant="60" id="6Lm-0e-Qze"/>
                                     <constraint firstItem="Wyb-7X-ozC" firstAttribute="centerX" secondItem="DZG-8X-5JR" secondAttribute="centerX" id="D74-rS-Nsk"/>
                                     <constraint firstItem="vqc-rF-71a" firstAttribute="centerY" secondItem="DZG-8X-5JR" secondAttribute="centerY" id="H6U-KT-nWL"/>
                                     <constraint firstItem="1TJ-xP-dfy" firstAttribute="top" secondItem="DZG-8X-5JR" secondAttribute="top" id="MO3-LW-LF8"/>
@@ -150,19 +150,20 @@
                             <constraint firstAttribute="trailing" secondItem="kke-b0-t9K" secondAttribute="trailing" id="raB-S7-i3v"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Notebook" id="HGb-6d-gvC">
+                    <navigationItem key="navigationItem" id="HGb-6d-gvC">
                         <barButtonItem key="leftBarButtonItem" title="Edit" id="L4d-lj-HVT">
                             <connections>
                                 <action selector="editButtonHandler:" destination="xke-r5-FdW" id="9ze-wm-JMp"/>
                             </connections>
                         </barButtonItem>
                         <rightBarButtonItems>
-                            <barButtonItem systemItem="rewind" id="e38-54-xHx">
+                            <barButtonItem image="logoutIcon" id="e38-54-xHx">
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
                                     <action selector="handleLogout:" destination="xke-r5-FdW" id="uym-K2-SKB"/>
                                 </connections>
                             </barButtonItem>
+                            <barButtonItem enabled="NO" image="settingsIcon" id="UcX-7o-V9M"/>
                             <barButtonItem systemItem="refresh" id="Wic-Lj-Bbj">
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
@@ -1682,19 +1683,20 @@
         </scene>
     </scenes>
     <resources>
-        <image name="defaultPhoto" width="540" height="540"/>
-        <image name="loginImage" width="252" height="168"/>
-        <image name="measButton" width="32" height="68"/>
-        <image name="noteButton" width="29" height="41"/>
-        <image name="photoButton" width="30" height="22"/>
+        <image name="loginImage" width="452" height="300"/>
+        <image name="logoutIcon" width="31" height="37"/>
+        <image name="measButton" width="22" height="48"/>
+        <image name="noteButton" width="33" height="46"/>
+        <image name="photoButton" width="45" height="35"/>
         <image name="photoIcon" width="640" height="640"/>
+        <image name="settingsIcon" width="36" height="36"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="Aw7-Z9-rno"/>
-        <segue reference="YXc-ga-pkL"/>
+        <segue reference="joq-zD-wWN"/>
         <segue reference="nb8-7h-fDE"/>
         <segue reference="r6J-Nj-yJ2"/>
         <segue reference="UsR-he-yCb"/>
+        <segue reference="3nC-ch-rdD"/>
         <segue reference="q4H-rL-AiD"/>
     </inferredMetricsTieBreakers>
 </document>

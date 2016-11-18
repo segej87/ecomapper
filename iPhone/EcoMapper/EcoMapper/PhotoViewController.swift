@@ -275,8 +275,7 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
             imageTakerController.delegate = self
             present(imageTakerController, animated: true, completion: nil)
         } else {
-//            noCamera()
-            self.performSegue(withIdentifier: "CropSegue", sender: #imageLiteral(resourceName: "samplePhoto"))
+            noCamera()
         }
     }
     

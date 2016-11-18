@@ -2,15 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
+      "filename" : "MeasIcon50.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "meas_icon.png",
+      "filename" : "MeasIcon100.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
+      "filename" : "MeasIcon150.png",
       "scale" : "3x"
     }
   ],
