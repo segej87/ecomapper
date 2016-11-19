@@ -125,7 +125,7 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
             gpsAccView.textColor = UIColor.red
         } else {
             gpsAccView.text = String(format: "%.1f m", abs(gpsAcc))
-            if gpsAcc <= UserVars.minGPSAccuracy {
+            if gpsAcc <= minGPSAccuracy! {
                 gpsAccView.textColor = UIColor.green
             } else {
                 gpsAccView.textColor = UIColor.red
@@ -137,7 +137,7 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
             gpsStabView.textColor = UIColor.red
         } else {
             gpsStabView.text = String(format: "%.1f m", abs(gpsStab))
-            if gpsStab <= UserVars.minGPSStability {
+            if gpsStab <= minGPSStability! {
                 gpsStabView.textColor = UIColor.green
             } else {
                 gpsStabView.textColor = UIColor.red
@@ -286,7 +286,7 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
         nameTextField.text = "Photo" + " - " + dateTime!
     }
     
-    @IBAction func attemptSave(_ sender: UIBarButtonItem) {
+    @IBAction override func attemptSave(_ sender: AnyObject) {
         print("Saving record?: \(saveRecord())")
         if saveRecord() {
             if mode == "new" {
@@ -305,6 +305,7 @@ class PhotoViewController: RecordViewController, UIImagePickerControllerDelegate
             self.performSegue(withIdentifier: "exitSegue", sender: self)
         }
     }
+    
     
     
     // MARK: NSCoding

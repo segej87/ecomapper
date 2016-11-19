@@ -27,6 +27,8 @@
 		FC5DFFE51D22EB2D00C31A31 /* AZSClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */; };
 		FC5DFFE71D22EBB100C31A31 /* libxml2.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */; };
 		FC6930151D74F2E6001407A0 /* ListPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */; };
+		FC7DFCC61DDFAA7000437B61 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7DFCC51DDFAA7000437B61 /* SettingsViewController.swift */; };
+		FC7DFCC81DDFD4B800437B61 /* DefaultPreferences.plist in Resources */ = {isa = PBXBuildFile; fileRef = FC7DFCC71DDFD4B800437B61 /* DefaultPreferences.plist */; };
 		FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */; };
 		FC8244E11D199D290048C3A7 /* RecordTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */; };
 		FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3A51D18EFE800251003 /* AppDelegate.swift */; };
@@ -76,6 +78,8 @@
 		FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AZSClient.framework; path = ../../../AZSClient.framework; sourceTree = "<group>"; };
 		FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.2.tbd; path = usr/lib/libxml2.2.tbd; sourceTree = SDKROOT; };
 		FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListPickerViewController.swift; sourceTree = "<group>"; };
+		FC7DFCC51DDFAA7000437B61 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		FC7DFCC71DDFD4B800437B61 /* DefaultPreferences.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DefaultPreferences.plist; sourceTree = "<group>"; };
 		FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
 		FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecordTableViewController.xib; sourceTree = "<group>"; };
 		FC84B3A21D18EFE800251003 /* EcoMapper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EcoMapper.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -146,6 +150,7 @@
 				FC306E931DD2A6A200DCC02A /* StartScreenViewController.swift */,
 				FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */,
 				FC0EC1B41DD2B4420050BDF1 /* NotebookViewController.swift */,
+				FC7DFCC51DDFAA7000437B61 /* SettingsViewController.swift */,
 				FC0756D11DCD61D20011B9B6 /* RecordViewController.swift */,
 				FC84B3A71D18EFE800251003 /* MeasViewController.swift */,
 				FCCE99311D1A23C300A675BE /* NoteViewController.swift */,
@@ -175,6 +180,7 @@
 				FC32D8DE1DD66B40000EDAD6 /* CornerpointView.swift */,
 				FC32D8DF1DD66B40000EDAD6 /* CroppableImageView.swift */,
 				FC32D8E01DD66B40000EDAD6 /* CroppableImageViewDelegateProtocol.swift */,
+				FC7DFCC71DDFD4B800437B61 /* DefaultPreferences.plist */,
 			);
 			path = EcoMapper;
 			sourceTree = "<group>";
@@ -273,6 +279,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FC8244E11D199D290048C3A7 /* RecordTableViewController.xib in Resources */,
+				FC7DFCC81DDFD4B800437B61 /* DefaultPreferences.plist in Resources */,
 				FC84B3B01D18EFE800251003 /* LaunchScreen.storyboard in Resources */,
 				FC84B3AD1D18EFE800251003 /* Assets.xcassets in Resources */,
 				FC84B3AB1D18EFE800251003 /* Main.storyboard in Resources */,
@@ -316,6 +323,7 @@
 				FC32D8E41DD66B40000EDAD6 /* CroppableImageViewDelegateProtocol.swift in Sources */,
 				FC50B37E1DD52EA5009B8EBE /* Reachability.swift in Sources */,
 				FC306E921DD282F300DCC02A /* PickerTableViewCell.swift in Sources */,
+				FC7DFCC61DDFAA7000437B61 /* SettingsViewController.swift in Sources */,
 				FC052F531D2EA1F5003DCD19 /* NewPhoto.swift in Sources */,
 				FCEBA2581D24E6AE00AB6A9F /* LoginViewController.swift in Sources */,
 				FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */,

@@ -23,6 +23,7 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var mediaMonitor: UIView!
     @IBOutlet weak var mediaProgress: UIActivityIndicatorView!
     @IBOutlet weak var mediaCounter: UILabel!
+    @IBOutlet weak var syncSpinner: UIActivityIndicatorView!
     
     /*
      An array to hold saved records.
@@ -221,10 +222,10 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBAction func attemptSync(_ sender: UIBarButtonItem) {
         if #available(iOS 8.0, *) {
             let alertVC = UIAlertController(title: "Are you sure?", message: "All records will be removed after syncing.", preferredStyle: .alert)
-            let syncAction = UIAlertAction(title: "Sync", style: .default, handler: self.executeSync)
             let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
-            alertVC.addAction(syncAction)
+            let syncAction = UIAlertAction(title: "Sync", style: .default, handler: self.executeSync)
             alertVC.addAction(cancelAction)
+            alertVC.addAction(syncAction)
             present(alertVC, animated: true, completion: nil)
         } else {
             let alertVC = UIAlertView(title: "No GPS", message: "Can't pinpoint your location, using default", delegate: self, cancelButtonTitle: "OK")
@@ -233,6 +234,9 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func executeSync(action: UIAlertAction) -> Void {
+        // Start the activity indicator
+        self.syncSpinner.startAnimating()
+        
         // Deactivate the buttons while uploading
         toggleButtons(enabled: false)
         
@@ -251,6 +255,7 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
             // Move to an asynchronous thread and upload the media from the media array
             let priority = DispatchQoS.QoSClass.default
             DispatchQueue.global(qos: priority).async{
+                self.syncSpinner.stopAnimating()
                 ud.uploadMedia()
             }
         } else {
@@ -266,6 +271,9 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
                 alertVC.show()
             }
             
+            //Stop the sync spinner
+            self.syncSpinner.stopAnimating()
+            
             // Reactivate the buttons
             toggleButtons(enabled: true)
         }
@@ -278,10 +286,10 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBAction func handleLogout(_ sender: UIBarButtonItem) {
         if #available(iOS 8.0, *) {
             let alertVC = UIAlertController(title: "Logout?", message: "Are you sure you want to leave Kora?", preferredStyle: .alert)
-            let leaveAction = UIAlertAction(title: "Logout", style: .default, handler: self.executeLogout)
             let stayAction = UIAlertAction(title: "Stay", style: .default, handler: nil)
-            alertVC.addAction(leaveAction)
+            let leaveAction = UIAlertAction(title: "Logout", style: .default, handler: self.executeLogout)
             alertVC.addAction(stayAction)
+            alertVC.addAction(leaveAction)
             present(alertVC, animated: true, completion: nil)
         } else {
             let alertVC = UIAlertView(title: "No GPS", message: "Can't pinpoint your location, using default", delegate: self, cancelButtonTitle: "OK")
@@ -482,6 +490,10 @@ class NotebookViewController: UIViewController, UITableViewDataSource, UITableVi
         nav?.barStyle = UIBarStyle.black
         nav?.backgroundColor = UIColor(red: 0/255 as CGFloat, green: 0/255 as CGFloat, blue: 96/255 as CGFloat, alpha: 1)
         self.navigationController?.navigationBar.tintColor = UIColor.lightGray
+        
+        logoutButton.width = CGFloat(44)
+        syncButton.width = CGFloat(44)
+        
     }
     
     func toggleButtons (enabled: Bool) {

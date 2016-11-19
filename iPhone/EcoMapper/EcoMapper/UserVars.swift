@@ -90,9 +90,9 @@ struct UserVars {
     /*
      Location settings
      */
-    static let maxUpdateTime = 1
-    static let minGPSAccuracy = 50 as Double
-    static let minGPSStability = 50 as Double
+//    static let maxUpdateTime = 1
+//    static let minGPSAccuracy = 50 as Double
+//    static let minGPSStability = 50 as Double
     
     /*
      Static string server URLs

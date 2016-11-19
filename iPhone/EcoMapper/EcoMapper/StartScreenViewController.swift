@@ -9,12 +9,33 @@
 import UIKit
 
 class StartScreenViewController: UIViewController {
+    
+    var defaults : UserDefaults?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         NetworkTests.setupReachability(nil)
         
+        defaults = UserDefaults.standard
+        if defaults?.integer(forKey: "DefMinAcc") == 0 {
+            defaults?.set(50, forKey: "DefMinAcc")
+        }
+        if defaults?.integer(forKey: "DefMinStab") == 0 {
+            defaults?.set(50, forKey: "DefMinStab")
+        }
+        if defaults?.double(forKey: "DefMaxTime") == 0 {
+            defaults?.set(1.0, forKey: "DefMaxTime")
+        }
+        if defaults?.string(forKey: "DefSyncStart") == nil {
+            defaults?.set("WiFi Only", forKey: "DefSyncStart")
+        }
+        if defaults?.string(forKey: "DefSyncFreq") == nil {
+            defaults?.set("Manual", forKey: "DefSyncFreq")
+        }
+        if defaults?.object(forKey: "PhotoWiFi") == nil {
+            defaults?.set(true, forKey: "PhotoWiFi")
+        }
         checkAndSegue()
     }
 
@@ -50,8 +71,8 @@ class StartScreenViewController: UIViewController {
                             self.performSegue(withIdentifier: "Notebook", sender: "saved login")
                             return
                     }
-                    
-                    if reach.isReachable() {
+                    let startSyncPref = self.defaults?.string(forKey: "DefSyncStart")
+                    if (startSyncPref == "Always" && reach.isReachable()) || (startSyncPref == "WiFi Only" && reach.isReachableViaWiFi()) {
                         self.getListsUsingUUID(uvuuid, sender: "saved login")
                     } else {
                         self.performSegue(withIdentifier: "Notebook", sender: "saved login")
@@ -83,7 +104,8 @@ class StartScreenViewController: UIViewController {
             
             // Make sure there are no errors creating the session and that some data is being passed
             guard error == nil && data != nil else {
-                print("Login list retrieve error: \(error!)")
+                print("Login list retrieve error: \(error!)")// Perform a segue to the notebook view controller
+                self.performSegue(withIdentifier: "Notebook", sender: sender)
                 return
             }
             
@@ -123,10 +145,12 @@ class StartScreenViewController: UIViewController {
                         
                     } catch let error as NSError {
                         NSLog("Login list retrieve parse error: \(error.localizedDescription)")
+                        // Perform a segue to the notebook view controller
+                        self.performSegue(withIdentifier: "Notebook", sender: sender)
                     }
                 } else {
                     
-                    // Show the error to the user as an alert controller
+                    // Log the error
                     var errorString: String?
                     if responseString!.contains("Error") {
                         errorString = responseString!.replacingOccurrences(of: "Error: ",with: "")
@@ -135,6 +159,8 @@ class StartScreenViewController: UIViewController {
                     }
                     
                     NSLog("Error retrieving user variables: \(errorString)")
+                    // Perform a segue to the notebook view controller
+                    self.performSegue(withIdentifier: "Notebook", sender: sender)
                 }
             }
         })

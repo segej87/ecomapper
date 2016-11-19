@@ -61,11 +61,23 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
      */
     var selectedImage : UIImage?
     
+    /*
+     The defaults object
+     */
+    var defaults : UserDefaults?
+    var minGPSAccuracy : Double?
+    var minGPSStability : Double?
+    var maxUpdateTime : Double?
     
     //MARK: Initialization
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        defaults = UserDefaults.standard
+        minGPSAccuracy = Double((defaults?.integer(forKey: "DefMinAcc"))!)
+        minGPSStability = Double((defaults?.integer(forKey: "DefMinStab"))!)
+        maxUpdateTime = defaults?.double(forKey: "DefMaxTime")
         
         // Style the navigation bar
         styleNavigationBar()
@@ -168,26 +180,28 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
             return false
         }
         
-        let elapsedTime = Date().compare(loc.timestamp).rawValue/60
+        let elapsedTime = Double(Date().compare(loc.timestamp).rawValue/60)
         
-        staleLoc = elapsedTime > UserVars.maxUpdateTime || (gpsAcc == -1 || gpsAcc > UserVars.minGPSAccuracy) || (gpsStab == -1 || gpsStab > UserVars.minGPSStability)
+        print("Elapsed time: \(elapsedTime)")
+        
+        staleLoc = elapsedTime > maxUpdateTime! || (gpsAcc == -1 || gpsAcc > minGPSAccuracy!) || (gpsStab == -1 || gpsStab > minGPSStability!)
         
         if staleLoc {
             var outString = ""
             
-            if elapsedTime > UserVars.maxUpdateTime {
+            if elapsedTime > maxUpdateTime! {
                 outString.append("Last location update: \(String(elapsedTime)) minutes ago.\n\n")
             }
             
             if gpsAcc == -1 {
                 outString.append("Current accuracy: Locking\n\n")
-            } else if gpsAcc > UserVars.minGPSAccuracy {
+            } else if gpsAcc > minGPSAccuracy! {
                 outString.append("Current accuracy: \(gpsAcc) m\n\n")
             }
             
             if gpsStab == -1 {
                 outString.append("Current stability: Locking\n\n")
-            } else if gpsStab > UserVars.minGPSStability {
+            } else if gpsStab > minGPSStability! {
                 outString.append("Current stability: \(gpsStab) m\n\n")
             }
             
@@ -206,6 +220,7 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
     
     func ignoreLocWarning(action: UIAlertAction) -> Void {
         userOverrideStale = true
+        attemptSave(self)
     }
     
     
@@ -363,10 +378,10 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
         if mode == "new" {
             if #available(iOS 8.0, *) {
                 let alertVC = UIAlertController(title: "Are you sure?", message: "All info in this record will be lost.", preferredStyle: .alert)
-                let leaveAction = UIAlertAction(title: "Leave", style: .default, handler: self.handleLeave)
                 let stayAction = UIAlertAction(title: "Stay", style: .default, handler: nil)
-                alertVC.addAction(leaveAction)
+                let leaveAction = UIAlertAction(title: "Leave", style: .default, handler: self.handleLeave)
                 alertVC.addAction(stayAction)
+                alertVC.addAction(leaveAction)
                 present(alertVC, animated: true, completion: nil)
             } else {
                 let alertVC = UIAlertView(title: "No GPS", message: "Can't pinpoint your location, using default", delegate: self, cancelButtonTitle: "OK")
@@ -416,6 +431,9 @@ class RecordViewController: UIViewController, UITextFieldDelegate, UITextViewDel
         preconditionFailure("This method must be overriden")
     }
     
+    @IBAction func attemptSave(_ sender: AnyObject) {
+        preconditionFailure("This method must be overriden")
+    }
     
     // MARK: Helper Methods
     

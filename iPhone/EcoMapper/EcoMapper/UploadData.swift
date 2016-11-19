@@ -126,8 +126,14 @@ open class UploadData {
                     NetworkTests.setupReachability(nil)
                     return
             }
-            if !reach.isReachableViaWiFi() {
+            
+            if UserDefaults.standard.bool(forKey: "PhotoWiFi") && !reach.isReachableViaWiFi() {
                 print("Can't reach WiFi")
+                break
+            }
+            
+            if !reach.isReachable() {
+                print("not connected")
                 break
             }
             

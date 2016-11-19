@@ -77,7 +77,7 @@ class NoteViewController: RecordViewController, UINavigationControllerDelegate {
             gpsAccView.textColor = UIColor.red
         } else {
             gpsAccView.text = String(format: "%.1f m", abs(gpsAcc))
-            if gpsAcc <= UserVars.minGPSAccuracy {
+            if gpsAcc <= minGPSAccuracy! {
                 gpsAccView.textColor = UIColor.green
             } else {
                 gpsAccView.textColor = UIColor.red
@@ -89,7 +89,7 @@ class NoteViewController: RecordViewController, UINavigationControllerDelegate {
             gpsStabView.textColor = UIColor.red
         } else {
             gpsStabView.text = String(format: "%.1f m", abs(gpsStab))
-            if gpsStab <= UserVars.minGPSStability {
+            if gpsStab <= minGPSStability! {
                 gpsStabView.textColor = UIColor.green
             } else {
                 gpsStabView.textColor = UIColor.red
@@ -170,7 +170,7 @@ class NoteViewController: RecordViewController, UINavigationControllerDelegate {
         nameTextField.text = "Note" + " - " + dateTime!
     }
     
-    @IBAction func attemptSave(_ sender: UIBarButtonItem) {
+    @IBAction override func attemptSave(_ sender: AnyObject) {
         if saveRecord() {
             self.performSegue(withIdentifier: "exitSegue", sender: self)
         }
