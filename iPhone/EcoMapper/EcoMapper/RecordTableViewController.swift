@@ -11,7 +11,7 @@ import Photos
 
 class RecordTableViewController: UITableViewController {
     
-    // MARK: Properties
+    // MARK: Class Variables
     // Button to send and receive data from server.
     @IBOutlet weak var syncButton: UIBarButtonItem!
     @IBOutlet weak var logoutButton: UIBarButtonItem!
@@ -148,7 +148,7 @@ class RecordTableViewController: UITableViewController {
                 let oldMediaPath = records[(indexPath as NSIndexPath).row].props["filepath"] as! String
                 
                 // Remove the root URL string to get the media name (media paths are formatted root URL/mediaName.
-                let oldMediaName = oldMediaPath.replacingOccurrences(of: "\(UserVars.blobRootURLString)\(UserVars.uuid!)/", with: "")
+                let oldMediaName = oldMediaPath.replacingOccurrences(of: "\(UserVars.blobRootURLString)\(UserVars.UUID!)/", with: "")
                 
                 // Find the index in the media array corresponding to the media name.
                 let oldMediaIndex = indexOfMedia(oldMediaName)
@@ -368,13 +368,13 @@ class RecordTableViewController: UITableViewController {
 
                 // Before updating the photo, find its corresponding record in the media list.
                 let oldMediaPath = records[(selectedIndexPath as NSIndexPath).row].props["filepath"] as! String
-                let oldMediaName = oldMediaPath.replacingOccurrences(of: "\(UserVars.blobRootURLString)\(UserVars.uuid!)/", with: "")
+                let oldMediaName = oldMediaPath.replacingOccurrences(of: "\(UserVars.blobRootURLString)\(UserVars.UUID!)/", with: "")
                 let oldMediaIndex = indexOfMedia(oldMediaName)
                 if oldMediaIndex != -1 {
                     medias[oldMediaIndex] = media
                 }
                 
-                record.props["filepath"] = "\(UserVars.blobRootURLString)\(UserVars.uuid!)/\(media.mediaName!)" as AnyObject?
+                record.props["filepath"] = "\(UserVars.blobRootURLString)\(UserVars.UUID!)/\(media.mediaName!)" as AnyObject?
                 
                 // Update the existing record.
                 records[(selectedIndexPath as NSIndexPath).row] = record
@@ -383,7 +383,7 @@ class RecordTableViewController: UITableViewController {
             } else {
                 // Add a new record
                 let newIndexPath = IndexPath(row: records.count, section: 0)
-                record.props["filepath"] = "\(UserVars.blobRootURLString)\(UserVars.uuid!)/\(media.mediaName!)" as AnyObject?
+                record.props["filepath"] = "\(UserVars.blobRootURLString)\(UserVars.UUID!)/\(media.mediaName!)" as AnyObject?
                 records.append(record)
                 tableView.insertRows(at: [newIndexPath], with: .bottom)
                 
@@ -412,6 +412,7 @@ class RecordTableViewController: UITableViewController {
             saveRecords()
         }
 
+        saveUserVars()
         saveLogin()
     }
     
@@ -451,13 +452,25 @@ class RecordTableViewController: UITableViewController {
     
     func saveLogin() {
         // Create a login object with the user variables
-        let loginInfo = LoginInfo(uuid: UserVars.uuid, accessLevels: UserVars.AccessLevels, tags: UserVars.Tags, species: UserVars.Species, units: UserVars.Units)
+        let loginInfo = LoginInfo(uuid: UserVars.UUID)
         
         // Save the login object
-        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo!, toFile: LoginInfo.ArchiveURL.path)
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(loginInfo, toFile: LoginInfo.ArchiveURL.path)
         
         if !isSuccessfulSave {
             print("Failed to save login info...")
+        }
+    }
+    
+    func saveUserVars() {
+        let userVars = UserVarsSaveFile(userName: UserVars.UName, accessLevels: UserVars.AccessLevels, tags: UserVars.Tags, species: UserVars.Species, units: UserVars.Units, accessDefaults: UserVars.AccessDefaults, tagDefaults: UserVars.TagsDefaults, speciesDefault: UserVars.SpecDefault, unitsDefault: UserVars.UnitsDefault)
+        
+        NSLog("Attempting to save user variables to \(UserVars.UserVarsURL!.path)")
+        
+        let isSuccessfulSave = NSKeyedArchiver.archiveRootObject(userVars, toFile: (UserVars.UserVarsURL!.path))
+        
+        if !isSuccessfulSave {
+            NSLog("Failed to save user variables...")
         }
     }
 }

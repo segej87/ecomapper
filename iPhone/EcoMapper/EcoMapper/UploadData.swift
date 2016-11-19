@@ -13,14 +13,10 @@ open class UploadData {
     
     // MARK: Properties
     // The calling table view
-    var tableView: RecordTableViewController?
+    var tableView: NotebookViewController?
     
-    init?(tableView: RecordTableViewController?) {
+    init(tableView: NotebookViewController?) {
         self.tableView = tableView
-        
-        if tableView == nil {
-            return nil
-        }
     }
     
     // MARK: Upload geojson records
@@ -39,7 +35,7 @@ open class UploadData {
             request.httpMethod = "POST"
             
             // Create the POST string with necessary variables, and put in HTTP body
-            let postString = "GUID=\(UserVars.uuid!)&geojson=\(dataString!)"
+            let postString = "GUID=\(UserVars.UUID!)&geojson=\(dataString!)"
             request.httpBody = postString.data(using: String.Encoding.utf8)
             
             // Create a session with the PHP script, and attempt to upload records
@@ -61,7 +57,7 @@ open class UploadData {
                 let responseString = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)
                 
                 // TODO: make sure this executes so "Local" items are changed to "Server"
-                self.getListsUsingUUID(UserVars.uuid!)
+                self.getListsUsingUUID(UserVars.UUID!)
                 
                 // Once background task finishes, perform post-upload operations
                 DispatchQueue.main.async {
@@ -116,15 +112,33 @@ open class UploadData {
         // Create a dictionary of media names and paths for upload loop
         var mediaList = [String:URL]()
         for i in tableView!.medias.indices {
-            mediaList[tableView!.medias[i].mediaName!] = tableView!.medias[i].mediaPath as URL?
+            if tableView!.medias[i].marked == true {
+                mediaList[tableView!.medias[i].mediaName!] = tableView!.medias[i].mediaPath as URL?
+            }
         }
         
         // Loop through media dictionary and attempt to upload
         for m in mediaList.keys{
+            
+            // Check if the device is connected to WiFi
+            guard let reach = NetworkTests.reachability
+                else {
+                    NetworkTests.setupReachability(nil)
+                    return
+            }
+            
+            if UserDefaults.standard.bool(forKey: "PhotoWiFi") && !reach.isReachableViaWiFi() {
+                print("Can't reach WiFi")
+                break
+            }
+            
+            if !reach.isReachable() {
+                print("not connected")
+                break
+            }
+            
             let mName = m
             let mPath = mediaList[m]
-            
-            print(mPath)
             
             // PHAsset only works on iOS 8.0 or above
             if #available(iOS 8.0, *) {
@@ -145,7 +159,7 @@ open class UploadData {
                         if let imageData = imageData {
                             
                             // Attempt to upload the blob to the server
-                            self.uploadBlob(mName, imageData: imageData, container: container)
+                            self.uploadBlob(mName, imageData: imageData, container: container, mPath: mPath!)
                         }
                     }
                     
@@ -154,7 +168,7 @@ open class UploadData {
                     
                     let imageData = UIImageJPEGRepresentation(result, 1.0)
                     
-                    self.uploadBlob(mName, imageData: imageData!, container: container)
+                    self.uploadBlob(mName, imageData: imageData!, container: container, mPath: mPath!)
                 } else {
                     print("Couldn't upload photo")
                 }
@@ -164,6 +178,8 @@ open class UploadData {
                 // TODO: Fallback on earlier versions
             }
         }
+        
+        tableView?.mediaProgress.stopAnimating()
     }
     
     // MARK: Media helper methods
@@ -171,7 +187,7 @@ open class UploadData {
     func getContainer() -> AZSCloudBlobContainer {
         // Connect to Azure blob storage container for media
         let connectionString = "DefaultEndpointsProtocol=https;AccountName=ecomapper;AccountKey=c0h6WIRF2ObRNWwAkp9arNRLb1KUa0/fZwnKohRwgZfrbVca5WXPxIqJKPeSVyK1oPdAgbIghCpPJNayrId1tw=="
-        let containerName = UserVars.uuid!
+        let containerName = UserVars.UUID!
         
         let storageAccount : AZSCloudStorageAccount;
         try! storageAccount = AZSCloudStorageAccount(fromConnectionString: connectionString)
@@ -197,7 +213,7 @@ open class UploadData {
         return container!
     }
     
-    func uploadBlob(_ mName: String, imageData: Data, container: AZSCloudBlobContainer) {
+    func uploadBlob(_ mName: String, imageData: Data, container: AZSCloudBlobContainer, mPath: URL) {
         // Attempt to upload the image data to the correct blob container
         let blob = container.blockBlobReference(fromName: mName)
         blob.upload(from: imageData, completionHandler: { (error: Error?) -> Void in
@@ -209,6 +225,7 @@ open class UploadData {
                 if self.tableView!.indexOfMedia(mName) != -1 {
                     self.tableView!.medias.remove(at: self.tableView!.indexOfMedia(mName))
                     self.tableView!.saveMedia()
+                    self.tableView!.mediaMonitorManager()
                 }
                 
                 // Check to make sure the deletion occurred succesfully
@@ -216,6 +233,14 @@ open class UploadData {
                     print("Media successfully removed")
                 } else {
                     print("Media couldn't be removed")
+                }
+                
+                // Try to delete the photo file
+                do {
+                    try FileManager.default.removeItem(at: mPath)
+                    NSLog("Deleted photo \(mPath)")
+                } catch let error as NSError {
+                    NSLog("Could not delete photo \(mPath): \(error.localizedDescription)")
                 }
             } else {
                 
@@ -262,7 +287,6 @@ open class UploadData {
             
             // Get the PHP script's response to the session
             let responseString = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)
-            self.tableView!.listString = responseString!
             
             // Perform rest of login procedure after background server session finishes
             DispatchQueue.main.async {
@@ -315,7 +339,7 @@ open class UploadData {
                             }
                         }
                         
-                        self.tableView!.saveLogin()
+                        UserVars.saveUserVars()
                         
                         // Reactivate the buttons and table
                         self.enableButtons()
@@ -325,8 +349,8 @@ open class UploadData {
                 } else {
                     // Show the error to the user as an alert controller
                     var errorString: String?
-                    if self.tableView!.listString!.replacingOccurrences(of: "Error", with: "") != self.tableView!.listString! as String {
-                        errorString = self.tableView!.listString!.replacingOccurrences(of: "Error: ",with: "")
+                    if responseString!.replacingOccurrences(of: "Error", with: "") != responseString! as String {
+                        errorString = responseString!.replacingOccurrences(of: "Error: ",with: "")
                     } else {
                         errorString = "Can't connect to the server - please check your internet connection"
                     }
@@ -350,7 +374,7 @@ open class UploadData {
     //MARK: General helper methods
     
     func enableButtons () {
-        for b in [self.tableView!.syncButton, self.tableView!.logoutButton, self.tableView!.newButton,self.tableView!.editButtonItem] {
+        for b in [self.tableView!.syncButton, self.tableView!.logoutButton,self.tableView!.editButtonItem] {
             b!.isEnabled = true
         }
         

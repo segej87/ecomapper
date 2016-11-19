@@ -10,68 +10,52 @@ import UIKit
 
 class ListPickerViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UISearchBarDelegate {
     
+    
     // MARK: Properties
-    // IB Properties
+    
+    /* 
+     IB Properties
+     */
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var newText: UITextField!
     
-    // Class variables
-    // A key indicating the type of list to use (sent via segue)
+    /* 
+     A key indicating the type of list to use (sent via segue)
+     */
     var itemType:String?
     
-    // Full data source for table view
+    /*
+     Full data source for table view
+     */
     var fullItems = [String]()
     
-    // Items to list in table view (after search)
+    /*
+     Items to list in table view (after search)
+     */
     var listItems = [String]()
     
-    // Items selected by the user
+    /*
+     Items selected by the user
+     */
     var selectedItems = [String]()
     
-    // Boolean indicating whether a search is active
+    /*
+     Boolean indicating whether a search is active
+     */
     var searchActive : Bool = false
+    
     
     // MARK: Initialization
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(itemType!)
-        
         self.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
-        // TODO: Set dynamically through segue
         // Load the initial full data source for the table view
-        switch itemType! {
-        case "tags":
-            self.fullItems = Array(UserVars.Tags.keys)
-            newText.placeholder = "Add new tag"
-        case "species":
-            self.fullItems = Array(UserVars.Species.keys)
-            newText.placeholder = "Add new measured item"
-        case "units":
-            self.fullItems = Array(UserVars.Units.keys)
-            newText.placeholder = "Add new unit"
-        case "access":
-            self.fullItems = UserVars.AccessLevels
-            newText.isEnabled = false
-            newText.placeholder = "New access levels can't be added remotely"
-        default:
-            self.fullItems = [String]()
-        }
-        
-        // Sort the lists
-        sortLists()
-        
-        // Since previously selected items may have been loaded during the segue,
-        // check if anything should be removed from the full list
-        for f in self.fullItems {
-            if self.selectedItems.contains(f) {
-                self.fullItems.remove(at: self.fullItems.index(of: f)!)
-            }
-        }
+        setItems()
         
         // Set the new item text field delegate
         self.newText.delegate = self
@@ -80,7 +64,9 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         self.searchBar.delegate = self
     }
     
+    
     // MARK: Table protocols
+    
     // Define two sections in the table view
     func numberOfSections(in tableView: UITableView) -> Int {
         return 2
@@ -118,18 +104,28 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     
     // Method for populating data in the table view
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // Table view cells are reused and should be dequeued using a cell identifier.
+        let cellIdentifier = "PickerTableViewCell"
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! PickerTableViewCell
         
-        let cell:UITableViewCell = self.tableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
+        cell.itemType = itemType!
         
         if (indexPath as NSIndexPath).section == 0 {
-            cell.textLabel?.text = self.selectedItems[(indexPath as NSIndexPath).row]
+            let rowItem = self.selectedItems[(indexPath as NSIndexPath).row]
+            cell.value = rowItem
+            cell.defaultButton.isHidden = false
+            cell.defaultButton.isEnabled = true
+            
+            cell.isDefault = checkDefault(value: rowItem)
         } else if (indexPath as NSIndexPath).section == 1 {
+            cell.defaultButton.isHidden = true
+            cell.defaultButton.isEnabled = false
             if (searchActive) {
                 if listItems.count > 0 {
-                    cell.textLabel?.text = self.listItems[(indexPath as NSIndexPath).row]
+                    cell.value = self.listItems[(indexPath as NSIndexPath).row]
                 }
             } else {
-                cell.textLabel?.text = self.fullItems[(indexPath as NSIndexPath).row]
+                cell.value = self.fullItems[(indexPath as NSIndexPath).row]
             }
         }
         
@@ -139,10 +135,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
     // Method for allowing the user to select rows in the table view
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        // If the selected row is in the available section, move
-        // the item from the available section to the selected section.
-        // If the selected row is in the selected section, move to the
-        // available section.
+        // Toggle selected items between Available and Selected
         if (indexPath as NSIndexPath).section == 1 {
             if (searchActive) {
                 if listItems[(indexPath as NSIndexPath).row] != "No item found" {
@@ -203,8 +196,7 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
             searchBar.text = ""
         }
         
-        // If the entered text is not already in the list, add as a
-        // selected item
+        // If the entered text is not already in the list, add as a selected item
         if !(textField.text?.isEmpty)! && !fullItems.contains(textField.text!) && !selectedItems.contains(textField.text!) {
             selectedItems.append(textField.text!)
             textField.text = ""
@@ -268,7 +260,51 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         self.tableView.reloadData()
     }
     
+    
+    // MARK: Actions
+    
+    @IBAction func cancel(_ sender: UIButton) {
+        self.dismiss(animated: false, completion: nil)
+    }
+    
+    @IBAction func save(_ sender: UIButton) {
+        print("List picker selected: \(selectedItems.joined(separator: ", "))")
+        
+    }
+    
+    
     // MARK: Helper methods
+    
+    func setItems() {
+        switch itemType! {
+        case "tags":
+            self.fullItems = Array(UserVars.Tags.keys)
+            newText.placeholder = "Add new tag"
+        case "species":
+            self.fullItems = Array(UserVars.Species.keys)
+            newText.placeholder = "Add new measured item"
+        case "units":
+            self.fullItems = Array(UserVars.Units.keys)
+            newText.placeholder = "Add new unit"
+        case "access":
+            self.fullItems = UserVars.AccessLevels
+            newText.isEnabled = false
+            newText.placeholder = "New access levels can't be added remotely"
+        default:
+            self.fullItems = [String]()
+        }
+        
+        // Sort the lists
+        sortLists()
+        
+        // Since previously selected items may have been loaded during the segue,
+        // check if anything should be removed from the full list
+        for f in self.fullItems {
+            if self.selectedItems.contains(f) {
+                self.fullItems.remove(at: self.fullItems.index(of: f)!)
+            }
+        }
+    }
     
     func sortLists () {
         // Sort the lists
@@ -291,15 +327,18 @@ class ListPickerViewController: UIViewController, UITableViewDelegate, UITableVi
         }
     }
     
-    // MARK: Actions
-    
-    @IBAction func cancel(_ sender: UIButton) {
-        self.dismiss(animated: false, completion: nil)
-        print("cancel")
-    }
-    
-    @IBAction func save(_ sender: UIButton) {
-        print("List picker selected: \(selectedItems.joined(separator: ", "))")
-        
+    func checkDefault(value: String) -> Bool {
+        switch (itemType!) {
+        case "tags":
+            return UserVars.TagsDefaults.contains(value)
+        case "species":
+            return UserVars.SpecDefault != nil && UserVars.SpecDefault == value
+        case "units":
+            return UserVars.UnitsDefault != nil && UserVars.UnitsDefault == value
+        case "access":
+            return UserVars.AccessDefaults.contains(value)
+        default:
+            return false
+        }
     }
 }

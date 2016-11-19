@@ -9,15 +9,27 @@
 /* Begin PBXBuildFile section */
 		FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */; };
 		FC052F531D2EA1F5003DCD19 /* NewPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */; };
-		FC0824FC1D87798E00286707 /* DataRetriever.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0824FB1D87798E00286707 /* DataRetriever.swift */; };
-		FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC3349DB1D1B365F00D112EA /* Reachability.swift */; };
+		FC0756D21DCD61D20011B9B6 /* RecordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0756D11DCD61D20011B9B6 /* RecordViewController.swift */; };
+		FC0EC1B51DD2B4420050BDF1 /* NotebookViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0EC1B41DD2B4420050BDF1 /* NotebookViewController.swift */; };
+		FC0EC1B71DD2C2E70050BDF1 /* LogoutSegue.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0EC1B61DD2C2E70050BDF1 /* LogoutSegue.swift */; };
+		FC306E921DD282F300DCC02A /* PickerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC306E911DD282F300DCC02A /* PickerTableViewCell.swift */; };
+		FC306E941DD2A6A200DCC02A /* StartScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC306E931DD2A6A200DCC02A /* StartScreenViewController.swift */; };
+		FC32D8E11DD66B40000EDAD6 /* CornerpointClientProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC32D8DD1DD66B40000EDAD6 /* CornerpointClientProtocol.swift */; };
+		FC32D8E21DD66B40000EDAD6 /* CornerpointView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC32D8DE1DD66B40000EDAD6 /* CornerpointView.swift */; };
+		FC32D8E31DD66B40000EDAD6 /* CroppableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC32D8DF1DD66B40000EDAD6 /* CroppableImageView.swift */; };
+		FC32D8E41DD66B40000EDAD6 /* CroppableImageViewDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC32D8E01DD66B40000EDAD6 /* CroppableImageViewDelegateProtocol.swift */; };
+		FC32D8E61DD66B52000EDAD6 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC32D8E51DD66B52000EDAD6 /* Utils.swift */; };
 		FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4E22221D21B93F00A57ED6 /* Media.swift */; };
+		FC50B37E1DD52EA5009B8EBE /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC50B37D1DD52EA5009B8EBE /* Reachability.swift */; };
+		FC50B3801DD557CD009B8EBE /* NetworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC50B37F1DD557CD009B8EBE /* NetworkTests.swift */; };
+		FC53E2FE1DCBD86F00AD9B92 /* UserVarSaveFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC53E2FD1DCBD86F00AD9B92 /* UserVarSaveFile.swift */; };
 		FC546EAA1D26C95200E62B6C /* UploadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC546EA91D26C95200E62B6C /* UploadData.swift */; };
 		FC5DFFE51D22EB2D00C31A31 /* AZSClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */; };
 		FC5DFFE71D22EBB100C31A31 /* libxml2.2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */; };
 		FC6930151D74F2E6001407A0 /* ListPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */; };
+		FC7DFCC61DDFAA7000437B61 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7DFCC51DDFAA7000437B61 /* SettingsViewController.swift */; };
+		FC7DFCC81DDFD4B800437B61 /* DefaultPreferences.plist in Resources */ = {isa = PBXBuildFile; fileRef = FC7DFCC71DDFD4B800437B61 /* DefaultPreferences.plist */; };
 		FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */; };
-		FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */; };
 		FC8244E11D199D290048C3A7 /* RecordTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */; };
 		FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3A51D18EFE800251003 /* AppDelegate.swift */; };
 		FC84B3A81D18EFE800251003 /* MeasViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC84B3A71D18EFE800251003 /* MeasViewController.swift */; };
@@ -31,6 +43,7 @@
 		FCEBA2581D24E6AE00AB6A9F /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */; };
 		FCEBA25A1D258F1700AB6A9F /* UserVars.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEBA2591D258F1700AB6A9F /* UserVars.swift */; };
 		FCEBA25C1D2597EE00AB6A9F /* LoginInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEBA25B1D2597EE00AB6A9F /* LoginInfo.swift */; };
+		FCEE49871DD6719000AECED7 /* CropImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCEE49861DD6719000AECED7 /* CropImageViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,16 +59,28 @@
 /* Begin PBXFileReference section */
 		FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
 		FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewPhoto.swift; sourceTree = "<group>"; };
-		FC0824FB1D87798E00286707 /* DataRetriever.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataRetriever.swift; sourceTree = "<group>"; };
-		FC3349DB1D1B365F00D112EA /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
+		FC0756D11DCD61D20011B9B6 /* RecordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordViewController.swift; sourceTree = "<group>"; };
+		FC0EC1B41DD2B4420050BDF1 /* NotebookViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotebookViewController.swift; sourceTree = "<group>"; };
+		FC0EC1B61DD2C2E70050BDF1 /* LogoutSegue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LogoutSegue.swift; sourceTree = "<group>"; };
+		FC306E911DD282F300DCC02A /* PickerTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerTableViewCell.swift; sourceTree = "<group>"; };
+		FC306E931DD2A6A200DCC02A /* StartScreenViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartScreenViewController.swift; sourceTree = "<group>"; };
+		FC32D8DD1DD66B40000EDAD6 /* CornerpointClientProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CornerpointClientProtocol.swift; path = "../../CropImg-master/CropImg/CornerpointClientProtocol.swift"; sourceTree = "<group>"; };
+		FC32D8DE1DD66B40000EDAD6 /* CornerpointView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CornerpointView.swift; path = "../../CropImg-master/CropImg/CornerpointView.swift"; sourceTree = "<group>"; };
+		FC32D8DF1DD66B40000EDAD6 /* CroppableImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CroppableImageView.swift; path = "../../CropImg-master/CropImg/CroppableImageView.swift"; sourceTree = "<group>"; };
+		FC32D8E01DD66B40000EDAD6 /* CroppableImageViewDelegateProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CroppableImageViewDelegateProtocol.swift; path = "../../CropImg-master/CropImg/CroppableImageViewDelegateProtocol.swift"; sourceTree = "<group>"; };
+		FC32D8E51DD66B52000EDAD6 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = "../../CropImg-master/CropImg/Utils.swift"; sourceTree = "<group>"; };
 		FC4E22221D21B93F00A57ED6 /* Media.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
+		FC50B37D1DD52EA5009B8EBE /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
+		FC50B37F1DD557CD009B8EBE /* NetworkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkTests.swift; sourceTree = "<group>"; };
+		FC53E2FD1DCBD86F00AD9B92 /* UserVarSaveFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserVarSaveFile.swift; sourceTree = "<group>"; };
 		FC546EA91D26C95200E62B6C /* UploadData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UploadData.swift; sourceTree = "<group>"; };
 		FC5DFFDA1D22E6CE00C31A31 /* EcoMapper-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EcoMapper-Bridging-Header.h"; sourceTree = "<group>"; };
 		FC5DFFE41D22EB2D00C31A31 /* AZSClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AZSClient.framework; path = ../../../AZSClient.framework; sourceTree = "<group>"; };
 		FC5DFFE61D22EBB100C31A31 /* libxml2.2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.2.tbd; path = usr/lib/libxml2.2.tbd; sourceTree = SDKROOT; };
 		FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListPickerViewController.swift; sourceTree = "<group>"; };
+		FC7DFCC51DDFAA7000437B61 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		FC7DFCC71DDFD4B800437B61 /* DefaultPreferences.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = DefaultPreferences.plist; sourceTree = "<group>"; };
 		FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
-		FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordTableViewController.swift; sourceTree = "<group>"; };
 		FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecordTableViewController.xib; sourceTree = "<group>"; };
 		FC84B3A21D18EFE800251003 /* EcoMapper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EcoMapper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC84B3A51D18EFE800251003 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -73,6 +98,7 @@
 		FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		FCEBA2591D258F1700AB6A9F /* UserVars.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserVars.swift; sourceTree = "<group>"; };
 		FCEBA25B1D2597EE00AB6A9F /* LoginInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginInfo.swift; sourceTree = "<group>"; };
+		FCEE49861DD6719000AECED7 /* CropImageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropImageViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,27 +147,40 @@
 			isa = PBXGroup;
 			children = (
 				FC84B3A51D18EFE800251003 /* AppDelegate.swift */,
+				FC306E931DD2A6A200DCC02A /* StartScreenViewController.swift */,
+				FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */,
+				FC0EC1B41DD2B4420050BDF1 /* NotebookViewController.swift */,
+				FC7DFCC51DDFAA7000437B61 /* SettingsViewController.swift */,
+				FC0756D11DCD61D20011B9B6 /* RecordViewController.swift */,
 				FC84B3A71D18EFE800251003 /* MeasViewController.swift */,
-				FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */,
+				FCCE99311D1A23C300A675BE /* NoteViewController.swift */,
 				FC00DC3D1D1A077B0096F4CD /* PhotoViewController.swift */,
+				FCEE49861DD6719000AECED7 /* CropImageViewController.swift */,
+				FC6930141D74F2E6001407A0 /* ListPickerViewController.swift */,
 				FC84B3C51D1919D400251003 /* Record.swift */,
+				FC4E22221D21B93F00A57ED6 /* Media.swift */,
+				FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */,
 				FCEBA25B1D2597EE00AB6A9F /* LoginInfo.swift */,
 				FCEBA2591D258F1700AB6A9F /* UserVars.swift */,
-				FC84B3A91D18EFE800251003 /* Main.storyboard */,
-				FCEBA2571D24E6AE00AB6A9F /* LoginViewController.swift */,
-				FC3349DB1D1B365F00D112EA /* Reachability.swift */,
-				FCCE99311D1A23C300A675BE /* NoteViewController.swift */,
-				FC8244DE1D199D290048C3A7 /* RecordTableViewController.swift */,
+				FC53E2FD1DCBD86F00AD9B92 /* UserVarSaveFile.swift */,
 				FC546EA91D26C95200E62B6C /* UploadData.swift */,
-				FC4E22221D21B93F00A57ED6 /* Media.swift */,
-				FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */,
+				FC50B37D1DD52EA5009B8EBE /* Reachability.swift */,
 				FC8244DC1D1998200048C3A7 /* RecordTableViewCell.swift */,
-				FC84B3AC1D18EFE800251003 /* Assets.xcassets */,
+				FC306E911DD282F300DCC02A /* PickerTableViewCell.swift */,
+				FC84B3A91D18EFE800251003 /* Main.storyboard */,
+				FC8244DF1D199D290048C3A7 /* RecordTableViewController.xib */,
 				FC84B3AE1D18EFE800251003 /* LaunchScreen.storyboard */,
-				FC84B3B11D18EFE800251003 /* Info.plist */,
 				FC5DFFDA1D22E6CE00C31A31 /* EcoMapper-Bridging-Header.h */,
-				FC052F521D2EA1F5003DCD19 /* NewPhoto.swift */,
-				FC0824FB1D87798E00286707 /* DataRetriever.swift */,
+				FC84B3B11D18EFE800251003 /* Info.plist */,
+				FC84B3AC1D18EFE800251003 /* Assets.xcassets */,
+				FC0EC1B61DD2C2E70050BDF1 /* LogoutSegue.swift */,
+				FC50B37F1DD557CD009B8EBE /* NetworkTests.swift */,
+				FC32D8E51DD66B52000EDAD6 /* Utils.swift */,
+				FC32D8DD1DD66B40000EDAD6 /* CornerpointClientProtocol.swift */,
+				FC32D8DE1DD66B40000EDAD6 /* CornerpointView.swift */,
+				FC32D8DF1DD66B40000EDAD6 /* CroppableImageView.swift */,
+				FC32D8E01DD66B40000EDAD6 /* CroppableImageViewDelegateProtocol.swift */,
+				FC7DFCC71DDFD4B800437B61 /* DefaultPreferences.plist */,
 			);
 			path = EcoMapper;
 			sourceTree = "<group>";
@@ -240,6 +279,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FC8244E11D199D290048C3A7 /* RecordTableViewController.xib in Resources */,
+				FC7DFCC81DDFD4B800437B61 /* DefaultPreferences.plist in Resources */,
 				FC84B3B01D18EFE800251003 /* LaunchScreen.storyboard in Resources */,
 				FC84B3AD1D18EFE800251003 /* Assets.xcassets in Resources */,
 				FC84B3AB1D18EFE800251003 /* Main.storyboard in Resources */,
@@ -260,22 +300,34 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FC0824FC1D87798E00286707 /* DataRetriever.swift in Sources */,
+				FC50B3801DD557CD009B8EBE /* NetworkTests.swift in Sources */,
+				FC32D8E31DD66B40000EDAD6 /* CroppableImageView.swift in Sources */,
+				FC306E941DD2A6A200DCC02A /* StartScreenViewController.swift in Sources */,
 				FCCE99321D1A23C300A675BE /* NoteViewController.swift in Sources */,
 				FC84B3A81D18EFE800251003 /* MeasViewController.swift in Sources */,
+				FC32D8E61DD66B52000EDAD6 /* Utils.swift in Sources */,
 				FCEBA25A1D258F1700AB6A9F /* UserVars.swift in Sources */,
 				FCEBA25C1D2597EE00AB6A9F /* LoginInfo.swift in Sources */,
+				FC53E2FE1DCBD86F00AD9B92 /* UserVarSaveFile.swift in Sources */,
 				FC6930151D74F2E6001407A0 /* ListPickerViewController.swift in Sources */,
 				FC84B3A61D18EFE800251003 /* AppDelegate.swift in Sources */,
 				FC8244DD1D1998200048C3A7 /* RecordTableViewCell.swift in Sources */,
+				FC0EC1B51DD2B4420050BDF1 /* NotebookViewController.swift in Sources */,
+				FCEE49871DD6719000AECED7 /* CropImageViewController.swift in Sources */,
+				FC32D8E21DD66B40000EDAD6 /* CornerpointView.swift in Sources */,
 				FC4E22231D21B93F00A57ED6 /* Media.swift in Sources */,
+				FC32D8E11DD66B40000EDAD6 /* CornerpointClientProtocol.swift in Sources */,
+				FC0756D21DCD61D20011B9B6 /* RecordViewController.swift in Sources */,
 				FC546EAA1D26C95200E62B6C /* UploadData.swift in Sources */,
 				FC84B3C61D1919D400251003 /* Record.swift in Sources */,
+				FC32D8E41DD66B40000EDAD6 /* CroppableImageViewDelegateProtocol.swift in Sources */,
+				FC50B37E1DD52EA5009B8EBE /* Reachability.swift in Sources */,
+				FC306E921DD282F300DCC02A /* PickerTableViewCell.swift in Sources */,
+				FC7DFCC61DDFAA7000437B61 /* SettingsViewController.swift in Sources */,
 				FC052F531D2EA1F5003DCD19 /* NewPhoto.swift in Sources */,
-				FC8244E01D199D290048C3A7 /* RecordTableViewController.swift in Sources */,
-				FC3349DC1D1B365F00D112EA /* Reachability.swift in Sources */,
 				FCEBA2581D24E6AE00AB6A9F /* LoginViewController.swift in Sources */,
 				FC00DC3E1D1A077B0096F4CD /* PhotoViewController.swift in Sources */,
+				FC0EC1B71DD2C2E70050BDF1 /* LogoutSegue.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,7 +408,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -398,7 +450,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
