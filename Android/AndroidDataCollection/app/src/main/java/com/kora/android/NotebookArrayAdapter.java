@@ -78,7 +78,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
         // Get the current record type from the data source.
         String dt = props.get("datatype").toString();
 
-        // If the photo path is not null or blank, get it at attempt to set the image view.
+        // If the photo path is not null or blank, get it and attempt to set the image view.
         String photoPath = records.get(position).photoPath;
         if (photoPath != null && !photoPath.equals("")) {
             File imgFile = new File(records.get(position).photoPath);
@@ -157,6 +157,7 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
                 .getBitmapFromMemCache(cacheKey);
 
         if (cachedBitmap != null) {
+            System.out.println("Bitmap size: (" + cachedBitmap.getWidth() + ", " + cachedBitmap.getHeight() + ")");
             imageView.setImageBitmap(cachedBitmap);
         } else {
             // First decode to check image dimensions
@@ -165,7 +166,6 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
             BitmapFactory.decodeFile(path, options);
 
             // Calculate inSampleSize
-            // TODO: Check!!
             options.inSampleSize = calculateInSampleSize(options);
 
             // Decode bitmap with inSampleSize set
@@ -205,6 +205,9 @@ class NotebookArrayAdapter extends ArrayAdapter<Record> {
                 inSampleSize *= 2;
             }
         }
+
+        System.out.println("Resample factor: " + inSampleSize);
+        System.out.println("Resampled size: " + "(" + width + ", " + height + ")");
 
         return inSampleSize;
     }

@@ -28,7 +28,7 @@ public class MapDisplay extends PApplet {
 	private static final long serialVersionUID = 1L;
 	
 	//flag indicating whether the user is offline
-	private static final boolean offline = true;
+	private static final boolean offline = false;
 	//flag indicating whether states should be included in geofilter
 	private static final boolean stateson = true;
 	

@@ -490,7 +490,7 @@ public abstract class NewRecord extends AppCompatActivity
             // If success, add the record to the list, save the list, and finish the activity.
             if (result) {
 
-                if (latestLoc == null) {
+                if (mode.equals("new") && latestLoc == null) {
                     Toast.makeText(NewRecord.this,
                             getString(R.string.no_user_location_found),
                             Toast.LENGTH_SHORT).show();

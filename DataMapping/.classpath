@@ -22,17 +22,17 @@
 			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/Apache/log4j/1.2.15/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/defhpotsdam/unfolding/0.9.7/unfolding-0.9.7.jar"/>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/JOGL/jogl-all/1.9.4/jogl-all-1.9.4.jar"/>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/MySQL/sqljdbc/4.2/sqljdbc-4.2.jar"/>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/processing/core/1.0.0/core-1.0.0.jar"/>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/processing/json4processing/1.0.0/json4processing-1.0.0.jar"/>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/SQLITE/sqlite-jdbc/3.7.2/sqlite-jdbc-3.7.2.jar"/>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/TUIO/libTUIO/1.5.0/libTUIO-1.5.0.jar"/>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/JOGL/gluegen-rt/1.9.4/gluegen-rt-1.9.4.jar"/>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/JOGL/gluegen-rt-natives-windows-amd64/1.9.4/gluegen-rt-natives-windows-amd64-1.9.4.jar"/>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/JOGL/gluegen-rt-natives-windows-i586/1.9.4/gluegen-rt-natives-windows-i586-1.9.4.jar"/>
-	<classpathentry kind="lib" path="C:/ecomapper/DataMapping/repo/JOGL/jogl-all-natives-windows-amd64/1.9.4/jogl-all-natives-windows-amd64-1.9.4.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/Apache/log4j/1.2.15/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/defhpotsdam/unfolding/0.9.7/unfolding-0.9.7.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/JOGL/jogl-all/1.9.4/jogl-all-1.9.4.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/MySQL/sqljdbc/4.2/sqljdbc-4.2.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/processing/core/1.0.0/core-1.0.0.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/processing/json4processing/1.0.0/json4processing-1.0.0.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/SQLITE/sqlite-jdbc/3.7.2/sqlite-jdbc-3.7.2.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/TUIO/libTUIO/1.5.0/libTUIO-1.5.0.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/JOGL/gluegen-rt/1.9.4/gluegen-rt-1.9.4.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/JOGL/gluegen-rt-natives-windows-amd64/1.9.4/gluegen-rt-natives-windows-amd64-1.9.4.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/JOGL/gluegen-rt-natives-windows-i586/1.9.4/gluegen-rt-natives-windows-i586-1.9.4.jar"/>
+	<classpathentry kind="lib" path="C:/koramap/DataMapping/repo/JOGL/jogl-all-natives-windows-amd64/1.9.4/jogl-all-natives-windows-amd64-1.9.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

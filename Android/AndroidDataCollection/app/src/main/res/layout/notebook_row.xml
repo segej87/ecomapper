@@ -10,12 +10,14 @@
         android:layout_height="89dp"
         android:maxWidth="89dp"
         android:maxHeight="89dp"
+        android:minWidth="89dp"
+        android:minHeight="89dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_marginEnd="6dip"
         android:contentDescription="@string/icon_description"
-        android:scaleType="center" />
+        android:scaleType="fitCenter" />
 
     <TextView
         android:id="@+id/firstLine"
