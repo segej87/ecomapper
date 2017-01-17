@@ -61,10 +61,11 @@ public class MapDisplay extends PApplet {
 	
 	public void setup(){
 		//get the current graphics device, get its size, and size the map at full screen
-//		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-//		int screenWidth = gd.getDisplayMode().getWidth();
-//		int screenHeight = gd.getDisplayMode().getHeight();
-		size(1366, 768, OPENGL);
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		int screenWidth = gd.getDisplayMode().getWidth();
+		int screenHeight = gd.getDisplayMode().getHeight();
+//		size(1366, 768, OPENGL);
+		size(screenWidth,screenHeight, OPENGL);
 		
 		//set up toolbars
 		ttb = new TopToolbar(this, 0, 0, this.width, 50, 250);
