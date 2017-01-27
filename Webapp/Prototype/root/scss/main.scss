@@ -1,0 +1,138 @@
+/*
+Copyright (c) 2017, jonse
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+*/
+/* 
+    Created on : Jan 26, 2017, 6:48:24 PM
+    Author     : jonse
+*/
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+}
+
+h1, h2, a {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+}
+
+p {
+    font-family: 'Lato', 'Open Sans', sans-serif; 
+}
+
+.container {
+    max-width: 940px;
+    margin: 0 auto;
+}
+
+/* Navigation Bar */
+.navbar {
+    position: fixed;
+    background: rgba(255, 255, 255, 0.75);
+    width: 100%;
+    overflow: hidden;
+    z-index: 1;
+    ul {
+        float: right;
+    }
+    li {
+        display: inline-block;
+    }
+    a {
+        color: #00004c;
+        font-weight: 100;
+        letter-spacing: 2px;
+        text : {
+            transform: uppercase;
+            decoration: none;
+        }
+        padding: 17px 20px;
+    }
+    a:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+}
+
+#logo {
+    float: left;
+    margin: 5px 20px;
+    height: 40px;
+}
+
+/* Main */
+.main {
+    text-align: center;
+    background: url("https://ecomapper.blob.core.windows.net/bg-artwork-etc/pond.jpg") no-repeat center center;
+    background-size: cover;
+    height: 500px;
+    .container {
+        border: 1px solid #FFF;
+        position: relative;
+        top: 105px;
+        width: 40%;
+        min-width: 400px;
+        padding-bottom: 20px;
+    }
+    h1 {
+        color: #fff;
+        margin: 0;
+        font-size: 130px;
+    }
+    p {
+        max-width: 400px;
+        background : {
+            color: rgb(255, 255, 255);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        color: #382f2f;
+        margin: 0 auto 20px auto;
+        font : {
+            size: 25px;
+            weight: 600;
+        }
+    }
+}
+
+/* Supporting */
+.supporting {
+    background-color: #382f2f;
+    padding: 25px 0 80px;
+    text-align: center;
+    p {
+        color: #efefef;
+        font-size: 16px;
+        margin-bottom: 20px;
+        line-height: 1.8em;
+        margin: auto;
+        width: 75%;
+    }
+}
+
+.clearfix {
+    clear: both;
+}
