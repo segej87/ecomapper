@@ -1,3 +1,9 @@
 [submodule "root"]
 	path = root
 	url = C:/koramap/Webapp/Prototype/root
+[submodule "Webapp/root"]
+	path = Webapp/root
+	url = c:/ecomapper/prototype/root
+[submodule "Webapp/Prototype/root"]
+	path = Webapp/Prototype/root
+	url = c:/ecomapper/prototype/root
