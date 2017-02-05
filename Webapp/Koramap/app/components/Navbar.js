@@ -2,6 +2,7 @@ var React = require('react');
 var navStyles = require('../styles/navStyles');
 var Logo = require('./Logo');
 var NavbarItem = require('./NavbarItem');
+var Values = require('../res/values');
 
 var Navbar = React.createClass({
 	barItems: ["Learn more", "Other maps"],
@@ -16,7 +17,7 @@ var Navbar = React.createClass({
 		if (this.props.loggedIn && this.props.userInfo.firstName != null) {
 			signInText = "Hi " + this.props.userInfo.firstName
 		} else {
-			signInText = "Sign in"
+			signInText = Values.strings.login
 		}
 		
 		return (

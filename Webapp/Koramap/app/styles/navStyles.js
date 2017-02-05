@@ -19,6 +19,7 @@ var a = {
 	textDecoration: 'none',
 	padding: '16.75px 20px',
 	fontFamily: 'Oswald, sans-serif',
+	cursor: 'pointer',
 	highlighted: {
 		color: '#00004c',
 		fontWeight: '100',
@@ -27,7 +28,8 @@ var a = {
 		textDecoration: 'none',
 		padding: '16.75px 20px',
 		fontFamily: 'Oswald, sans-serif',
-		background: 'rgba(255, 255, 255, 0.5)'
+		background: 'rgba(255, 255, 255, 0.5)',
+		cursor: 'pointer'
 	}
 };
 

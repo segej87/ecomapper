@@ -34,14 +34,15 @@ var login = {
 	backgroundColor: 'white',
 	borderRadius: 300/60,
 	border: 'none',
-	textSize: 50,
+	textSize: 30,
 	zIndex: '1001',
-	backgroundColor: 'rgb(250, 250, 250)',
 	boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.4)',
 	h1: {
-		marginTop: 40,
+		margin: '40px 40px 20px 40px',
+		paddingBottom: 10,
 		textAlign: 'center',
-		color: '#00004c'
+		color: '#00004c',
+		borderBottom: '1px solid red'
 	},
 	form: {
 		textAlign: 'center',
@@ -54,8 +55,8 @@ var login = {
 		fontFamily: 'Oswald, sans-serif',
 		fontSize: 16,
 		borderRadius: 3,
-		borderColor: 'rgba(100, 100, 100, 0.25)',
-		borderWidth: 2
+		borderColor: 'rgba(50, 50, 50, 0.25)',
+		borderWidth: 1
 	},
 	button: {
 		backgroundColor: 'rgba(255, 75, 100, 0.9)',

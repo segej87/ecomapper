@@ -19,7 +19,7 @@ var NavbarItem = React.createClass({
 		);
 	},
 	
-	handleClick: function (e) {
+	handleClick: function () {
 		var faded = !this.props.faded;
 		this.props.onClick(faded);
 	},
@@ -37,14 +37,14 @@ var NavbarItem = React.createClass({
 		
 		if (this.props.text == "Other maps") {
 			output = (<li style={navStyles.li}>
-			<a href='#' style={linkStyle} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+			<a style={linkStyle} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
 				{this.props.text}
 			</a>
 			<NavbarDropdown highlighted={this.state.highlighted}/>
 			</li>);
 		} else {
 			output = (<li style={navStyles.li}>
-			<a href='#' style={linkStyle} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onClick={this.handleClick}>
+			<a style={linkStyle} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onClick={this.handleClick}>
 				{this.props.text}
 			</a>
 			</li>);

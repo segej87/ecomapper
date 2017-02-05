@@ -18,6 +18,14 @@ var HelloWorld = React.createClass({
 		};
 	},
 	
+	handleLoggingIn: function (result) {
+		this.setState(
+			{
+				loggingIn: result
+			}
+		);
+	},
+	
 	handleLoggedIn: function (result, info) {
 		this.setState(
 			{
@@ -25,16 +33,10 @@ var HelloWorld = React.createClass({
 				userInfo: {
 					userName: info.userName,
 					firstName: info.firstName,
-					lastName: info.lastName
-				}
-			}
-		);
-	},
-	
-	handleLoggingIn: function (loggingIn) {
-		this.setState(
-			{
-				loggingIn: loggingIn
+					lastName: info.lastName,
+					userId: info.userId
+				},
+				loggingIn: false
 			}
 		);
 	},
@@ -42,10 +44,10 @@ var HelloWorld = React.createClass({
 	render: function() {
 		return (
 		<div style={appStyles.app}>
-		<Login loggingIn={this.state.loggingIn} onSubmit={this.handleLoggedIn} onFinish={this.handleLoggingIn} />
-		<Navbar loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} faded={this.state.faded} onClick={this.handleLoggingIn}/>
-		<Main loggedIn={this.state.loggedIn} userInfo= {this.state.userInfo}/>
-		<Supporting />
+			<Login loggingIn={this.state.loggingIn} onSubmit={this.handleLoggedIn} firstName = {this.state.userInfo.firstName}/>
+			<Navbar loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} faded={this.state.faded} onClick={this.handleLoggingIn}/>
+			<Main loggedIn={this.state.loggedIn} userInfo= {this.state.userInfo}/>
+			<Supporting />
 		</div>
 		);
 	}

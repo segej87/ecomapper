@@ -22,6 +22,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -207,7 +209,11 @@ public class LoginActivity extends AppCompatActivity {
 
                 conn.disconnect();
 
-                return response;
+                JSONObject responseJSON = new JSONObject(response);
+
+                String uid = responseJSON.getString("UID");
+
+                return uid;
             } catch (Exception e) {
                 return getString(R.string.server_connection_error) + e.getMessage();
             }
