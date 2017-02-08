@@ -24,40 +24,8 @@ var Login = React.createClass({
 		}
 	},
 	
-	tester: function () {
-		var params = JSON.stringify({
-			username: this.state.username,
-			password: this.state.password
-		});
-		
-		var formData = new FormData();
-		
-		for (var k in params) {
-			formData.append(k, params[k]);
-		};
-		
-		fetch('http://ecocollector.azurewebsites.net/get_login.php', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'x-www-form-urlencoded; charset=UTF-8'
-			},
-			body: formData
-		})
-		.then ((response) => response.json())
-		.then((json) => {
-				this.setState({
-					result: json
-				});
-			}
-		)
-		.catch((error) => {
-			console.log(error)
-		});
-	},
-	
-	tester2: function (e) {
+	attemptLogin: function (e) {
 		e.preventDefault();
-		console.log('starting tester2');
 		
 		formData='username=' + this.state.username + '&password=' + this.state.password;
 		
@@ -79,7 +47,9 @@ var Login = React.createClass({
 				var firstname = JSON.parse(request.responseText).firstname;
 				var lastname = JSON.parse(request.responseText).lastname;
 				
-				this.props.onSubmit(true, {userName: this.state.username, firstName: firstname, lastname: lastname, userId: id});
+				document.getElementById('uname').value = '';
+				document.getElementById('pword').value = '';
+				this.props.onSubmit(true, {userName: this.state.username, firstName: firstname, lastName: lastname, userId: id});
 			} else {
 				console.log('Status: ' + request.status);
 				console.log('Status text: ' + request.statusText);
@@ -87,16 +57,15 @@ var Login = React.createClass({
 		};
 
 		request.open(method, url, true);
-		if (method == 'GET') {
-			request.send();
-		} else {
-			request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			request.send(formData);
-		}
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		request.send(formData);
 	},
 	
-	attemptLogin: function (e) {
-		this.tester2(e);
+	handleCancel: function () {
+		document.getElementById('uname').value = '';
+		document.getElementById('pword').value = '';
+		
+		this.props.onSubmit(this.props.parentState.loggedIn, this.props.parentState.userInfo);
 	},
 	
 	render: function () {
@@ -114,12 +83,14 @@ var Login = React.createClass({
 				<div style={style}>
 					<h1 style={style.h1}>{Values.strings.login}</h1>
 					<div style={style.form}>
-						{Values.strings.username}<br/>
-						<input style={style.input} type="text" onChange={this.handleInput.bind(this, 'u')}/><br/><br/>
-						{Values.strings.password}<br/>
-						<input style={style.input} type="password" onChange={this.handleInput.bind(this, 'p')}/><br/><br/><br/>
+						<p style = {style.p}>{Values.strings.username}</p>
+						<input style={style.input} type="text" onChange={this.handleInput.bind(this, 'u')} id='uname'/>
+						<p style={style.p}>{Values.strings.password}</p>
+						<input style={style.input} type="password" onChange={this.handleInput.bind(this, 'p')} id='pword'/>
 						<button style={style.button} onClick={this.attemptLogin}>{Values.strings.login}</button>
 					</div>
+					<a style={style.a} onClick={this.handleSignup}>{Values.strings.signup}</a>
+					<a style={style.a} onClick={this.handleCancel}>{Values.strings.cancel}</a>
 				</div>
 			</div>
 		);

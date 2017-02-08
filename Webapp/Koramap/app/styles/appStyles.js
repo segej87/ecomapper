@@ -37,20 +37,23 @@ var login = {
 	textSize: 30,
 	zIndex: '1001',
 	boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.4)',
+	textAlign: 'center',
 	h1: {
-		margin: '40px 40px 20px 40px',
+		margin: '30px 40px 20px 40px',
 		paddingBottom: 10,
 		textAlign: 'center',
 		color: '#00004c',
 		borderBottom: '1px solid red'
 	},
 	form: {
+		display: 'inline-block',
 		textAlign: 'center',
 		marginBottom: 5
 	},
 	input: {
 		width: 200,
 		height: 20,
+		marginBottom: 10,
 		textAlign: 'center',
 		fontFamily: 'Oswald, sans-serif',
 		fontSize: 16,
@@ -60,6 +63,8 @@ var login = {
 	},
 	button: {
 		backgroundColor: 'rgba(255, 75, 100, 0.9)',
+		marginTop: 10,
+		marginBottom: 10,
 		color: 'white',
 		fontFamily: 'Lato, Open Sans, sans-serif',
 		fontSize: 20,
@@ -69,6 +74,17 @@ var login = {
 		cursor: 'pointer',
 		borderRadius: 7,
 		boxShadow: '0px 4px 8px 0px rgba(0, 0, 0, 0.2)'
+	},
+	p: {
+		marginTop: 0,
+		marginBottom: 5
+	},
+	a: {
+		margin: 'auto',
+		marginBottom: 5,
+		display: 'block',
+		color: 'blue',
+		cursor: 'pointer'
 	}
 }
 

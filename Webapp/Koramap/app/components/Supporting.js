@@ -1,5 +1,5 @@
 var React = require('react');
-var supportingStyles = require('../styles/supportingStyles')
+var supportingStyles = require('../styles/home/supportingStyles')
 
 var Supporting = React.createClass({
 	render: function () {

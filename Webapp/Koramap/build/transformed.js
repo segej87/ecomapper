@@ -4724,20 +4724,23 @@ var login = {
 	textSize: 30,
 	zIndex: '1001',
 	boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.4)',
+	textAlign: 'center',
 	h1: {
-		margin: '40px 40px 20px 40px',
+		margin: '30px 40px 20px 40px',
 		paddingBottom: 10,
 		textAlign: 'center',
 		color: '#00004c',
 		borderBottom: '1px solid red'
 	},
 	form: {
+		display: 'inline-block',
 		textAlign: 'center',
 		marginBottom: 5
 	},
 	input: {
 		width: 200,
 		height: 20,
+		marginBottom: 10,
 		textAlign: 'center',
 		fontFamily: 'Oswald, sans-serif',
 		fontSize: 16,
@@ -4747,6 +4750,8 @@ var login = {
 	},
 	button: {
 		backgroundColor: 'rgba(255, 75, 100, 0.9)',
+		marginTop: 10,
+		marginBottom: 10,
 		color: 'white',
 		fontFamily: 'Lato, Open Sans, sans-serif',
 		fontSize: 20,
@@ -4756,6 +4761,17 @@ var login = {
 		cursor: 'pointer',
 		borderRadius: 7,
 		boxShadow: '0px 4px 8px 0px rgba(0, 0, 0, 0.2)'
+	},
+	p: {
+		marginTop: 0,
+		marginBottom: 5
+	},
+	a: {
+		margin: 'auto',
+		marginBottom: 5,
+		display: 'block',
+		color: 'blue',
+		cursor: 'pointer'
 	}
 };
 
@@ -6920,7 +6936,9 @@ module.exports = getIteratorFn;
 var strings = {
 	login: 'Log in',
 	username: 'Username',
-	password: 'Password'
+	password: 'Password',
+	cancel: 'Cancel',
+	signup: 'Sign up'
 };
 
 module.exports = {
@@ -9669,7 +9687,7 @@ var HelloWorld = React.createClass({
 		});
 	},
 
-	handleLoggedIn: function (result, info) {
+	handleLoginResult: function (result, info) {
 		this.setState({
 			loggedIn: result,
 			userInfo: {
@@ -9680,13 +9698,19 @@ var HelloWorld = React.createClass({
 			},
 			loggingIn: false
 		});
+
+		if (result) {
+			console.log('Logging in');
+		} else {
+			console.log('Login canceled');
+		}
 	},
 
 	render: function () {
 		return React.createElement(
 			'div',
 			{ style: appStyles.app },
-			React.createElement(Login, { loggingIn: this.state.loggingIn, onSubmit: this.handleLoggedIn, firstName: this.state.userInfo.firstName }),
+			React.createElement(Login, { loggingIn: this.state.loggingIn, onSubmit: this.handleLoginResult, parentState: this.state }),
 			React.createElement(Navbar, { loggedIn: this.state.loggedIn, userInfo: this.state.userInfo, faded: this.state.faded, onClick: this.handleLoggingIn }),
 			React.createElement(Main, { loggedIn: this.state.loggedIn, userInfo: this.state.userInfo }),
 			React.createElement(Supporting, null)
@@ -9763,119 +9787,48 @@ var Login = React.createClass({
 		}
 	},
 
-	tester: function () {
-		var params = JSON.stringify({
-			username: this.state.username,
-			password: this.state.password
-		});
+	attemptLogin: function (e) {
+		e.preventDefault();
 
-		var formData = new FormData();
-
-		for (var k in params) {
-			formData.append(k, params[k]);
-		};
-
-		fetch('http://ecocollector.azurewebsites.net/get_login.php').catch(error => alert(error)); //, {
-		// method: 'POST',
-		// headers: {
-		// 'Accept': 'application/json',
-		// 'Content-Type': 'x-www-form-urlencoded; charset=UTF-8'
-		// },
-		// body: formData
-		// })
-		// .then ((response) => response.json())
-		// .then((json) => {
-		// this.setState({
-		// result: json
-		// });
-		// }
-		// )
-		// .catch((error) => {
-		// alert(error)
-		// });
-	},
-
-	createCORSRequest: function (method, url) {
-		var xhr = new XMLHttpRequest();
-
-		if ("withCredentials" in xhr) {
-			xhr.open(method, url, true);
-		} else if (typeof XDomainRequest != "undefined") {
-			xhr = new XDomainRequest();
-			xhr.open(method, url);
-		} else {
-			xhr = null;
-		}
-
-		return xhr;
-	},
-
-	tester2: function () {
-		alert('starting tester2');
-
-		// var params = JSON.stringify({
-		// username: this.state.username,
-		// password: this.state.password
-		// });
-
-		// var formData = new FormData();
-
-		// for (var k in params) {
-		// formData.append(k, params[k]);
-		// };
-
-		// var formString = JSON.stringify({formData});
+		formData = 'username=' + this.state.username + '&password=' + this.state.password;
 
 		var request = new XMLHttpRequest();
 
 		var method = 'POST';
-		var url = 'get_login.php';
+		var url = 'http://ecocollector.azurewebsites.net/get_login.php';
 
 		request.onreadystatechange = e => {
-			alert('onreadystatechange called');
-
 			if (request.readyState !== 4) {
-				alert(request.readyState);
+				console.log('Ready state: ' + request.readyState);
 				return;
+			} else {
+				console.log('Ready state: ' + request.readyState);
 			}
 
 			if (request.status === 200) {
-				alert(request.responseText);
+				var id = JSON.parse(request.responseText).UID.toLowerCase();
+				var firstname = JSON.parse(request.responseText).firstname;
+				var lastname = JSON.parse(request.responseText).lastname;
+
+				document.getElementById('uname').value = '';
+				document.getElementById('pword').value = '';
+				this.props.onSubmit(true, { userName: this.state.username, firstName: firstname, lastName: lastname, userId: id });
 			} else {
-				alert("Status: " + request.status);
+				console.log('Status: ' + request.status);
+				console.log('Status text: ' + request.statusText);
 			}
 		};
 
 		request.open(method, url, true);
-		request.setRequestHeader("Content-Type", "x-www-form-urlencoded");
-		request.send();
-
-		// New attempt
-		// var request = createCORSRequest("POST", "http://koramap.org/get_login.php")
-
-		// if (request) {
-		// request.onload = function () {
-		// alert('onload called');
-
-		// if (request.readyState !== 4) {
-		// alert(request.readyState);
-		// return;
-		// }
-
-		// if (request.status === 200) {
-		// alert(request.responseText);
-		// } else {
-		// alert(request.status);
-		// }
-		// };
-
-		// request.send();
-		// }
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		request.send(formData);
 	},
 
-	attemptLogin: function () {
-		this.tester2();
-		// this.props.onSubmit(true, {userName: 'segej87', firstName: 'Jon', lastName: 'Sege', userId: 1234});
+	handleCancel: function () {
+		document.getElementById('uname').value = '';
+		document.getElementById('pword').value = '';
+
+		this.props.onSubmit(this.props.parentState.loggedIn, this.props.parentState.userInfo);
 	},
 
 	render: function () {
@@ -9897,27 +9850,38 @@ var Login = React.createClass({
 				React.createElement(
 					'h1',
 					{ style: style.h1 },
-					this.state.result
+					Values.strings.login
 				),
 				React.createElement(
 					'div',
 					{ style: style.form },
-					Values.strings.username,
-					React.createElement('br', null),
-					React.createElement('input', { style: style.input, type: 'text', onChange: this.handleInput.bind(this, 'u') }),
-					React.createElement('br', null),
-					React.createElement('br', null),
-					Values.strings.password,
-					React.createElement('br', null),
-					React.createElement('input', { style: style.input, type: 'password', onChange: this.handleInput.bind(this, 'p') }),
-					React.createElement('br', null),
-					React.createElement('br', null),
-					React.createElement('br', null),
+					React.createElement(
+						'p',
+						{ style: style.p },
+						Values.strings.username
+					),
+					React.createElement('input', { style: style.input, type: 'text', onChange: this.handleInput.bind(this, 'u'), id: 'uname' }),
+					React.createElement(
+						'p',
+						{ style: style.p },
+						Values.strings.password
+					),
+					React.createElement('input', { style: style.input, type: 'password', onChange: this.handleInput.bind(this, 'p'), id: 'pword' }),
 					React.createElement(
 						'button',
 						{ style: style.button, onClick: this.attemptLogin },
 						Values.strings.login
 					)
+				),
+				React.createElement(
+					'a',
+					{ style: style.a, onClick: this.handleSignup },
+					Values.strings.signup
+				),
+				React.createElement(
+					'a',
+					{ style: style.a, onClick: this.handleCancel },
+					Values.strings.cancel
 				)
 			)
 		);

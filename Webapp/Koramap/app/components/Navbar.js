@@ -1,11 +1,14 @@
 var React = require('react');
-var navStyles = require('../styles/navStyles');
+var NavbarHomeSet = require('./NavbarHomeSet');
+var NavbarMapSet = require('./NavbarMapSet');
 var Logo = require('./Logo');
-var NavbarItem = require('./NavbarItem');
+var navStyles = require('../styles/navStyles');
 var Values = require('../res/values');
 
-var Navbar = React.createClass({
-	barItems: ["Learn more", "Other maps"],
+var Navbar = React.createClass({	
+	handleBack: function () {
+		this.props.onBack(!this.props.parentState.mapping);
+	},
 	
 	handleClick: function (faded) {
 		this.props.onClick(faded);
@@ -13,22 +16,27 @@ var Navbar = React.createClass({
 	
 	render: function() {
 		var signInText;
+		var set;
 		
-		if (this.props.loggedIn && this.props.userInfo.firstName != null) {
-			signInText = "Hi " + this.props.userInfo.firstName
+		if (this.props.parentState.loggedIn && this.props.parentState.userInfo.firstName != null) {
+			signInText = "Hi " + this.props.parentState.userInfo.firstName
 		} else {
 			signInText = Values.strings.login
 		}
 		
+		if (this.props.navType == 'home') {
+			set = <NavbarHomeSet parentState={this.props.parentState} signInText={signInText} onClick={this.handleClick} />
+		} else {
+			set = <NavbarMapSet parentState={this.props.parentState} signInText={signInText} onClick={this.handleClick} onBack={this.handleBack} />
+		}
+		
 		return (
-		<div style={navStyles.navbar}>
+			<div style={navStyles.navbar}>
 			<Logo style={navStyles.logo} />
 			<ul style={navStyles.ul}>
-				<NavbarItem text="Learn more" loggedIn={this.props.loggedIn} />
-				<NavbarItem text="Other maps" loggedIn={this.props.loggedIn} />
-				<NavbarItem text={signInText} loggedIn={this.props.loggedIn} faded={this.props.faded} onClick={this.handleClick} />
+				{set}
 			</ul>
-		</div>
+			</div>
 		);
 	}
 });

@@ -2,8 +2,8 @@ var React = require('react');
 var appStyles = require('../styles/appStyles');
 var Login = require('./Login');
 var Navbar = require('./Navbar');
-var Main = require('./Main');
-var Supporting = require('./Supporting');
+var Home = require('./Home');
+var Map = require('./Map');
 
 var HelloWorld = React.createClass({
 	getInitialState: function () {
@@ -14,7 +14,9 @@ var HelloWorld = React.createClass({
 				firstName: null,
 				lastName: null
 			},
-			loggingIn: false
+			loggingIn: false,
+			faded: false,
+			mapping: false
 		};
 	},
 	
@@ -26,7 +28,7 @@ var HelloWorld = React.createClass({
 		);
 	},
 	
-	handleLoggedIn: function (result, info) {
+	handleLoginResult: function (result, info) {
 		this.setState(
 			{
 				loggedIn: result,
@@ -39,16 +41,42 @@ var HelloWorld = React.createClass({
 				loggingIn: false
 			}
 		);
+		
+		if (result) {
+			console.log('Logged in');
+		} else {
+			console.log('Login canceled');
+		}
+	},
+	
+	handleMapping: function (result) {
+		this.setState(
+			{
+				mapping: result
+			}
+		);
 	},
 	
 	render: function() {
+		var bodyJSX;
+		var navType;
+		
+		if (this.state.mapping) {
+			bodyJSX = <Map loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping}/>;
+			navType = 'map'
+		} else {
+			bodyJSX = <Home loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping} />;
+			navType = 'home'
+		}
+		
+		console.log('Rendering app with navType: ' + navType);
+		
 		return (
-		<div style={appStyles.app}>
-			<Login loggingIn={this.state.loggingIn} onSubmit={this.handleLoggedIn} firstName = {this.state.userInfo.firstName}/>
-			<Navbar loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} faded={this.state.faded} onClick={this.handleLoggingIn}/>
-			<Main loggedIn={this.state.loggedIn} userInfo= {this.state.userInfo}/>
-			<Supporting />
-		</div>
+			<div style={appStyles.app}>
+				<Login loggingIn={this.state.loggingIn} onSubmit={this.handleLoginResult} parentState = {this.state}/>
+				<Navbar parentState={this.state} onClick={this.handleLoggingIn} onBack={this.handleMapping} navType={navType} />
+				{bodyJSX}
+			</div>
 		);
 	}
 });

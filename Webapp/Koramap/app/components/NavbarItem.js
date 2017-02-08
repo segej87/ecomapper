@@ -1,5 +1,5 @@
 var React = require('react');
-var NavbarDropdown =require('./NavbarDropdown');
+var NavbarDropdown = require('./NavbarDropdown');
 var navStyles = require('../styles/navStyles');
 
 var NavbarItem = React.createClass({
@@ -26,6 +26,8 @@ var NavbarItem = React.createClass({
 		
 	render: function () {
 		var linkStyle;
+		var dropdownLine;
+		var linkLine;
 		
 		if (this.state.highlighted) {
 			linkStyle = navStyles.a.highlighted
@@ -33,24 +35,30 @@ var NavbarItem = React.createClass({
 			linkStyle = navStyles.a
 		}
 		
-		var output;
-		
-		if (this.props.text == "Other maps") {
-			output = (<li style={navStyles.li}>
-			<a style={linkStyle} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
-				{this.props.text}
-			</a>
-			<NavbarDropdown highlighted={this.state.highlighted}/>
-			</li>);
-		} else {
-			output = (<li style={navStyles.li}>
-			<a style={linkStyle} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onClick={this.handleClick}>
-				{this.props.text}
-			</a>
-			</li>);
+		if ('dropdown' in this.props && this.props.dropdown != null) {
+			dropdownLine = <NavbarDropdown highlighted={this.state.highlighted} items={this.props.dropdown}/>;
 		}
 		
-		return output;
+		if ('onClick' in this.props && typeof this.props.onClick == 'function') {
+			linkLine = (
+				<a style={linkStyle} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onClick={this.props.onClick}>
+					{this.props.text}
+				</a>
+			);
+		} else {
+			linkLine = (
+				<a style={linkStyle} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+					{this.props.text}
+				</a>
+			);
+		}
+		
+		return (
+			<li style={navStyles.li}>
+				{linkLine}
+				{dropdownLine}
+			</li>
+		);
 	}
 });
 

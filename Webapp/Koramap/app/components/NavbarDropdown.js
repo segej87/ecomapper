@@ -3,6 +3,8 @@ var navStyles = require('../styles/navStyles');
 var NavbarDropdownItem = require('./NavbarDropdownItem')
 
 var NavbarDropdown = React.createClass({
+	items: [],
+	
 	getInitialState: function () {
 		return {highlighted: false};
 	},
@@ -15,6 +17,13 @@ var NavbarDropdown = React.createClass({
 		this.setState({highlighted: false});
 	},
 	
+	componentWillMount: function () {
+		this.items = [];
+		for (var i = 0; i < this.props.items.length; i++) {
+			this.items.push(<NavbarDropdownItem link={this.props.items[i].link} name={this.props.items[i].name} onClick={this.handleMouseLeave} key={i} />);
+		}
+	},
+	
 	render: function () {
 		var linkStyle;
 		
@@ -25,12 +34,10 @@ var NavbarDropdown = React.createClass({
 		}
 		
 		return (
-		<div style={navStyles.dropdown} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
-			<div style={linkStyle}>
-				<NavbarDropdownItem link="http://my-observatory.com/" name="myObservatory" onClick={this.handleMouseLeave}/>
-				<NavbarDropdownItem link="http://inaturalist.org/" name="iNaturalist" onClick={this.handleMouseLeave}/>
-				<NavbarDropdownItem link="http://wikimapia.org/" name="wikimapia" onClick={this.handleMouseLeave}/>
-			</div>
+			<div style={navStyles.dropdown} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
+				<div style={linkStyle}>
+					{this.items}
+				</div>
 			</div>
 		);
 	}

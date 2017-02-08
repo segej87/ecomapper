@@ -1,7 +1,9 @@
 var strings = {
 	login: 'Log in',
 	username: 'Username',
-	password: 'Password'
+	password: 'Password',
+	cancel: 'Cancel',
+	signup: 'Sign up'
 };
 
 module.exports = {
