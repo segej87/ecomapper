@@ -1,25 +1,25 @@
 var app = {
 	position: 'absolute',
+	boxSizing: 'border-box',
+	margin: 0,
+	padding: 0,
 	top: 0,
 	left: 0,
 	right: 0,
-	bottom: 0,
-	boxSizing: 'border-box',
-	margin: 0,
-	padding: 0
+	bottom: 0
 }
 
 var fadeOut = {
 	position: 'absolute',
+	boxSizing: 'border-box',
 	top: 0,
 	left: 0,
 	right: 0,
 	bottom: 0,
-	boxSizing: 'border-box',
 	margin: 0,
 	padding: 0,
 	backgroundColor: 'rgba(0, 0, 0, 0.75)',
-	zIndex: '1000'
+	zIndex: '10000000'
 }
 
 var login = {
@@ -35,7 +35,7 @@ var login = {
 	borderRadius: 300/60,
 	border: 'none',
 	textSize: 30,
-	zIndex: '1001',
+	zIndex: '10000001',
 	boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.4)',
 	textAlign: 'center',
 	h1: {

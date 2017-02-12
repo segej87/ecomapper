@@ -1,13 +1,13 @@
- var main = {
+ main = {
 	margin: 0,
 	padding: 0,
 	textAlign: 'center',
 	background: 'url("https://ecomapper.blob.core.windows.net/bg-artwork-etc/pond.jpg") no-repeat center center',
 	backgroundSize: 'cover',
-	height: 500,
+	height: 500
 };
 
-var container = {
+container = {
 	border: '1px solid #FFF',
 	position: 'relative',
 	top: 105,
@@ -18,7 +18,7 @@ var container = {
 	margin: '0 auto'
 };
 
-var h1 = {
+h1 = {
 	color: '#fff',
 	margin: '0',
 	fontSize: 130,
@@ -26,7 +26,7 @@ var h1 = {
 	textTransform: 'uppercase'
 };
 
-var p = {
+p = {
 	maxWidth: 400,
 	backgroundColor: 'rgba(255, 255, 255, 0.5)',
 	color: '#00004c',
@@ -36,7 +36,7 @@ var p = {
 	fontWeight: '600'
 };
 
-var button = {
+button = {
 	backgroundColor: 'rgba(255, 75, 100, 0.9)',
 	color: 'white',
 	fontFamily: 'Lato, Open Sans, sans-serif',
@@ -47,7 +47,7 @@ var button = {
 	cursor: 'pointer',
 	borderRadius: 7,
 	boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.4)'
-}
+};
 
 module.exports = {
 	main,
@@ -55,4 +55,4 @@ module.exports = {
 	h1,
 	p,
 	button
-}
+};

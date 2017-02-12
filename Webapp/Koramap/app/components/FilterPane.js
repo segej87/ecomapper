@@ -1,16 +1,35 @@
 React = require('react');
+SidebarToggle = require('./SidebarToggle');
+SidebarStyles = require('../styles/map/sidebarStyles');
 
 var FilterPane = React.createClass({
+	getInitialState: function () {
+		return {
+			open: false
+		};
+	},
+	
+	openChange: function (result) {
+		this.setState({
+			open: result
+		});
+	},
+	
 	render: function () {
-		var display;
-		
-		if (this.props.open) {
-			display = <h1>Filter is open!</h1>;
+		if (this.state.open) {
+			return (
+				<div style={SidebarStyles.sidebarContainer}>
+					<div style={SidebarStyles.sidebarOpen}></div>
+					<SidebarToggle type="filter" onClick={this.openChange} open={this.state.open} />
+				</div>
+			);
 		} else {
-			display = <h1>Filter is closed!</h1>;
+			return (
+				<div style={SidebarStyles.sidebarContainer}>
+					<SidebarToggle type="filter" onClick = {this.openChange} open={this.state.open} />
+				</div>
+			);
 		}
-		
-		return display;
 	}
 });
 

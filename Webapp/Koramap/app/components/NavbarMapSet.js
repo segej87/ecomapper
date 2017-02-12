@@ -15,8 +15,8 @@ var NavbarHomeSet = React.createClass({
 	render: function () {
 		return (
 			<ul>
-				<NavbarItem loggedIn={this.props.parentState.loggedIn} text="Back" onClick={this.handleBack} />
-				<NavbarItem text={this.props.signInText} loggedIn={this.props.parentState.loggedIn} faded={this.props.parentState.faded} onClick={this.handleClick} />
+				<NavbarItem loggedIn={this.props.parentState.loggedIn} text="Back" onClick={this.handleBack} mapping={this.props.parentState.mapping} />
+				<NavbarItem text={this.props.signInText} loggedIn={this.props.parentState.loggedIn} faded={this.props.parentState.faded} onClick={this.handleClick} mapping={this.props.parentState.mapping}/>
 			</ul>
 		);
 	}

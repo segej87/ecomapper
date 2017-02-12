@@ -78,7 +78,7 @@ var Login = React.createClass({
 		}
 		
 		return (
-			<div style={appStyles.app}>
+			<div>
 				<Fader faded={this.props.loggingIn} />
 				<div style={style}>
 					<h1 style={style.h1}>{Values.strings.login}</h1>
@@ -89,8 +89,10 @@ var Login = React.createClass({
 						<input style={style.input} type="password" onChange={this.handleInput.bind(this, 'p')} id='pword'/>
 						<button style={style.button} onClick={this.attemptLogin}>{Values.strings.login}</button>
 					</div>
-					<a style={style.a} onClick={this.handleSignup}>{Values.strings.signup}</a>
-					<a style={style.a} onClick={this.handleCancel}>{Values.strings.cancel}</a>
+					<div>
+						<a style={style.a} onClick={this.handleSignup}>{Values.strings.signup}</a>
+						<a style={style.a} onClick={this.handleCancel}>{Values.strings.cancel}</a>
+					</div>
 				</div>
 			</div>
 		);

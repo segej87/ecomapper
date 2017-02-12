@@ -1,14 +1,28 @@
+Colors = require('../res/values').colors;
+Numbers = require('../res/values').numbers;
+
 var navbar = {
 	margin: 0,
 	padding: 0,
 	position: 'fixed',
-    background: 'rgba(255, 255, 255, 0.75)',
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
     width: '100%',
-	zIndex: '1'
+	height: Numbers.navHeight,
+	zIndex: '1000000',
+	blue: {
+		margin: 0,
+		padding: 0,
+		position: 'fixed',
+		backgroundColor: Colors.darkBlue,
+		width: '100%',
+		height: Numbers.navHeight,
+		zIndex: '1000000'
+	}
 };
 
 var ul = {
-	float: 'right'
+	float: 'right',
+	height: '100%'
 };
 
 var a = {
@@ -17,9 +31,19 @@ var a = {
 	letterSpacing: 2,
 	textTransform: 'uppercase',
 	textDecoration: 'none',
-	padding: '16.75px 20px',
+	padding: '3vh 20px',
 	fontFamily: 'Oswald, sans-serif',
 	cursor: 'pointer',
+	blue: {
+		color: 'white',
+		fontWeight: '100',
+		letterSpacing: 2,
+		textTransform: 'uppercase',
+		textDecoration: 'none',
+		padding: '16.75px 20px',
+		fontFamily: 'Oswald, sans-serif',
+		cursor: 'pointer'
+	},
 	highlighted: {
 		color: '#00004c',
 		fontWeight: '100',
@@ -29,18 +53,30 @@ var a = {
 		padding: '16.75px 20px',
 		fontFamily: 'Oswald, sans-serif',
 		background: 'rgba(255, 255, 255, 0.5)',
-		cursor: 'pointer'
+		cursor: 'pointer',
+		blue: {
+			color: 'white',
+			fontWeight: '100',
+			letterSpacing: 2,
+			textTransform: 'uppercase',
+			textDecoration: 'none',
+			padding: '16.75px 20px',
+			fontFamily: 'Oswald, sans-serif',
+			background: 'rgba(255, 255, 255, 0.5)',
+			cursor: 'pointer'
+		}
 	}
 };
 
 var li = {
-	display: 'inline-block'
+	display: 'inline-block',
+	height: '100%'
 };
 
 var logo = {
 	float: 'left',
-	margin: '5px 20px',
-	height: 40
+	margin: '1vh 20px',
+	height: '6vh'
 };
 
 var dropdown = {
@@ -56,7 +92,7 @@ var dropdownContent = {
     backgroundColor: 'rgba(255, 255, 255, 0.75)',
     minWidth: '165px',
     boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.4)',
-    zIndex: '10',
+    zIndex: '1000000',
     borderRadius: '0 0 2px 2px',
 	width: 166,
 	a: {

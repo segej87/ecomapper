@@ -1,9 +1,9 @@
-var React = require('react');
-var appStyles = require('../styles/appStyles');
-var Login = require('./Login');
-var Navbar = require('./Navbar');
-var Home = require('./Home');
-var Map = require('./Map');
+React = require('react');
+appStyles = require('../styles/appStyles');
+Login = require('./Login');
+Navbar = require('./Navbar');
+Home = require('./Home');
+MapContainer = require('./MapContainer');
 
 var HelloWorld = React.createClass({
 	getInitialState: function () {
@@ -62,7 +62,7 @@ var HelloWorld = React.createClass({
 		var navType;
 		
 		if (this.state.mapping) {
-			bodyJSX = <Map loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping}/>;
+			bodyJSX = <MapContainer loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping}/>;
 			navType = 'map'
 		} else {
 			bodyJSX = <Home loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping} />;

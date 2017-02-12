@@ -30,9 +30,17 @@ var NavbarItem = React.createClass({
 		var linkLine;
 		
 		if (this.state.highlighted) {
-			linkStyle = navStyles.a.highlighted
+			if (this.props.mapping) {
+				linkStyle = navStyles.a.highlighted.blue
+			} else {
+				linkStyle = navStyles.a.highlighted
+			}
 		} else {
-			linkStyle = navStyles.a
+			if (this.props.mapping) {
+				linkStyle = navStyles.a.blue
+			} else {
+				linkStyle = navStyles.a
+			}
 		}
 		
 		if ('dropdown' in this.props && this.props.dropdown != null) {

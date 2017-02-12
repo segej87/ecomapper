@@ -1,6 +1,6 @@
-var React = require('react');
-var mainStyles = require('../styles/home/mainStyles');
-var Supporting = require('./Supporting');
+React = require('react');
+mainStyles = require('../styles/home/mainStyles');
+Supporting = require('./Supporting');
 
 var Home = React.createClass ({
 	handleClick: function () {
