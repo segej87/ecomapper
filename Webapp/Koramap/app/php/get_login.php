@@ -2,6 +2,12 @@
 
 // array for JSON response
 $response = array();
+
+// headers for CORS
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+header('Access-Control-Max-Age: 1000');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
         
 // Connect to mysql database
 try
@@ -42,8 +48,10 @@ if (isset($_POST['username']) && isset($_POST['password']))
             
             if ($login["password"] == $password)
             {
-                $response["UID"] = $result["UID"];		
-                echo $response["UID"];
+                $response["UID"] = $result["UID"];
+				$response["firstname"] = $result["firstname"];
+				$response["lastname"] = $result["lastname"];	
+                print_r(json_encode($response,JSON_PRETTY_PRINT));
             }
             else
             {

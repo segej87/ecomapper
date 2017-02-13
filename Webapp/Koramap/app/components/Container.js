@@ -41,8 +41,7 @@ var Container = React.createClass({
 				}
 
 				if (request.status === 200) {
-					this.geoJson = JSON.parse(JSON.parse(request.responseText).text[0]);
-					
+					this.geoJson = JSON.parse(request.responseText);
 					this.processData();
 				} else {
 					console.log('Status: ' + request.status);
@@ -58,7 +57,7 @@ var Container = React.createClass({
   
   processData: function () {
 	  this.markers = this.geoJson.features.map((feature, i) => {
-		  return <Marker key={feature.id} onClick={this.onMarkerClick} name={feature.properties.name} position={{lat: feature.geometry.coordinates[1], lng: feature.geometry.coordinates[0]}}/>
+		  return <Marker key={feature.id} onClick={this.onMarkerClick} name={feature.properties.name} position={{lat: feature.geometry.coordinates[0], lng: feature.geometry.coordinates[1]}}/>
 	  });
 	  
 	  this.setState({
