@@ -61,6 +61,14 @@ var Login = React.createClass({
 		request.send(formData);
 	},
 	
+	handleEnter: function (event) {
+		if (event.charCode == 13) {
+			event.charCode == null;
+			this.attemptLogin(event);
+			return false;
+		}
+	},
+	
 	handleCancel: function () {
 		document.getElementById('uname').value = '';
 		document.getElementById('pword').value = '';
@@ -86,7 +94,7 @@ var Login = React.createClass({
 						<p style = {style.p}>{Values.strings.username}</p>
 						<input style={style.input} type="text" onChange={this.handleInput.bind(this, 'u')} id='uname'/>
 						<p style={style.p}>{Values.strings.password}</p>
-						<input style={style.input} type="password" onChange={this.handleInput.bind(this, 'p')} id='pword'/>
+						<input style={style.input} type="password" onChange={this.handleInput.bind(this, 'p')} onKeyPress={this.handleEnter} id='pword'/>
 						<button style={style.button} onClick={this.attemptLogin}>{Values.strings.login}</button>
 					</div>
 					<div>

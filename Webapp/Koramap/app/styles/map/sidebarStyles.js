@@ -3,49 +3,69 @@ Numbers = require('../../res/values').numbers;
 
 sidebarContainer = {
 	position: 'absolute',
-	zIndex: '1000001',
 	marginTop: Numbers.sidebarTopMargin,
 	marginLeft: 0,
-	height: Numbers.sidebarHeight
+	maxHeight: Numbers.sidebarHeight
 };
 
 sidebarOpen = {
-	position: 'relative',
-	float: 'left',
-	marginTop: 0,
-    backgroundColor: Colors.filterColor,
-    width: 300,
-	height: '100%',
-	textAlign: 'right',
-	padding: 20
+	filter: {
+		position: 'relative',
+		float: 'left',
+		zIndex: '1000002',
+		marginTop: 0,
+		backgroundColor: Colors.filterColor,
+		width: 300,
+		height: Numbers.sidebarHeight,
+		textAlign: 'center',
+		fontFamily: 'Oswald, sans-serif',
+		padding: 0,
+		boxShadow: '4px 0px 4px 0px rgba(0, 0, 0, 0.4)'
+	},
+	message: {
+		position: 'relative',
+		float: 'left',
+		zIndex: '1000002',
+		marginTop: 0,
+		backgroundColor: Colors.messageColor,
+		width: 300,
+		height: Numbers.sidebarHeight,
+		textAlign: 'center',
+		fontFamily: 'Oswald, sans-serif',
+		padding: 0,
+		boxShadow: '4px 0px 4px 0px rgba(0, 0, 0, 0.4)'
+	}
 };
 
 toggle = {
 	filter: {
 		position: 'relative',
 		float: 'left',
-		height: 50,
+		height: Numbers.toggleHeight,
 		width: 30,
+		zIndex: '1000001',
 		color: 'white',
-		textWeight: '900',
+		fontWeight: '900',
 		backgroundColor: Colors.filterColor,
 		cursor: 'pointer',
 		border: 'none',
 		borderRadius: '0px 7px 7px 0px',
-		boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.4)'
+		boxShadow: '4px 2px 4px 0px rgba(0, 0, 0, 0.4)'
 	},
 	message: {
 		position: 'relative',
 		float: 'left',
-		height: 100,
+		top: Numbers.toggleHeight,
+		height: Numbers.toggleHeight,
 		width: 30,
+		zIndex: '1000001',
 		color: 'white',
-		textWeight: '900',
+		fontWeight: '900',
 		backgroundColor: Colors.messageColor,
 		cursor: 'pointer',
 		border: 'none',
 		borderRadius: '0px 7px 7px 0px',
-		boxShadow: '0px 4px 4px 0px rgba(0, 0, 0, 0.4)'
+		boxShadow: '4px 2px 4px 0px rgba(0, 0, 0, 0.4)'
 	}
 };
 

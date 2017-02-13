@@ -16,7 +16,7 @@ var MapContainer = React.createClass({
 		return (
 			<div style={mapStyles.main}>
 				<Sidebar />
-				<Container />
+				<Container userInfo={this.props.userInfo}/>
 			</div>
 		)
 	}

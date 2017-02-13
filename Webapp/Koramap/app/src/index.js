@@ -43,6 +43,8 @@ const evtNames = [
   'zoom_changed'
 ];
 
+var geoJson;
+
 export {wrapper as GoogleApiWrapper} from './GoogleApiComponent'
 export {Marker} from './components/Marker'
 export {InfoWindow} from './components/InfoWindow'
@@ -56,6 +58,7 @@ export class Map extends React.Component {
                     'You must include a `google` prop.');
 
         this.listeners = {}
+		
         this.state = {
           currentLocation: {
             lat: this.props.initialCenter.lat,
@@ -285,7 +288,7 @@ Map.defaultProps = {
     lng: -122.419416
   },
   center: {},
-  centerAroundCurrentLocation: false,
+  centerAroundCurrentLocation: true,
   style: {},
   containerStyle: {},
   visible: true

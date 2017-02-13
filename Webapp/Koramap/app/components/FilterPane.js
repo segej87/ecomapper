@@ -19,7 +19,9 @@ var FilterPane = React.createClass({
 		if (this.state.open) {
 			return (
 				<div style={SidebarStyles.sidebarContainer}>
-					<div style={SidebarStyles.sidebarOpen}></div>
+					<div style={SidebarStyles.sidebarOpen.filter}>
+						<h1 style={{color: 'white'}}>Filtering</h1>
+					</div>
 					<SidebarToggle type="filter" onClick={this.openChange} open={this.state.open} />
 				</div>
 			);

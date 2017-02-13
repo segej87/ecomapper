@@ -12,7 +12,8 @@ var HelloWorld = React.createClass({
 			userInfo: {
 				userName: null,
 				firstName: null,
-				lastName: null
+				lastName: null,
+				userId: null
 			},
 			loggingIn: false,
 			faded: false,

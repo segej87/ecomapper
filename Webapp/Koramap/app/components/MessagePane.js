@@ -19,14 +19,14 @@ var MessagePane = React.createClass({
 		if (this.state.open) {
 			return (
 				<div style={SidebarStyles.sidebarContainer}>
-					<div style={SidebarStyles.sidebarOpen}></div>
-					<SidebarToggle type="filter" onClick = {this.openChange} open={this.state.open} />
+					<div style={SidebarStyles.sidebarOpen.message}></div>
+					<SidebarToggle type="message" onClick = {this.openChange} open={this.state.open} />
 				</div>
 			);
 		} else {
 			return (
 				<div style={SidebarStyles.sidebarContainer}>
-					<SidebarToggle type="filter" onClick = {this.openChange} open={this.state.open} />
+					<SidebarToggle type="message" onClick = {this.openChange} open={this.state.open} />
 				</div>
 			);
 		}

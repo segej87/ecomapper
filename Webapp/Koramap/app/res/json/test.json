@@ -1,0 +1,472 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.9899966,
+                    40.7365808,
+                    -22
+                ]
+            },
+            "properties": {
+                "tags": [
+                    "Testing"
+                ],
+                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20161109_182824.jpg",
+                "text": "",
+                "name": "Photo - 2016-11-09 18:28:24",
+                "datatype": "photo",
+                "datetime": "2016-11-09 18:28:24",
+                "access": [
+                    "Testing"
+                ],
+                "accuracy": 8
+            },
+            "id": "ec7fa8fa-f48e-4db1-a798-8345d186ce69"
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.9747069,
+                    40.761853,
+                    -51
+                ]
+            },
+            "properties": {
+                "tags": [
+                    "Testing"
+                ],
+                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20161109_202705.jpg",
+                "text": "By trump tower",
+                "name": "Photo - 2016-11-09 20:27:05",
+                "datatype": "photo",
+                "access": [
+                    "Testing"
+                ],
+                "datetime": "2016-11-09 20:27:05",
+                "accuracy": 38
+            },
+            "id": "8d368ac7-3bbe-407d-a6fe-e1dac10b8edf"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.9927822,
+                    40.6953594,
+                    0
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "photo",
+                "datetime": "2016-11-16 19:42:19",
+                "name": "SURJ Meeting",
+                "text": "",
+                "access": [
+                    "Testing"
+                ],
+                "tags": [
+                    "Testing"
+                ],
+                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20161116_194219.jpg",
+                "accuracy": 21.502000808716
+            },
+            "id": "b3806829-4e38-4269-92fa-2fc810cead10"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -71.5437915,
+                    42.3471951,
+                    92
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "name": "Jake's restaurant",
+                "text": "Intersection of 20 and Main St",
+                "datatype": "note",
+                "datetime": "2016-11-22 09:46:04",
+                "tags": [
+                    "Testing"
+                ],
+                "access": [
+                    "Testing"
+                ],
+                "accuracy": 15
+            },
+            "id": "e7aded0f-077e-4b12-b33e-210081d7f6d3"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -70.6638755,
+                    42.612472,
+                    18
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "note",
+                "datetime": "2016-11-23 10:46:42",
+                "text": "Sasha's house (1 center st)",
+                "name": "Note - 2016-11-23 10:46:42",
+                "tags": [
+                    "Testing"
+                ],
+                "access": [
+                    "Testing"
+                ],
+                "accuracy": 6
+            },
+            "id": "8f18dfec-adbb-4d31-8cd0-843dc253ce66"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -70.6274893,
+                    42.6216853,
+                    -27
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "photo",
+                "datetime": "2016-11-23 15:05:33",
+                "name": "Sasha's grandpa",
+                "text": "Gloucester",
+                "access": [
+                    "Testing"
+                ],
+                "tags": [
+                    "Testing"
+                ],
+                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20161123_150533.jpg",
+                "accuracy": 4
+            },
+            "id": "d67f912e-6d15-486d-8ec2-a026db12e5d9"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -71.4415248,
+                    42.3765089,
+                    -30
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "photo",
+                "datetime": "2016-11-24 13:47:37",
+                "name": "Thanksgiving table",
+                "text": "Test",
+                "access": [
+                    "Testing"
+                ],
+                "tags": [
+                    "Testing"
+                ],
+                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20161124_134737.jpg",
+                "accuracy": 12
+            },
+            "id": "fd85a44e-c415-4ac7-97f8-0160dfa3118c"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.9765291,
+                    40.687335,
+                    0
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "photo",
+                "datetime": "2016-11-30 22:49:43",
+                "name": "Photo - 2016-11-30 22:49:43",
+                "text": "Water pouring into Fulton G stop",
+                "access": [
+                    "Testing"
+                ],
+                "tags": [
+                    "Testing"
+                ],
+                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20161130_224943.jpg",
+                "accuracy": 22.045999526978
+            },
+            "id": "80592731-0256-40d7-b49d-6b6ec226c97c"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -122.3910588,
+                    37.6156104,
+                    42
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "name": "SFO BART",
+                "text": "While sitting on the train",
+                "datatype": "note",
+                "datetime": "2016-12-01 12:36:26",
+                "tags": [
+                    "Testing"
+                ],
+                "access": [
+                    "Testing"
+                ],
+                "accuracy": 170
+            },
+            "id": "e3999f4d-af1c-4436-a557-e05f0f224ffb"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -122.3872456,
+                    37.5999453,
+                    -29
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "meas",
+                "datetime": "2016-12-01 13:08:51",
+                "units": "Testing",
+                "species": "Testing",
+                "text": "Under Caltrain station on southbound side",
+                "name": "Milbrae Caltrain",
+                "value": 1.23,
+                "access": [
+                    "Testing"
+                ],
+                "tags": [
+                    "Testing"
+                ],
+                "accuracy": 6
+            },
+            "id": "94d542e2-8b26-476c-9814-b3ecde8f5fdc"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -121.980351,
+                    37.3968063,
+                    -87
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "photo",
+                "datetime": "2016-12-02 09:45:19",
+                "name": "At Echelon",
+                "text": "",
+                "access": [
+                    "Testing"
+                ],
+                "tags": [
+                    "Testing"
+                ],
+                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20161202_094519.jpg",
+                "accuracy": 8
+            },
+            "id": "23a5f7cb-0356-4c5b-b450-ac2c1f0501da"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -120.1745008,
+                    39.322496,
+                    1788
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "photo",
+                "datetime": "2016-12-03 15:25:19",
+                "name": "Truckee",
+                "text": "Gina's house",
+                "access": [
+                    "Testing"
+                ],
+                "tags": [
+                    "Testing"
+                ],
+                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20161203_152519.jpg",
+                "accuracy": 17
+            },
+            "id": "59b7214c-a97e-40a6-9ae8-c7e340f6dc85"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -121.9807494,
+                    37.3966282,
+                    -41
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "photo",
+                "datetime": "2016-12-05 16:33:23",
+                "name": "Test",
+                "text": "This is a test",
+                "access": [
+                    "UC Berkeley"
+                ],
+                "tags": [
+                    "Well Water"
+                ],
+                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20161205_163323.jpg",
+                "accuracy": 8
+            },
+            "id": "5ae1e484-88fa-420b-847a-1d4dc83e66bb"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.9455093,
+                    40.8349833,
+                    -9
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "photo",
+                "datetime": "2016-12-22 14:54:04",
+                "name": "Dan's office",
+                "text": "",
+                "access": [
+                    "Private"
+                ],
+                "tags": [
+                    "Testing"
+                ],
+                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20161222_145404.jpg",
+                "accuracy": 11
+            },
+            "id": "e94d2b89-5ea4-4686-8be6-d4d0fa5db0dd"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -71.0535375,
+                    42.3578658,
+                    0
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "photo",
+                "datetime": "2016-12-23 00:30:30",
+                "name": "Photo - 2016-12-23 00:30:30",
+                "text": "Mr Dooley's",
+                "access": [
+                    "Testing"
+                ],
+                "tags": [
+                    "Testing"
+                ],
+                "filepath": "https://ecomapper.blob.core.windows.net/f2e0b43f-0760-425a-b36d-109e65531b5c/Photo_20161223_003030.jpg",
+                "accuracy": 19.445999145508
+            },
+            "id": "6f5a5a1a-593a-442a-9dcb-e084f0afc11a"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -70.3821749,
+                    43.4114956,
+                    -22
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "note",
+                "datetime": "2016-12-29 23:15:43",
+                "text": "Test",
+                "name": "Biddeford bathroom!",
+                "tags": [
+                    "Testing"
+                ],
+                "access": [
+                    "Testing"
+                ],
+                "accuracy": 4
+            },
+            "id": "ce6af384-7b2c-474b-b59c-c3be59c7e5e5"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.9971896,
+                    40.7469595,
+                    0
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "meas",
+                "datetime": "2017-01-11 12:58:11",
+                "units": "watts",
+                "species": "Wattage",
+                "text": "In ywln office",
+                "name": "Meas - 2017-01-11 12:58:11",
+                "value": 1.33,
+                "tags": [
+                    "Testing"
+                ],
+                "access": [
+                    "Testing"
+                ],
+                "accuracy": 50
+            },
+            "id": "52520bd0-b7ca-4994-9724-73f794e677d9"
+        },
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.8929003,
+                    40.7466682,
+                    0
+                ]
+            },
+            "type": "Feature",
+            "properties": {
+                "datatype": "note",
+                "datetime": "2017-01-19 18:57:05",
+                "text": "Test",
+                "name": "Little Tibet",
+                "tags": [
+                    "Testing"
+                ],
+                "access": [
+                    "Testing"
+                ],
+                "accuracy": 20.194000244141
+            },
+            "id": "5ee3b779-e51d-4a3a-a012-429b391a5144"
+        }
+    ]
+}
