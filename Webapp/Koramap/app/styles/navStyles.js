@@ -9,6 +9,7 @@ var navbar = {
     width: '100%',
 	height: Numbers.navHeight,
 	zIndex: '1000000',
+	fontSize: '2.45vh',
 	blue: {
 		margin: 0,
 		padding: 0,
@@ -16,7 +17,8 @@ var navbar = {
 		backgroundColor: Colors.darkBlue,
 		width: '100%',
 		height: Numbers.navHeight,
-		zIndex: '1000000'
+		zIndex: '1000000',
+		fontSize: '2.45vh',
 	}
 };
 
@@ -31,7 +33,7 @@ var a = {
 	letterSpacing: 2,
 	textTransform: 'uppercase',
 	textDecoration: 'none',
-	padding: '3vh 20px',
+	padding: '2vh 20px',
 	fontFamily: 'Oswald, sans-serif',
 	cursor: 'pointer',
 	blue: {
@@ -40,7 +42,7 @@ var a = {
 		letterSpacing: 2,
 		textTransform: 'uppercase',
 		textDecoration: 'none',
-		padding: '16.75px 20px',
+		padding: '2.45vh 20px',
 		fontFamily: 'Oswald, sans-serif',
 		cursor: 'pointer'
 	},
@@ -50,7 +52,7 @@ var a = {
 		letterSpacing: 2,
 		textTransform: 'uppercase',
 		textDecoration: 'none',
-		padding: '16.75px 20px',
+		padding: '2.45vh 20px',
 		fontFamily: 'Oswald, sans-serif',
 		background: 'rgba(255, 255, 255, 0.5)',
 		cursor: 'pointer',
@@ -60,7 +62,7 @@ var a = {
 			letterSpacing: 2,
 			textTransform: 'uppercase',
 			textDecoration: 'none',
-			padding: '16.75px 20px',
+			padding: '2.45vh 20px',
 			fontFamily: 'Oswald, sans-serif',
 			background: 'rgba(255, 255, 255, 0.5)',
 			cursor: 'pointer'
@@ -87,7 +89,7 @@ var dropdown = {
 var dropdownContent = {
 	display: 'inline-block',
     position: 'absolute',
-    top: 20,
+    top: '3.15vh',
 	left: -166,
     backgroundColor: 'rgba(255, 255, 255, 0.75)',
     minWidth: '165px',

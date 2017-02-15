@@ -10,10 +10,10 @@ var HelloWorld = React.createClass({
 		return {
 			loggedIn: false,
 			userInfo: {
-				userName: null,
-				firstName: null,
-				lastName: null,
-				userId: null
+				userName: 'public',
+				firstName: 'Guest',
+				lastName: 'Person',
+				userId: '10101010-1010-1010-1010-101010101010'
 			},
 			loggingIn: false,
 			faded: false,

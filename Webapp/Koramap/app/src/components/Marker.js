@@ -94,7 +94,8 @@ Marker.propTypes = {
 evtNames.forEach(e => Marker.propTypes[e] = T.func)
 
 Marker.defaultProps = {
-  name: 'Marker'
+  name: 'Marker',
+  datetime: Date()
 }
 
 export default Marker

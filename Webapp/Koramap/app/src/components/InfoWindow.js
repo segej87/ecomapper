@@ -75,6 +75,11 @@ export class InfoWindow extends React.Component {
 
   renderChildren() {
     const {children} = this.props;
+	for (var i = 0; i < children.length; i++) {
+		if (children[i].props.onClick) {
+			google.maps.event.addListener(children[i], 'delete', children[i].props.onClick.bind(this))
+		}
+	}
     return ReactDOMServer.renderToString(children);
   }
 

@@ -10,9 +10,11 @@
   "author": "jonse",
   "license": "BSD-2-Clause",
   "dependencies": {
+    "dateformat": "^2.0.0",
     "google-maps-react": "^1.0.19",
     "react": "^15.4.2",
-    "react-dom": "^15.4.2"
+    "react-dom": "^15.4.2",
+    "react-timer-mixin": "^0.13.3"
   },
   "devDependencies": {
     "babel-core": "^6.22.1",

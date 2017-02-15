@@ -6,11 +6,10 @@ var GoogleApiWrapper = require('../src/index').GoogleApiWrapper
 var Map = require('../src/index').Map
 import Marker from '../src/components/Marker'
 import InfoWindow from '../src/components/InfoWindow'
+import TimerMixin from 'react-timer-mixin';
 
 var Container = React.createClass({
-	geoJson: {},
-	
-	markers: {},
+	mixins: [TimerMixin],
 	
   getInitialState: function() {
     return {
@@ -21,81 +20,118 @@ var Container = React.createClass({
     }
   },
   
-  loadData: function (userId) {
-	  if (userId == null) {
-			console.log('Not logged in')
-		} else {
-			const formData='GUID=' + userId;
-		
-			var request = new XMLHttpRequest;
-			
-			var method = 'POST';
-			var url = 'http://ecocollector.azurewebsites.net/get_geojson.php';
-			
-			request.onreadystatechange = (e) => {
-				if (request.readyState !== 4) {
-					console.log('Ready state: ' + request.readyState);
-					return;
-				} else {
-					console.log('Ready state: ' + request.readyState)
-				}
-
-				if (request.status === 200) {
-					this.geoJson = JSON.parse(request.responseText);
-					this.processData();
-				} else {
-					console.log('Status: ' + request.status);
-					console.log('Status text: ' + request.statusText);
-				}
-			};
-
-			request.open(method, url, true);
-			request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			request.send(formData);
-		}
-  },
-  
-  processData: function () {
-	  this.markers = this.geoJson.features.map((feature, i) => {
-		  return <Marker key={feature.id} onClick={this.onMarkerClick} name={feature.properties.name} position={{lat: feature.geometry.coordinates[0], lng: feature.geometry.coordinates[1]}}/>
-	  });
+  processData: function (features) {
+	  if (features == 'reset') {
+		  delete this.markers;
+		  return;
+	  }
+	  
+	  if (this.markers) {
+		  var currentIds = [];
+		  for (var i = 0; i < this.markers.length; i++) {
+			currentIds.push(this.markers[i].key);
+		  }
+		  
+		  var featureIds = [];
+		  for (var i = 0; i < features.length; i++) {
+			  featureIds.push(features[i].id);
+		  }
+		  
+		  for (var i = 0; i < currentIds.length; i++) {
+			  if (!featureIds.includes(currentIds[i])) {
+				  this.markers.splice(i, 1);
+			  }
+		  }
+		  
+		  for (var i = 0; i < featureIds.length; i++) {
+			  if (!currentIds.includes(featureIds[i])) {
+				  const feature = features[i];
+				  this.markers.push(
+					<Marker key={feature.id} 
+					  onClick={this.onMarkerClick} 
+					  fuid={feature.id}
+					  name={feature.properties.name} 
+					  submitter={feature.properties.submitter} 
+					  datetime={feature.properties.datetime} 
+					  tags={feature.properties.tags} 
+					  featureProps={feature.properties} 
+					  position={{lat: feature.geometry.coordinates[0], lng: feature.geometry.coordinates[1]}}/>
+				  );
+			  }
+		  }
+	  } else {
+		  this.markers = features.map((feature, i) => {
+			  return (
+			  <Marker key={feature.id} 
+			  onClick={this.onMarkerClick} 
+			  fuid={feature.id}
+			  name={feature.properties.name} 
+			  submitter={feature.properties.submitter} 
+			  datetime={feature.properties.datetime} 
+			  tags={feature.properties.tags} 
+			  featureProps={feature.properties} 
+			  position={{lat: feature.geometry.coordinates[0], lng: feature.geometry.coordinates[1]}}/>
+			  );
+		  });
+	  }
 	  
 	  this.setState({
 		  hasMarkers: true
 	  });
   },
-
+  
   onMarkerClick: function(props, marker, e) {
     this.setState({
       selectedPlace: props,
       activeMarker: marker,
       showingInfoWindow: true
     });
+	
+	this.props.handleSelected(this.state.selectedPlace);
   },
 
   onInfoWindowClose: function() {
     this.setState({
+	  selectedPlace: {},
       showingInfoWindow: false,
       activeMarker: null
     })
+	
+	this.props.handleSelected(this.state.selectedPlace);
   },
 
   onMapClicked: function(props) {
     if (this.state.showingInfoWindow) {
       this.setState({
+		selectedPlace: {},
         showingInfoWindow: false,
         activeMarker: null
       })
+	  
+	  this.props.handleSelected(this.state.selectedPlace);
     }
   },
   
   componentWillMount: function () {
-	  this.loadData(this.props.userInfo.userId)
+	  this.props.loadRecords();
+  },
+  
+  componentDidMount: function () {
+	this.setInterval(
+		() => { this.props.loadRecords(); },
+		30000
+	);
   },
   
   componentWillReceiveProps: function (nextProps) {
 	  if (nextProps.userInfo.userId != this.props.userInfo.userId) {
-		  this.loadData(nextProps.userInfo.userId)
+		  this.props.resetRecords();
+	  }
+	  
+	  if (nextProps.records.features) {
+		this.processData(nextProps.records.features);
+	  } else {
+		  this.processData('reset');
 	  }
   },
   
@@ -111,15 +147,6 @@ var Container = React.createClass({
 				  zoom={14}
 				  onClick={this.onMapClicked}
 				  guid={this.props.userInfo.userId}>
-
-				<InfoWindow
-				  marker={this.state.activeMarker}
-				  visible={this.state.showingInfoWindow}
-				  onClose={this.onInfoWindowClose}>
-					<div>
-					  <h1>{this.state.selectedPlace.name}</h1>
-					</div>
-				</InfoWindow>
 			  </Map>
 			  </div>
 		);
@@ -132,15 +159,6 @@ var Container = React.createClass({
           onClick={this.onMapClicked}
 		  guid={this.props.userInfo.userId}>
 		{this.markers}
-
-        <InfoWindow
-          marker={this.state.activeMarker}
-          visible={this.state.showingInfoWindow}
-          onClose={this.onInfoWindowClose}>
-            <div>
-              <h1>{this.state.selectedPlace.name}</h1>
-            </div>
-        </InfoWindow>
       </Map>
 	  </div>
     )

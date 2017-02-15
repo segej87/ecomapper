@@ -36,10 +36,7 @@ var Login = React.createClass({
 		
 		request.onreadystatechange = (e) => {
 			if (request.readyState !== 4) {
-				console.log('Ready state: ' + request.readyState);
 				return;
-			} else {
-				console.log('Ready state: ' + request.readyState)
 			}
 
 			if (request.status === 200) {
