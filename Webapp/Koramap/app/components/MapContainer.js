@@ -27,7 +27,7 @@ var MapContainer = React.createClass({
 	},
 	
 	loadRecords: function () {
-		if (this.props.userInfo.userId != null) {
+		if (this.props.userInfo.userId != null && !this.props.offline) {
 			console.log('Loading data');
 			const formData='GUID=' + this.props.userInfo.userId + '&filters=' + JSON.stringify(this.state.filters);
 		
@@ -141,6 +141,7 @@ var MapContainer = React.createClass({
 				handleDelete={this.handleDelete}
 				/>
 				<Container 
+				offline={this.props.offline}
 				userInfo={this.props.userInfo} 
 				loadRecords={this.loadRecords} 
 				records={this.state.records} 

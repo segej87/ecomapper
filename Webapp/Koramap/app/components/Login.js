@@ -25,6 +25,10 @@ var Login = React.createClass({
 	},
 	
 	attemptLogin: function (e) {
+		if (this.props.offline) {
+			this.handleCancel();
+		}
+		
 		e.preventDefault();
 		
 		formData='username=' + this.state.username + '&password=' + this.state.password;

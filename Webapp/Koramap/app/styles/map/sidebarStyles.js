@@ -6,8 +6,9 @@ sidebarContainer = {
 	marginTop: Numbers.sidebarTopMargin,
 	marginLeft: 0,
 	maxHeight: Numbers.sidebarHeight,
-	color: 'white',
-	textAlign: 'left'
+	color: 'black',
+	textAlign: 'left',
+	boxSizing: 'border-box'
 };
 
 sidebarOpen = {
@@ -71,22 +72,33 @@ toggle = {
 
 h1 = {
 	fontSize: '3vh',
-	marginBottom: 5
+	marginBottom: 5,
+	color: 'black'
 };
 
 p = {
-	fontSize: '2vh',
+	fontSize: 11,
 	marginTop: 5,
-	marginBottom: 5
+	marginBottom: 5,
+	color: 'black'
 };
 
 a = {
 	fontSize: '2vh',
-	textDecoration: 'none'
+	textDecoration: 'none',
+	cursor: 'pointer',
+	color: 'blue'
+};
+
+date = {
+	fontSize: 11,
+	marginTop: 5,
+	marginBottom: 5,
+	color: 'rgb(75, 75, 75)'
 };
 
 featureInfo = {
-	color: 'white',
+	color: 'black',
 	overflow: 'auto'
 };
 
@@ -148,9 +160,78 @@ addButton = {
 };
 
 buttonHolder = {
-	backgroundColor: 'white',
+	backgroundColor: 'rgb(245, 245, 245)',
 	borderRadius: 2,
-	padding: 5
+	padding: 10,
+	marginTop: -0.5,
+	textAlign: 'center',
+	backgroundColor: 'rgba(245, 245, 245, 0.75)',
+	border: 'none'
+};
+
+tabHolder = {
+	marginTop: 10,
+	paddingTop: 2,
+	paddingLeft: 5,
+	paddingRight: 5,
+	textAlign: 'center',
+	marginBottom: 0
+};
+
+titleArea = {
+	borderBottom: '1px solid black'
+};
+
+noteArea = {
+	paddingLeft: 5,
+	paddingRight: 5,
+	paddingTop: 5,
+	paddingBottom: 5,
+	backgroundColor: 'white',
+	border: 'none',
+	borderRadius: 2,
+	minHeight: 50
+};
+
+note = {
+	fontSize: 12,
+	color: 'black',
+	margin: 0
+};
+
+tab = {
+	fontSize: '2vh',
+	borderTop: '1px solid rgba(150,150,150,0.75)',
+	borderLeft: '1px solid rgba(150,150,150,0.75)',
+	borderRight: '1px solid rgba(150,150,150,0.75)',
+	borderBottom: 'none',
+	marginLeft: 2.5,
+	marginRight: 2.5,
+	marginBottom: 0,
+	paddingTop: 2,
+	paddingLeft: 5,
+	paddingRight: 5,
+	minWidth: 100,
+	textDecoration: 'none',
+	backgroundColor: 'rgba(245, 245, 245, 0.25)',
+	cursor: 'pointer',
+	selected: {
+		fontSize: '2vh',
+		borderTop: '1px solid rgba(150,150,150,0.75)',
+		borderLeft: '1px solid rgba(150,150,150,0.75)',
+		borderRight: '1px solid rgba(150,150,150,0.75)',
+		borderBottom: 'none',
+		marginLeft: 2.5,
+		marginRight: 2.5,
+		marginBottom: 0,
+		paddingTop: 2,
+		paddingLeft: 5,
+		paddingRight: 5,
+		minWidth: 100,
+		textDecoration: 'none',
+		backgroundColor: 'rgba(245, 245, 245, 0.75)',
+		cursor: 'pointer',
+	}
 };
 
 module.exports = {
@@ -161,9 +242,15 @@ module.exports = {
 	h1,
 	p,
 	a,
+	date,
+	titleArea,
+	noteArea,
+	note,
 	deleteButton,
 	tagButton,
 	accessButton,
 	buttonHolder,
-	addButton
+	addButton,
+	tabHolder,
+	tab
 };

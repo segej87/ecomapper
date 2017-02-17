@@ -17,7 +17,8 @@ var HelloWorld = React.createClass({
 			},
 			loggingIn: false,
 			faded: false,
-			mapping: false
+			mapping: false,
+			offline: true
 		};
 	},
 	
@@ -63,7 +64,7 @@ var HelloWorld = React.createClass({
 		var navType;
 		
 		if (this.state.mapping) {
-			bodyJSX = <MapContainer loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping}/>;
+			bodyJSX = <MapContainer offline={this.state.offline} loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping}/>;
 			navType = 'map'
 		} else {
 			bodyJSX = <Home loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping} />;
@@ -74,7 +75,7 @@ var HelloWorld = React.createClass({
 		
 		return (
 			<div style={appStyles.app}>
-				<Login loggingIn={this.state.loggingIn} onSubmit={this.handleLoginResult} parentState = {this.state}/>
+				<Login offline={this.state.offline} loggingIn={this.state.loggingIn} onSubmit={this.handleLoginResult} parentState = {this.state}/>
 				<Navbar parentState={this.state} onClick={this.handleLoggingIn} onBack={this.handleMapping} navType={navType} />
 				{bodyJSX}
 			</div>

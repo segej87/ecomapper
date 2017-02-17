@@ -1,15 +1,29 @@
 React = require('react');
+TabArea = require('./TabArea');
 SidebarStyles = require('../styles/map/sidebarStyles');
 
 var FeatureInfo = React.createClass({
 	getInitialState: function () {
 		return ({
-			photo: false
+			photo: false,
+			activeButtons: 'Tags'
 		});
 	},
 	
 	handleDelete: function () {
 		this.props.handleDelete();
+	},
+	
+	changeActiveButtons: function () {
+		if (this.state.activeButtons == 'Tags') {
+			this.setState({
+				activeButtons: 'Access'
+			});
+		} else {
+			this.setState({
+				activeButtons: 'Tags'
+			});
+		}
 	},
 	
 	componentWillReceiveProps: function (nextProps) {
@@ -40,24 +54,11 @@ var FeatureInfo = React.createClass({
 			photo = <img style={{width: '100%'}} src={this.props.selectedPlace.featureProps.filepath} />
 		}
 		
-		var tags = this.props.selectedPlace.featureProps.tags.map((tag, i) => {
-			return (
-				<button key={'tag_' + this.props.selectedPlace.fuid + i} style={SidebarStyles.tagButton}>{tag}</button>
-			);
-		});
-		
-		var access = this.props.selectedPlace.featureProps.access.map((access, i) => {
-			return (
-				<button key={'access_' + this.props.selectedPlace.fuid + i} style={SidebarStyles.accessButton}>{access}</button>
-			);
-		});
-		
 		var editArea;
 		
 		if (this.props.ownFeature) {
 			editArea = (
-				<div style={{marginTop: 10, backgroundColor: 'rgba(255, 255, 255, 0.5)', paddingTop: 2, paddingLeft: 5, paddingRight: 5, paddingBottom: 5}}>
-					<p style={SidebarStyles.p}>Edit:</p>
+				<div style={{marginTop: 10, paddingTop: 2, paddingLeft: 5, paddingRight: 5, paddingBottom: 2, textAlign: 'center'}}>
 					<button style={SidebarStyles.deleteButton} onClick={this.handleDelete}>Delete</button>
 				</div>
 			);
@@ -65,19 +66,21 @@ var FeatureInfo = React.createClass({
 		
 		return (
 			<div style={SidebarStyles.featureInfo}>
-				<h1 style={SidebarStyles.h1}>{this.props.selectedPlace.featureProps.name}</h1>
-				<a href='#' style={SidebarStyles.a}>{this.props.selectedPlace.featureProps.submitter}</a>
-				<p style={SidebarStyles.p}>{this.props.selectedPlace.featureProps.datetime}</p>
-					{photo}
-				<p style={SidebarStyles.p}>{this.props.selectedPlace.featureProps.text}</p>
-				<div style={{marginTop: 10, backgroundColor: 'rgba(230, 230, 230, 0.5)', paddingTop: 2, paddingLeft: 5, paddingRight: 5, paddingBottom: 5}}>
-					<p style={SidebarStyles.p}>Tags:</p>
-					{tags}
+				<div style={SidebarStyles.titleArea}>
+					<h1 style={SidebarStyles.h1}>{this.props.selectedPlace.featureProps.name}</h1>
 				</div>
-				<div style={{marginTop: 10, backgroundColor: 'rgba(200, 200, 200, 0.5)', paddingTop: 2, paddingLeft: 5, paddingRight: 5, paddingBottom: 5}}>
-					<p style={SidebarStyles.p}>Access levels:</p>
-					{access}
+				<div style={{display: 'inline-block', position: 'relative', float: 'right', width: '100%', marginBottom: 10}}>
+					<a style={SidebarStyles.a}>{this.props.selectedPlace.featureProps.submitter}</a>
+					<div style={{textAlign: 'right', position: 'relative', float: 'right', display: 'inline-block'}}>
+						<a style={SidebarStyles.date}>{this.props.selectedPlace.featureProps.datetime}</a>
+					</div>
 				</div>
+				{photo}
+				<p style={SidebarStyles.p}>Note:</p>
+				<div style={SidebarStyles.noteArea}>
+					<p style={SidebarStyles.note}>{this.props.selectedPlace.featureProps.text}</p>
+				</div>
+				<TabArea activeButtons={this.state.activeButtons} onClick={this.changeActiveButtons} selectedPlace={this.props.selectedPlace}/>
 				{editArea}
 			</div>
 		);
