@@ -6,10 +6,8 @@ var GoogleApiWrapper = require('../src/index').GoogleApiWrapper
 var Map = require('../src/index').Map
 import Marker from '../src/components/Marker'
 import InfoWindow from '../src/components/InfoWindow'
-import TimerMixin from 'react-timer-mixin';
 
 var Container = React.createClass({
-	mixins: [TimerMixin],
 	
   getInitialState: function() {
     return {
@@ -37,16 +35,17 @@ var Container = React.createClass({
 			  featureIds.push(features[i].id);
 		  }
 		  
+		  var newMarkers = [];
 		  for (var i = 0; i < currentIds.length; i++) {
-			  if (!featureIds.includes(currentIds[i])) {
-				  this.markers.splice(i, 1);
+			  if (featureIds.includes(currentIds[i])) {
+				  newMarkers.push(this.markers[i])
 			  }
 		  }
 		  
 		  for (var i = 0; i < featureIds.length; i++) {
 			  if (!currentIds.includes(featureIds[i])) {
 				  const feature = features[i];
-				  this.markers.push(
+				  newMarkers.push(
 					<Marker key={feature.id} 
 					  onClick={this.onMarkerClick} 
 					  fuid={feature.id}
@@ -59,6 +58,8 @@ var Container = React.createClass({
 				  );
 			  }
 		  }
+		  
+		  this.markers = newMarkers;
 	  } else {
 		  this.markers = features.map((feature, i) => {
 			  return (
@@ -110,17 +111,6 @@ var Container = React.createClass({
 	  
 	  this.props.handleSelected(this.state.selectedPlace);
     }
-  },
-  
-  componentWillMount: function () {
-	  this.props.loadRecords();
-  },
-  
-  componentDidMount: function () {
-	this.setInterval(
-		() => { this.props.loadRecords(); },
-		30000
-	);
   },
   
   componentWillReceiveProps: function (nextProps) {

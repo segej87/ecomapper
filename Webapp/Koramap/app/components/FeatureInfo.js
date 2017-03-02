@@ -6,7 +6,7 @@ var FeatureInfo = React.createClass({
 	getInitialState: function () {
 		return ({
 			photo: false,
-			activeButtons: 'Tags'
+			activeButtons: 'tags'
 		});
 	},
 	
@@ -15,13 +15,13 @@ var FeatureInfo = React.createClass({
 	},
 	
 	changeActiveButtons: function () {
-		if (this.state.activeButtons == 'Tags') {
+		if (this.state.activeButtons == 'tags') {
 			this.setState({
-				activeButtons: 'Access'
+				activeButtons: 'access'
 			});
 		} else {
 			this.setState({
-				activeButtons: 'Tags'
+				activeButtons: 'tags'
 			});
 		}
 	},
@@ -48,6 +48,12 @@ var FeatureInfo = React.createClass({
 	},
 	
 	render: function () {
+		var meas;
+		
+		if (this.props.selectedPlace.featureProps.datatype == 'meas') {
+			meas = <p>{this.props.selectedPlace.featureProps.species + ': ' + this.props.selectedPlace.featureProps.value + ' ' + this.props.selectedPlace.featureProps.units}</p>
+		}
+		
 		var photo;
 		
 		if (this.state.photo) {
@@ -75,6 +81,7 @@ var FeatureInfo = React.createClass({
 						<a style={SidebarStyles.date}>{this.props.selectedPlace.featureProps.datetime}</a>
 					</div>
 				</div>
+				{meas}
 				{photo}
 				<p style={SidebarStyles.p}>Note:</p>
 				<div style={SidebarStyles.noteArea}>

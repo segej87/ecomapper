@@ -1,11 +1,14 @@
 React = require('react');
-Sidebar = require('./Sidebar');
-Container = require('./Container').default;
-Values = require('../res/values');
-mapStyles = require('../styles/map/mapStyles');
-mainStyles = require('../styles/home/mainStyles');
+let Sidebar = require('./Sidebar');
+let Container = require('./Container').default;
+let Values = require('../res/values');
+let mapStyles = require('../styles/map/mapStyles');
+let mainStyles = require('../styles/home/mainStyles');
+import TimerMixin from 'react-timer-mixin';
 
 var MapContainer = React.createClass({
+	mixins: [TimerMixin],
+	
 	getInitialState: function () {
 		var today = new Date();
 		var monthago = new Date();
@@ -16,9 +19,21 @@ var MapContainer = React.createClass({
 		monthago.setMilliseconds(0);
 		
 		return {
+			firstListLoad: true,
+			lists: {
+				datatype: ['Meas','Photo','Note'],
+				submitters: [],
+				access: ['Public','Private'],
+				tags: [],
+				species: [],
+				date: ['none', 'none']
+			},
 			filters: {
-				access: ['test'],
-				tags: ['test', 'test2','test3','test4','test5','test6'],
+				datatype: ['Meas','Photo','Note'],
+				submitters: [],
+				access: ['Public','Private'],
+				tags: [],
+				species: [],
 				date: ['none', 'none']
 			},
 			records: {},
@@ -26,10 +41,128 @@ var MapContainer = React.createClass({
 		};
 	},
 	
-	loadRecords: function () {
+	handleFilterChange: function (type, val, result) {
+		var newItems;
+		switch (result) {
+			case 'Remove':
+				newItems = [];
+				for (var i = 0; i < this.state.filters[type].length; i++) {
+					if (this.state.filters[type][i] != val) {
+						newItems.push(this.state.filters[type][i]);
+					}
+				}
+				break;
+			case 'Remove all others':
+				newItems = [val];
+				break;
+			case 'Add':
+				newItems = this.state.filters[type];
+				if (!newItems.includes(val)) {
+					newItems.push(val);
+				}
+		}
+		
+		var newFilters = {};
+		for (var i = 0; i < Object.keys(this.state.filters).length; i++) {
+			newFilters[Object.keys(this.state.filters)[i]] = Object.values(this.state.filters)[i];
+		}
+		if (newItems) {
+			newFilters[type] = newItems;
+		}
+		
+		this.setState({
+			filters: newFilters
+		});
+		
+		this.loadRecords(newFilters);
+	},
+	
+	loadLists: function () {
+		if (this.props.userInfo.userId != null && !this.props.offline) {
+			console.log('Loading lists');
+			const formData='GUID=' + this.props.userInfo.userId;
+		
+			var request = new XMLHttpRequest;
+			
+			var method = 'POST';
+			var url = 'http://ecocollector.azurewebsites.net/get_lists.php';
+			
+			request.onreadystatechange = (e) => {
+				if (request.readyState !== 4) {
+					return;
+				}
+
+				if (request.status === 200) {
+					const result = JSON.parse(request.responseText);
+					
+					var tagsArray = [];
+					if (Object.keys(result).includes('tags') && !result.tags.includes("Warning: tags not found")) {
+						tagsArray = result.tags;
+					}
+					
+					var accessArray = this.state.lists.access;
+					if (Object.keys(result).includes('institutions') && !result.institutions.includes("Warning: institutions not found")) {
+						for (var j = 0; j < result.institutions.length; j++) {
+							accessArray.push(result.institutions[j]);
+						}
+					}
+					
+					var speciesArray = this.state.lists.species;
+					if (Object.keys(result).includes('species') && !result.species.includes("Warning: species not found")) {
+						for (var j = 0; j < result.species.length; j++) {
+							speciesArray.push(result.species[j]);
+						}
+					}
+					
+					var submittersArray = this.state.lists.submitters;
+					if (Object.keys(result).includes('submitters') && !result.submitters.includes("Warning: submitters not found")) {
+						for (var j = 0; j < result.submitters.length; j++) {
+							submittersArray.push(result.submitters[j]);
+						}
+					}
+					
+					this.setState({
+						lists: {
+							datatype: this.state.filters.datatype,
+							submitters: submittersArray,
+							access: accessArray,
+							tags: tagsArray,
+							species: speciesArray,
+							date: this.state.filters.date
+						}
+					});
+					
+					if (this.state.firstListLoad) {
+						this.setState({
+							filters: {
+								datatype: this.state.filters.datatype,
+								submitters: submittersArray,
+								access: accessArray,
+								tags: tagsArray,
+								species: speciesArray,
+								date: this.state.filters.date
+							},
+							firstListLoad: false
+						});
+						
+						this.loadRecords();
+					}
+				} else {
+					console.log('Status: ' + request.status);
+					console.log('Status text: ' + request.statusText);
+				}
+			};
+
+			request.open(method, url, true);
+			request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			request.send(formData);
+		}
+	},
+	
+	loadRecords: function (filters = this.state.filters) {
 		if (this.props.userInfo.userId != null && !this.props.offline) {
 			console.log('Loading data');
-			const formData='GUID=' + this.props.userInfo.userId + '&filters=' + JSON.stringify(this.state.filters);
+			const formData='GUID=' + this.props.userInfo.userId + '&filters=' + JSON.stringify(filters);
 		
 			var request = new XMLHttpRequest;
 			
@@ -43,9 +176,8 @@ var MapContainer = React.createClass({
 
 				if (request.status === 200) {
 					const geoJsonIn = JSON.parse(request.responseText);
+					
 					if (Object.keys(geoJsonIn).includes('text') && geoJsonIn.text == "Warning: geojson not found") {
-						
-						console.log(Object.keys(this.state.records).length);
 						if (Object.keys(this.state.records).length > 0){
 							this.setState({
 								records: {}
@@ -60,24 +192,37 @@ var MapContainer = React.createClass({
 						} else {
 							var currentRecords = this.state.records;
 							var currentFeats = currentRecords.features;
+							const newFeats = geoJsonIn.features;
 							
-							var currentIds = [];
-							for (var i = 0; i < currentFeats.length; i++) {
-								currentIds.push(currentFeats[i].id);
-							}
-							
-							for (var i = 0; i < geoJsonIn.features.length; i++) {
-								if (!currentIds.includes(geoJsonIn.features[i].id)) {
-									console.log('Adding feature');
-									currentFeats.push(geoJsonIn.features[i]);
+							if (currentFeats) {
+								var currentIds = [];
+								for (var i = 0; i < currentFeats.length; i++) {
+									currentIds.push(currentFeats[i].id);
 								}
+								
+								var newIds =[]
+								for (var i = 0; i < geoJsonIn.features.length; i++) {
+									newIds.push(geoJsonIn.features[i].id);
+								}
+								
+								for (var i = 0; i < newIds.length; i++) {
+									if (!currentIds.includes(newIds[i])) {
+										currentFeats.push(newFeats[i]);
+									}
+								}
+								
+								for (var i = currentFeats.length-1; i >=0; i--) {
+									if (!newIds.includes(currentFeats[i].id)) {
+										currentFeats.splice(i, 1);
+									}
+								}
+								
+								let newRecords = {type: currentRecords.type, features: currentFeats};
+								
+								this.setState({
+									records: newRecords
+								});
 							}
-							
-							newRecords = {type: currentRecords.type, features: currentRecords.features};
-							
-							this.setState({
-								records: newRecords
-							});
 						}
 					}
 				} else {
@@ -93,34 +238,26 @@ var MapContainer = React.createClass({
 	},
 	
 	resetRecords: function () {
-		this.setState({
-			records: {}
-		});
+		this.setState(this.getInitialState());
 		
-		this.loadRecords();
+		this.loadLists();
 	},
 	
 	handleDelete: function (id) {
-		currentRecords = this.state.records;
-		currentFeatures = currentRecords.features;
+		let currentRecords = this.state.records;
+		let currentFeatures = currentRecords.features;
 		
-		for (i = 0; i < currentFeatures.length; i++) {
+		for (var i = 0; i < currentFeatures.length; i++) {
 			if (currentFeatures[i].id == id) {
-				currentFeatures.splice(i, i);
+				currentFeatures.splice(i, 1);
 			}
 		}
 		
-		newRecords = {type: currentRecords.type, features: currentFeatures};
+		let newRecords = {type: currentRecords.type, features: currentFeatures};
 		
 		this.setState({
 			records: newRecords,
 			selectedPlace: {}
-		});
-	},
-	
-	handleFilterChange: function (filters) {
-		this.setState({
-			filters: filters
 		});
 	},
 	
@@ -130,15 +267,27 @@ var MapContainer = React.createClass({
 		});
 	},
 	
+	componentWillMount: function () {
+		this.loadLists();
+	},
+  
+	componentDidMount: function () {
+		this.setInterval(
+			() => { this.loadRecords(); },
+			30000
+		);
+	},
+	
 	render: function () {
 		return (
 			<div style={mapStyles.main}>
 				<Sidebar 
 				userInfo={this.props.userInfo} 
-				loadRecords={this.loadRecords} 
 				selectedPlace={this.state.selectedPlace} 
 				filters={this.state.filters}
+				lists={this.state.lists}
 				handleDelete={this.handleDelete}
+				onFilterChange={this.handleFilterChange}
 				/>
 				<Container 
 				offline={this.props.offline}
@@ -154,4 +303,4 @@ var MapContainer = React.createClass({
 	}
 });
 
-module.exports = MapContainer;
+export default (MapContainer);

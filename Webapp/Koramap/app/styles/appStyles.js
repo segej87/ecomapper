@@ -85,6 +85,13 @@ var login = {
 		display: 'block',
 		color: 'blue',
 		cursor: 'pointer'
+	},
+	error: {
+		backgroundColor: 'rgba(255, 255, 255, 0.5)',
+		color: 'red',
+		margin: '0 auto 20px auto',
+		fontFamily: 'Lato, Open Sans, sans-serif',
+		fontSize: 10
 	}
 }
 

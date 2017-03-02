@@ -15,7 +15,7 @@ sidebarOpen = {
 	filter: {
 		position: 'relative',
 		float: 'left',
-		zIndex: '1000002',
+		zIndex: '1000003',
 		marginTop: 0,
 		backgroundColor: Colors.filterColor,
 		width: 300,
@@ -27,7 +27,7 @@ sidebarOpen = {
 	message: {
 		position: 'relative',
 		float: 'left',
-		zIndex: '1000002',
+		zIndex: '1000004',
 		marginTop: 0,
 		backgroundColor: Colors.messageColor,
 		width: 300,
@@ -59,7 +59,7 @@ toggle = {
 		top: Numbers.toggleHeight,
 		height: Numbers.toggleHeight,
 		width: 30,
-		zIndex: '1000001',
+		zIndex: '1000002',
 		color: 'white',
 		fontWeight: '900',
 		backgroundColor: Colors.messageColor,
@@ -71,13 +71,14 @@ toggle = {
 };
 
 h1 = {
-	fontSize: '3vh',
+	fontSize: Numbers.h1FontSize,
 	marginBottom: 5,
 	color: 'black'
 };
 
 p = {
-	fontSize: 11,
+	display: 'inline-block',
+	fontSize: 12,
 	marginTop: 5,
 	marginBottom: 5,
 	color: 'black'
@@ -102,12 +103,54 @@ featureInfo = {
 	overflow: 'auto'
 };
 
-tagButton = {
+tagsButton = {
 	backgroundColor: 'rgba(75, 200, 100, 0.9)',
 	color: 'white',
 	fontFamily: 'Lato, Open Sans, sans-serif',
-	fontSize: '2vh',
-	height: '3vh',
+	fontSize: Numbers.buttonFontSize,
+	height: Numbers.buttonHeight,
+	border: 'none',
+	cursor: 'pointer',
+	borderRadius: 2,
+	boxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.4)',
+	marginBottom: 5,
+	marginRight: 5,
+};
+
+datatypeButton = {
+	backgroundColor: 'rgba(200, 200, 100, 0.9)',
+	color: 'white',
+	fontFamily: 'Lato, Open Sans, sans-serif',
+	fontSize: Numbers.buttonFontSize,
+	height: Numbers.buttonHeight,
+	border: 'none',
+	cursor: 'pointer',
+	borderRadius: 2,
+	boxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.4)',
+	marginBottom: 5,
+	marginRight: 5,
+	moving: {
+		backgroundColor: 'rgba(200, 200, 100, 0.9)',
+		color: 'white',
+		fontFamily: 'Lato, Open Sans, sans-serif',
+		fontSize: Numbers.buttonFontSize,
+		height: Numbers.buttonHeight,
+		border: 'none',
+		cursor: 'pointer',
+		borderRadius: 2,
+		boxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.4)',
+		marginBottom: 5,
+		marginRight: 5,
+		position: 'absolute'
+	}
+};
+
+speciesButton = {
+	backgroundColor: 'rgba(200, 100, 75, 0.9)',
+	color: 'white',
+	fontFamily: 'Lato, Open Sans, sans-serif',
+	fontSize: Numbers.buttonFontSize,
+	height: Numbers.buttonHeight,
 	border: 'none',
 	cursor: 'pointer',
 	borderRadius: 2,
@@ -120,8 +163,8 @@ accessButton = {
 	backgroundColor: 'rgba(75, 100, 200, 0.9)',
 	color: 'white',
 	fontFamily: 'Lato, Open Sans, sans-serif',
-	fontSize: '2vh',
-	height: '3vh',
+	fontSize: Numbers.buttonFontSize,
+	height: Numbers.buttonHeight,
 	border: 'none',
 	cursor: 'pointer',
 	borderRadius: 2,
@@ -134,8 +177,8 @@ deleteButton = {
 	backgroundColor: 'rgba(255, 75, 100, 0.9)',
 	color: 'white',
 	fontFamily: 'Lato, Open Sans, sans-serif',
-	fontSize: '2vh',
-	height: '3vh',
+	fontSize: Numbers.buttonFontSize,
+	height: Numbers.buttonHeight,
 	width: '9vh',
 	border: 'none',
 	cursor: 'pointer',
@@ -149,9 +192,10 @@ addButton = {
 	position: 'relative',
 	float: 'right',
 	border: 'none',
-	width: 20,
-	height: 20,
-	backgroundColor: 'rgba(220,220,220,0.75)',
+	width: 15,
+	height: 15,
+	fontSize: 10,
+	backgroundColor: 'rgba(220,220,220,0.95)',
 	borderRadius: 2,
 	boxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.4)',
 	padding: 0,
@@ -166,7 +210,9 @@ buttonHolder = {
 	marginTop: -0.5,
 	textAlign: 'center',
 	backgroundColor: 'rgba(245, 245, 245, 0.75)',
-	border: 'none'
+	border: 'none',
+	maxHeight: 75,
+	overflowY: 'auto'
 };
 
 tabHolder = {
@@ -234,6 +280,117 @@ tab = {
 	}
 };
 
+dropdown = {
+	position: 'absolute',
+	display: 'inline-block'
+};
+
+dropdownContent = {
+	display: 'inline-block',
+    position: 'absolute',
+	left: -10,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    minWidth: '125px',
+    boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.4)',
+    zIndex: '100000000000000000',
+    borderRadius: '0 0 2px 2px',
+	a: {
+		display: 'inline-block',
+		width: 115,
+		fontWeight: '50',
+		letterSpacing: 1,
+		textTransform: 'none',
+		color: '#00004c',
+		textDecoration: 'none',
+		padding: 5,
+		fontFamily: 'Oswald, sans-serif',
+		fontSize: 10,
+		highlighted: {
+			display: 'block',
+			width: 115,
+			fontWeight: '50',
+			letterSpacing: 1,
+			textTransform: 'none',
+			color: '#00004c',
+			textDecoration: 'none',
+			padding: 5,
+			fontFamily: 'Oswald, sans-serif',
+			background: 'rgba(255, 255, 255, 0.75)',
+			cursor: 'pointer',
+			fontSize: 10,
+		}
+	}
+};
+
+addDisplay = {
+	display: 'inline-block',
+	position: 'absolute',
+	left: 325,
+	top: Numbers.toggleHeight + 20,
+	backgroundColor: 'white',
+	height: '75%',
+	width: 250,
+	borderRadius: 7,
+	boxShadow: '4px 0px 4px 0px rgba(0, 0, 0, 0.4)',
+	p: {
+		display: 'inline-block',
+		fontSize: 12,
+		margin: '30px 0px 5px 10px',
+		padding: 2,
+		color: 'white',
+		backgroundColor: 'rgba(255, 75, 100, 0.9)',
+		boxShadow: '2px 0px 2px 0px rgba(0, 0, 0, 0.4)'
+	},
+	input: {
+		fontSize: 10,
+		height: 16,
+		border: 'none',
+		textAlign: 'left',
+		paddingLeft: 10,
+		boxShadow: '2px 0px 2px 0px rgba(0, 0, 0, 0.4)'
+	},
+	ul: {
+		borderTop: '1px solid grey',
+		padding: 0,
+		height: '70%',
+		overflow: 'auto'
+	},
+	li: {
+		paddingLeft: 5,
+		paddingTop: 5,
+		paddingBottom: 2,
+		verticalAlign: 'middle',
+		margin: '5px 10px',
+		listStyle: 'none',
+		cursor: 'pointer',
+		boxShadow: '2px 0px 2px 0px rgba(0, 0, 0, 0.4)'
+	}
+	
+};
+
+closeButton = {
+	position: 'relative',
+	float: 'right',
+	borderRadius: 7,
+	backgroundColor: 'white',
+	color: 'black',
+	border: 'none',
+	cursor: 'pointer',
+	fontSize: 16
+};
+
+hidden = {
+	display: 'none'
+};
+
+pointer = {
+	color: 'white',
+	position: 'absolute',
+	left: 300,
+	top: -25,
+	fontSize: 20
+};
+
 module.exports = {
 	sidebarContainer,
 	sidebarOpen,
@@ -247,10 +404,19 @@ module.exports = {
 	noteArea,
 	note,
 	deleteButton,
-	tagButton,
+	tagsButton,
 	accessButton,
+	speciesButton,
 	buttonHolder,
+	datatypeButton,
+	speciesButton,
 	addButton,
 	tabHolder,
-	tab
+	tab,
+	dropdown,
+	dropdownContent,
+	hidden,
+	addDisplay,
+	closeButton,
+	pointer
 };

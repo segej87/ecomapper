@@ -1,7 +1,7 @@
 Colors = require('../res/values').colors;
 Numbers = require('../res/values').numbers;
 
-var navbar = {
+navbar = {
 	margin: 0,
 	padding: 0,
 	position: 'fixed',
@@ -22,12 +22,12 @@ var navbar = {
 	}
 };
 
-var ul = {
+ul = {
 	float: 'right',
 	height: '100%'
 };
 
-var a = {
+a = {
 	color: '#00004c',
 	fontWeight: '100',
 	letterSpacing: 2,
@@ -70,23 +70,23 @@ var a = {
 	}
 };
 
-var li = {
+li = {
 	display: 'inline-block',
 	height: '100%'
 };
 
-var logo = {
+logo = {
 	float: 'left',
 	margin: '1vh 20px',
 	height: '6vh'
 };
 
-var dropdown = {
+dropdown = {
 	position: 'relative',
 	display: 'inline-block'
 };
 
-var dropdownContent = {
+dropdownContent = {
 	display: 'inline-block',
     position: 'absolute',
     top: '3.15vh',
@@ -120,7 +120,7 @@ var dropdownContent = {
 	}
 };
 
-var hidden = {
+hidden = {
 	display: 'none'
 };
 

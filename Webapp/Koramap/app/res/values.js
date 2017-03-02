@@ -4,7 +4,10 @@ numbers = {
 	sidebarHeight: '92vh',
 	mapHeight: '92vh',
 	toggleHeight: 50,
-	toggleWidth: 30
+	toggleWidth: 30,
+	buttonFontSize: 11,
+	buttonHeight: 17,
+	h1FontSize: 17
 };
 
 strings = {
@@ -17,9 +20,9 @@ strings = {
 
 colors = {
 	darkBlue: '#00004c',
-	filterColor: '#2E8B57',
+	filterColor: '#7baa8f',
 	shapesColor: '#8A2BE2',
-	messageColor: '#ffb347'
+	messageColor: '#ffc777'
 };
 
 keys = {

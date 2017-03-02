@@ -4,18 +4,25 @@ FilterPane = require('./FilterPane');
 MessagePane = require('./MessagePane');
 
 var Sidebar = React.createClass({
+	handleFilterChange: function (type, val, result) {
+		this.props.onFilterChange(type, val, result);
+	},
+	
 	render: function () {
+		// console.log(this.props.lists);
+		
 		return (
 			<div>
 				<MessagePane 
 				userInfo={this.props.userInfo} 
 				selectedPlace={this.props.selectedPlace} 
 				filters={this.props.filters}
-				loadRecords={this.props.loadRecords}
 				handleDelete={this.props.handleDelete}
 				/>
 				<FilterPane 
 				filters={this.props.filters}
+				lists={this.props.lists}
+				onFilterChange={this.handleFilterChange}
 				/>
 			</div>
 		);

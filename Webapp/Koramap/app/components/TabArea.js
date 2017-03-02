@@ -6,9 +6,13 @@ TabArea = React.createClass({
 	},
 	
 	render: function () {
+		// const buttons = this.props.selectedPlace.featureProps[this.props.activeButtons].map((item, i) => {
+			
+		// });
+		
 		var tags = this.props.selectedPlace.featureProps.tags.map((tag, i) => {
 			return (
-				<button key={'tag_' + this.props.selectedPlace.fuid + i} style={SidebarStyles.tagButton}>{tag}</button>
+				<button key={'tag_' + this.props.selectedPlace.fuid + i} style={SidebarStyles.tagsButton}>{tag}</button>
 			);
 		});
 		
@@ -22,7 +26,7 @@ TabArea = React.createClass({
 		var buttons;
 		
 		switch (this.props.activeButtons) {
-			case 'Tags':
+			case 'tags':
 				buttons = tags;
 				tabArea = (
 					<div style={SidebarStyles.tabHolder}>
@@ -31,7 +35,7 @@ TabArea = React.createClass({
 					</div>
 				);
 				break;
-			case 'Access':
+			case 'access':
 				buttons = access;
 				tabArea = (
 					<div style={SidebarStyles.tabHolder}>

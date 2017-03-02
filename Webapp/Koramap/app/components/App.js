@@ -3,7 +3,7 @@ appStyles = require('../styles/appStyles');
 Login = require('./Login');
 Navbar = require('./Navbar');
 Home = require('./Home');
-MapContainer = require('./MapContainer');
+MapContainer = require('./MapContainer').default;
 
 var HelloWorld = React.createClass({
 	getInitialState: function () {
@@ -18,7 +18,7 @@ var HelloWorld = React.createClass({
 			loggingIn: false,
 			faded: false,
 			mapping: false,
-			offline: true
+			offline: false
 		};
 	},
 	

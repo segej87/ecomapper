@@ -8,7 +8,8 @@ var Login = React.createClass({
 		return {
 			username: '',
 			password: '',
-			result: ''
+			result: '',
+			error: '',
 		};
 	},
 	
@@ -21,6 +22,12 @@ var Login = React.createClass({
 			this.setState({
 				password: e.target.value
 			});
+		}
+		
+		if (this.state.error != '') {
+			this.setState({
+					error: ''
+				});
 		}
 	},
 	
@@ -44,13 +51,27 @@ var Login = React.createClass({
 			}
 
 			if (request.status === 200) {
-				var id = JSON.parse(request.responseText).UID.toLowerCase();
-				var firstname = JSON.parse(request.responseText).firstname;
-				var lastname = JSON.parse(request.responseText).lastname;
-				
-				document.getElementById('uname').value = '';
-				document.getElementById('pword').value = '';
-				this.props.onSubmit(true, {userName: this.state.username, firstName: firstname, lastName: lastname, userId: id});
+				try {
+					var id = JSON.parse(request.responseText).UID.toLowerCase();
+					if (id) {
+						var firstname = JSON.parse(request.responseText).firstname;
+						var lastname = JSON.parse(request.responseText).lastname;
+						
+						document.getElementById('uname').value = '';
+						document.getElementById('pword').value = '';
+						this.props.onSubmit(true, {userName: this.state.username, firstName: firstname, lastName: lastname, userId: id});
+					}
+				} catch (e) {
+					var errorText = 'Can\'t log you in. Please try again.';
+					if (request.responseText.includes('do not match any on record')) {
+						errorText = 'That username and password combo doesn\'t match our records';
+					} else if (request.responseText.includes('not found')) {
+						errorText = 'That username wasn\'t found';
+					}
+					this.setState({
+						error: errorText
+					});
+				}
 			} else {
 				console.log('Status: ' + request.status);
 				console.log('Status text: ' + request.statusText);
@@ -74,6 +95,8 @@ var Login = React.createClass({
 		document.getElementById('uname').value = '';
 		document.getElementById('pword').value = '';
 		
+		this.setState(this.getInitialState());
+		
 		this.props.onSubmit(this.props.parentState.loggedIn, this.props.parentState.userInfo);
 	},
 	
@@ -84,6 +107,11 @@ var Login = React.createClass({
 			style = appStyles.login
 		} else {
 			style = {display: 'none'};
+		}
+		
+		var errorMsg;
+		if (this.state.error != '') {
+			errorMsg = <p style={style.error}>{this.state.error}</p>
 		}
 		
 		return (
@@ -101,6 +129,7 @@ var Login = React.createClass({
 					<div>
 						<a style={style.a} onClick={this.handleSignup}>{Values.strings.signup}</a>
 						<a style={style.a} onClick={this.handleCancel}>{Values.strings.cancel}</a>
+						{errorMsg}
 					</div>
 				</div>
 			</div>
