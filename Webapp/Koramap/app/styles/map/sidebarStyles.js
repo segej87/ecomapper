@@ -73,15 +73,22 @@ toggle = {
 h1 = {
 	fontSize: Numbers.h1FontSize,
 	marginBottom: 5,
-	color: 'black'
+	color: 'white'
 };
 
 p = {
+	textAlign: 'center',
+	minWidth: 75,
+	padding: 2,
+	fontFamily: 'Lato, Open Sans, sans-serif',
+	backgroundColor: 'rgba(220,220,220,0.95)',
+	borderRadius: '2px 2px 0px 0px',
 	display: 'inline-block',
 	fontSize: 12,
 	marginTop: 5,
-	marginBottom: 5,
-	color: 'black'
+	marginBottom: 0,
+	color: 'black',
+	boxShadow: '0px -1px 1px 0px rgba(0, 0, 0, 0.4)',
 };
 
 a = {
@@ -159,6 +166,20 @@ speciesButton = {
 	marginRight: 5
 };
 
+submittersButton = {
+	backgroundColor: 'rgba(200, 100, 100, 0.9)',
+	color: 'white',
+	fontFamily: 'Lato, Open Sans, sans-serif',
+	fontSize: Numbers.buttonFontSize,
+	height: Numbers.buttonHeight,
+	border: 'none',
+	cursor: 'pointer',
+	borderRadius: 2,
+	boxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.4)',
+	marginBottom: 5,
+	marginRight: 5
+};
+
 accessButton = {
 	backgroundColor: 'rgba(75, 100, 200, 0.9)',
 	color: 'white',
@@ -190,14 +211,15 @@ deleteButton = {
 
 addButton = {
 	position: 'relative',
+	top: 8.5,
 	float: 'right',
 	border: 'none',
 	width: 15,
 	height: 15,
 	fontSize: 10,
 	backgroundColor: 'rgba(220,220,220,0.95)',
-	borderRadius: 2,
-	boxShadow: '0px 2px 3px 0px rgba(0, 0, 0, 0.4)',
+	borderRadius: '2px 2px 0px 0px',
+	boxShadow: '0px -1px 1px 0px rgba(0, 0, 0, 0.4)',
 	padding: 0,
 	textAlign: 'center',
 	cursor: 'pointer'
@@ -205,11 +227,10 @@ addButton = {
 
 buttonHolder = {
 	backgroundColor: 'rgb(245, 245, 245)',
-	borderRadius: 2,
+	borderRadius: '0px 0px 2px 2px',
 	padding: 10,
-	marginTop: -0.5,
 	textAlign: 'center',
-	backgroundColor: 'rgba(245, 245, 245, 0.75)',
+	backgroundColor: 'rgb(245, 245, 245)',
 	border: 'none',
 	maxHeight: 75,
 	overflowY: 'auto'
@@ -293,28 +314,27 @@ dropdownContent = {
     minWidth: '125px',
     boxShadow: '0px 8px 16px 0px rgba(0, 0, 0, 0.4)',
     zIndex: '100000000000000000',
-    borderRadius: '0 0 2px 2px',
+    borderRadius: '0 0px 0px 0px',
 	a: {
 		display: 'inline-block',
 		width: 115,
-		fontWeight: '50',
 		letterSpacing: 1,
 		textTransform: 'none',
 		color: '#00004c',
 		textDecoration: 'none',
 		padding: 5,
-		fontFamily: 'Oswald, sans-serif',
+		fontFamily: 'Lato, sans-serif',
 		fontSize: 10,
 		highlighted: {
 			display: 'block',
 			width: 115,
-			fontWeight: '50',
+			fontWeight: 'bolder',
 			letterSpacing: 1,
 			textTransform: 'none',
 			color: '#00004c',
 			textDecoration: 'none',
 			padding: 5,
-			fontFamily: 'Oswald, sans-serif',
+			fontFamily: 'Lato, sans-serif',
 			background: 'rgba(255, 255, 255, 0.75)',
 			cursor: 'pointer',
 			fontSize: 10,
@@ -326,7 +346,7 @@ addDisplay = {
 	display: 'inline-block',
 	position: 'absolute',
 	left: 325,
-	top: Numbers.toggleHeight + 20,
+	top: Numbers.toggleHeight,
 	backgroundColor: 'white',
 	height: '75%',
 	width: 250,
@@ -335,23 +355,24 @@ addDisplay = {
 	p: {
 		display: 'inline-block',
 		fontSize: 12,
-		margin: '30px 0px 5px 10px',
+		margin: '0px 0px 0px 0px',
 		padding: 2,
-		color: 'white',
-		backgroundColor: 'rgba(255, 75, 100, 0.9)',
-		boxShadow: '2px 0px 2px 0px rgba(0, 0, 0, 0.4)'
+		color: 'black',
 	},
 	input: {
-		fontSize: 10,
+		fontFamily: 'Open Sans, sans-serif',
+		fontSize: 11,
 		height: 16,
 		border: 'none',
 		textAlign: 'left',
 		paddingLeft: 10,
-		boxShadow: '2px 0px 2px 0px rgba(0, 0, 0, 0.4)'
 	},
 	ul: {
-		borderTop: '1px solid grey',
+		position: 'relative',
+		top : '9%',
+		borderTop: '2px solid rgba(100,100,100,0.5)',
 		padding: 0,
+		paddingTop: 10,
 		height: '70%',
 		overflow: 'auto'
 	},
@@ -363,9 +384,50 @@ addDisplay = {
 		margin: '5px 10px',
 		listStyle: 'none',
 		cursor: 'pointer',
-		boxShadow: '2px 0px 2px 0px rgba(0, 0, 0, 0.4)'
+		boxShadow: '1px 1px 2px 1px rgba(0, 0, 0, 0.4)'
+	},
+	searchHolder: {
+		textAlign: 'center',
+		borderBottom: '1.5px solid rgb(255,75,100)',
+		position: 'relative',
+		width: 205,
+		height: 20,
+		top: '7%',
+		left: '50%',
+		margin: '0 -101px',
+		boxShadow: '0px 0px 2px 0px rgba(0, 0, 0, 0.4)',
+		hover: {
+			textAlign: 'center',
+			borderBottom: '1.5px solid rgb(255,75,100)',
+			position: 'relative',
+			width: 205,
+			height: 20,
+			top: '7%',
+			left: '50%',
+			margin: '0 -101px',
+			boxShadow: '0px 0px 3px 0px rgba(0, 0, 0, 0.4)',
+		}
 	}
 	
+};
+
+dateField = {
+	backgroundColor: 'rgba(0,0,0,0)',
+	border: 'none',
+	borderBottom: '1.5px solid white',
+	minWidth: 110,
+	maxWidth: 125,
+	minHeight: 20,
+	maxHeight: 20,
+	color: 'white',
+	textAlign: 'left',
+	label: {
+		fontSize: 11,
+		marginTop: 2,
+		paddingLeft: 6,
+		textAlign: 'left',
+		color: 'rgb(220,220,220)'
+	}
 };
 
 closeButton = {
@@ -387,7 +449,7 @@ pointer = {
 	color: 'white',
 	position: 'absolute',
 	left: 300,
-	top: -25,
+	top: -16.5,
 	fontSize: 20
 };
 
@@ -406,6 +468,7 @@ module.exports = {
 	deleteButton,
 	tagsButton,
 	accessButton,
+	submittersButton,
 	speciesButton,
 	buttonHolder,
 	datatypeButton,
@@ -417,6 +480,7 @@ module.exports = {
 	dropdownContent,
 	hidden,
 	addDisplay,
+	dateField,
 	closeButton,
 	pointer
 };

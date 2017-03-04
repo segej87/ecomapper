@@ -33,7 +33,7 @@ a = {
 	letterSpacing: 2,
 	textTransform: 'uppercase',
 	textDecoration: 'none',
-	padding: '2vh 20px',
+	padding: '2.65vh 20px',
 	fontFamily: 'Oswald, sans-serif',
 	cursor: 'pointer',
 	blue: {
@@ -42,7 +42,7 @@ a = {
 		letterSpacing: 2,
 		textTransform: 'uppercase',
 		textDecoration: 'none',
-		padding: '2.45vh 20px',
+		padding: '2.65vh 20px',
 		fontFamily: 'Oswald, sans-serif',
 		cursor: 'pointer'
 	},
@@ -52,7 +52,7 @@ a = {
 		letterSpacing: 2,
 		textTransform: 'uppercase',
 		textDecoration: 'none',
-		padding: '2.45vh 20px',
+		padding: '2.65vh 20px',
 		fontFamily: 'Oswald, sans-serif',
 		background: 'rgba(255, 255, 255, 0.5)',
 		cursor: 'pointer',
@@ -62,7 +62,7 @@ a = {
 			letterSpacing: 2,
 			textTransform: 'uppercase',
 			textDecoration: 'none',
-			padding: '2.45vh 20px',
+			padding: '2.65vh 20px',
 			fontFamily: 'Oswald, sans-serif',
 			background: 'rgba(255, 255, 255, 0.5)',
 			cursor: 'pointer'

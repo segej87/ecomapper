@@ -1,4 +1,4 @@
-var app = {
+app = {
 	position: 'absolute',
 	boxSizing: 'border-box',
 	margin: 0,
@@ -9,7 +9,7 @@ var app = {
 	bottom: 0
 }
 
-var fadeOut = {
+fadeOut = {
 	position: 'absolute',
 	boxSizing: 'border-box',
 	top: 0,
@@ -22,7 +22,7 @@ var fadeOut = {
 	zIndex: '10000000'
 }
 
-var login = {
+login = {
 	position: 'fixed',
 	width: 300,
 	height: 350,
@@ -80,7 +80,10 @@ var login = {
 		marginBottom: 5
 	},
 	a: {
-		margin: 'auto',
+		position: 'relative',
+		width: '75',
+		left: '50%',
+		margin: '0 -37.5px',
 		marginBottom: 5,
 		display: 'block',
 		color: 'blue',

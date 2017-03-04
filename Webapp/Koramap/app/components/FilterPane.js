@@ -1,6 +1,6 @@
 React = require('react');
 SidebarToggle = require('./SidebarToggle');
-FilterContent = require('./FilterContent');
+FilterContent = require('./FilterContent').default;
 SidebarStyles = require('../styles/map/sidebarStyles');
 
 var FilterPane = React.createClass({

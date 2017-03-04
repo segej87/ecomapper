@@ -7,7 +7,7 @@ numbers = {
 	toggleWidth: 30,
 	buttonFontSize: 11,
 	buttonHeight: 17,
-	h1FontSize: 17
+	h1FontSize: 20
 };
 
 strings = {

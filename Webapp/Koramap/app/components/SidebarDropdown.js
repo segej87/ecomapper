@@ -16,7 +16,7 @@ var SidebarDropdown = React.createClass({
 	},
 	
 	handleClick: function (result) {
-		this.props.handleClick(this.props.type, result);
+		this.props.handleClick(this.props.type, this.props.item, result);
 		this.setState({highlighted: false});
 	},
 	

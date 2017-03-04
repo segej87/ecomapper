@@ -1,7 +1,8 @@
-React = require('react');
-SidebarStyles = require('../styles/map/sidebarStyles');
-FilterButton = require('./FilterButton');
-AddDdn = require('./AddDdn');
+const React = require('react');
+const SidebarStyles = require('../styles/map/sidebarStyles');
+const FilterButton = require('./FilterButton');
+const AddDdn = require('./AddDdn');
+const DateField = require('./DateField');
 
 var FilterContent = React.createClass({
 	getInitialState: function () {
@@ -23,7 +24,7 @@ var FilterContent = React.createClass({
 	},
 	
 	handleAdd: function (e) {
-		label = e.target.id.replace('add_','')
+		const label = e.target.id.replace('add_','')
 		
 		if (this.state.showingDdn && this.state.addingType == label) {
 			this.setState({
@@ -49,7 +50,7 @@ var FilterContent = React.createClass({
 	
 	addItem: function (item) {
 		this.props.onFilterChange(this.state.addingType, item, 'Add');
-		index = this.state.ddnItems.indexOf(item);
+		var index = this.state.ddnItems.indexOf(item);
 		
 		var newItems =[];
 		if (this.state.ddnItems.length <= 1) {
@@ -89,8 +90,8 @@ var FilterContent = React.createClass({
 		}
 	},
 	
-	handleClick: function (type, result) {
-		this.props.onFilterChange(type, this.state.highlightedItem, result);
+	handleClick: function (type, val, result) {
+		this.props.onFilterChange(type, val, result);
 		this.setState({
 			highlightedType: null,
 			highlightedItem: null
@@ -121,9 +122,29 @@ var FilterContent = React.createClass({
 		});
 	},
 	
+	componentDidMount: function () {
+		var missingObject = {};
+		for (var i = 0; i < Object.keys(this.props.filters).length; i++) {
+			const label = Object.keys(this.props.filters)[i];
+			
+			var missingItems = [];
+			for (var j = 0; j < this.props.lists[label].length; j++) {
+				if (!this.props.filters[label].includes(this.props.lists[label][j])) {
+					missingItems.push(this.props.lists[label][j]);
+				}
+			}
+			
+			missingObject[label] = missingItems;
+		}
+		
+		this.setState({
+			missingFilters: missingObject
+		});
+	},
+	
 	render: function () {
 		const itemArray = ['Remove','Remove all others'];
-		const filtersArray = {tags: 'Tags:',access: 'Access levels:',datatype: 'Datatypes:',species: 'Species:'};
+		const filtersArray = {submitters: 'Submitters',tags: 'Tags',access: 'Access levels',datatype: 'Datatypes',species: 'Species'};
 		
 		var filterDisplay = [];
 		for (var i = 0; i < Object.keys(filtersArray).length; i++) {
@@ -137,37 +158,37 @@ var FilterContent = React.createClass({
 			}
 			
 			filterDisplay.push(
-			<div style={{marginTop: 20}} key={'filters_' + i}>
-				<div style={{display: 'inline-block', position: 'relative', float: 'right', width: '100%', marginBottom: 0}}>
-					<p style={SidebarStyles.p}>{Object.values(filtersArray)[i]}</p>
-					<button style={SidebarStyles.addButton} onClick={this.handleAdd} id={'add_' + f}>+</button>
-					{pointer}
+				<div style={{marginTop: 20}} key={'filters_' + i}>
+					<div style={{display: 'inline-block', position: 'relative', float: 'right', width: '100%', marginBottom: 0}}>
+						<p style={SidebarStyles.p}>{Object.values(filtersArray)[i]}</p>
+						<button style={SidebarStyles.addButton} onClick={this.handleAdd} id={'add_' + f}>+</button>
+						{pointer}
+					</div>
+					<div style={SidebarStyles.buttonHolder} onMouseLeave={this.changeHighlightedItem}>
+						{this.props.filters[f].map((item, i) => {
+							return (
+								<div key={f + '_' + i} style={{display: 'inline-block'}}>
+									<FilterButton
+									key={f + '_' + i}
+									item={item}
+									type={f}
+									onClick={this.changeHighlightedItem}
+									highlightedType={this.state.highlightedType}
+									highlightedItem={this.state.highlightedItem}
+									handleDragRemove={this.handleDragRemove} />
+									<SidebarDropdown
+									key={f + 'ddn_' + i}
+									type={f}
+									item={item}
+									highlightedType={this.state.highlightedType}
+									highlightedItem={this.state.highlightedItem}
+									items={itemArray}
+									handleClick={this.handleClick} />
+								</div>
+							);
+						})}
+					</div>
 				</div>
-				<div style={SidebarStyles.buttonHolder} onMouseLeave={this.changeHighlightedItem}>
-					{this.props.filters[f].map((item, i) => {
-						return (
-							<div key={f + '_' + i} style={{display: 'inline-block'}}>
-								<FilterButton
-								key={f + '_' + i}
-								item={item}
-								type={f}
-								onClick={this.changeHighlightedItem}
-								highlightedType={this.state.highlightedType}
-								highlightedItem={this.state.highlightedItem}
-								handleDragRemove={this.handleDragRemove} />
-								<SidebarDropdown
-								key={f + 'ddn_' + i}
-								type={f}
-								item={item}
-								highlightedType={this.state.highlightedType}
-								highlightedItem={this.state.highlightedItem}
-								items={itemArray}
-								handleClick={this.handleClick} />
-							</div>
-						);
-					})}
-				</div>
-			</div>
 			);
 		}
 		
@@ -175,14 +196,21 @@ var FilterContent = React.createClass({
 			<div>
 				<AddDdn items={this.state.missingFilters} type={this.state.addingType} highlighted={this.state.showingDdn} onClose={this.closeAdd} onAdd={this.addItem}/>
 				<h1 style={SidebarStyles.h1}>Filters</h1>
-				<div style={{textAlign: 'right'}}>
-					<p style={SidebarStyles.p}>Submitters:</p>
-					<input type="text" id="submitter" style={{marginLeft: 10, position: 'relative', float: 'right'}} />
-				</div>
 				{filterDisplay}
+				<div style={{marginTop: 20, textAlign: 'center'}}>
+					<div style={{display: 'inline-block'}}>
+						<DateField type="startDate" onChange={this.handleClick} currentVal={this.props.filters.date[0]}/>
+						<p style={SidebarStyles.dateField.label}>Start date</p>
+					</div>
+					<div style={{display: 'inline-block', width: 50}}></div>
+					<div style={{display: 'inline-block'}}>
+						<DateField type="endDate" onChange={this.handleClick} currentVal={this.props.filters.date[1]}/>
+						<p style={SidebarStyles.dateField.label}>End date</p>
+					</div>
+				</div>
 			</div>
 		);
 	}
 });
 
-module.exports = FilterContent;
+export default (FilterContent);

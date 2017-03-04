@@ -121,7 +121,7 @@ var Login = React.createClass({
 					<h1 style={style.h1}>{Values.strings.login}</h1>
 					<div style={style.form}>
 						<p style = {style.p}>{Values.strings.username}</p>
-						<input style={style.input} type="text" onChange={this.handleInput.bind(this, 'u')} id='uname'/>
+						<input style={style.input} type="text" onChange={this.handleInput.bind(this, 'u')} autofocus id='uname'/>
 						<p style={style.p}>{Values.strings.password}</p>
 						<input style={style.input} type="password" onChange={this.handleInput.bind(this, 'p')} onKeyPress={this.handleEnter} id='pword'/>
 						<button style={style.button} onClick={this.attemptLogin}>{Values.strings.login}</button>

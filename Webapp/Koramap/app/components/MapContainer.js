@@ -29,15 +29,17 @@ var MapContainer = React.createClass({
 				date: ['none', 'none']
 			},
 			filters: {
-				datatype: ['Meas','Photo','Note'],
+				datatype: [],
 				submitters: [],
-				access: ['Public','Private'],
+				access: [],
 				tags: [],
 				species: [],
-				date: ['none', 'none']
+				date: [monthago, today]
 			},
 			records: {},
-			selectedPlace: {}
+			selectedPlace: {},
+			loadingLists: false,
+			loadingData: false
 		};
 	},
 	
@@ -60,6 +62,12 @@ var MapContainer = React.createClass({
 				if (!newItems.includes(val)) {
 					newItems.push(val);
 				}
+				break;
+			case 'Replace':
+				newItems = val;
+				break;
+			default:
+				break;
 		}
 		
 		var newFilters = {};
@@ -67,18 +75,27 @@ var MapContainer = React.createClass({
 			newFilters[Object.keys(this.state.filters)[i]] = Object.values(this.state.filters)[i];
 		}
 		if (newItems) {
-			newFilters[type] = newItems;
+			if (!type.includes('Date')) {
+				newFilters[type] = newItems;
+			} else {
+				if (type.includes('start')) {
+					newFilters.date[0] = newItems;
+				} else if (type.includes('end')) {
+					newFilters.date[1] = newItems;
+				}
+			}
 		}
 		
 		this.setState({
 			filters: newFilters
 		});
 		
-		this.loadRecords(newFilters);
+		this.loadRecords(newFilters,true);
 	},
 	
 	loadLists: function () {
-		if (this.props.userInfo.userId != null && !this.props.offline) {
+		if (this.props.userInfo.userId != null && !this.props.offline && !this.state.loadingLists) {
+			this.setState({loadingLists: true});
 			console.log('Loading lists');
 			const formData='GUID=' + this.props.userInfo.userId;
 		
@@ -123,25 +140,18 @@ var MapContainer = React.createClass({
 					
 					this.setState({
 						lists: {
-							datatype: this.state.filters.datatype,
+							datatype: this.state.lists.datatype,
 							submitters: submittersArray,
 							access: accessArray,
 							tags: tagsArray,
 							species: speciesArray,
 							date: this.state.filters.date
-						}
+						},
+						loadingLists: false
 					});
 					
 					if (this.state.firstListLoad) {
 						this.setState({
-							filters: {
-								datatype: this.state.filters.datatype,
-								submitters: submittersArray,
-								access: accessArray,
-								tags: tagsArray,
-								species: speciesArray,
-								date: this.state.filters.date
-							},
 							firstListLoad: false
 						});
 						
@@ -150,6 +160,7 @@ var MapContainer = React.createClass({
 				} else {
 					console.log('Status: ' + request.status);
 					console.log('Status text: ' + request.statusText);
+					this.setState({loadingLists: false});
 				}
 			};
 
@@ -159,8 +170,9 @@ var MapContainer = React.createClass({
 		}
 	},
 	
-	loadRecords: function (filters = this.state.filters) {
-		if (this.props.userInfo.userId != null && !this.props.offline) {
+	loadRecords: function (filters = this.state.filters, override = false) {
+		if (this.props.userInfo.userId != null && !this.props.offline && (!this.state.loadingData || override)) {
+			this.setState({loadingData: true});
 			console.log('Loading data');
 			const formData='GUID=' + this.props.userInfo.userId + '&filters=' + JSON.stringify(filters);
 		
@@ -180,14 +192,16 @@ var MapContainer = React.createClass({
 					if (Object.keys(geoJsonIn).includes('text') && geoJsonIn.text == "Warning: geojson not found") {
 						if (Object.keys(this.state.records).length > 0){
 							this.setState({
-								records: {}
+								records: {},
+								loadingData: false
 							});
 						}
 					} else {
 						if (Object.keys(this.state.records).length == 0) {
 							console.log('Setting initial data');
 							this.setState({
-								records: geoJsonIn
+								records: geoJsonIn,
+								loadingData: false
 							});
 						} else {
 							var currentRecords = this.state.records;
@@ -220,7 +234,8 @@ var MapContainer = React.createClass({
 								let newRecords = {type: currentRecords.type, features: currentFeats};
 								
 								this.setState({
-									records: newRecords
+									records: newRecords,
+									loadingData: false
 								});
 							}
 						}
@@ -228,6 +243,7 @@ var MapContainer = React.createClass({
 				} else {
 					console.log('Status: ' + request.status);
 					console.log('Status text: ' + request.statusText);
+					this.setState({loadingData: false});
 				}
 			};
 
