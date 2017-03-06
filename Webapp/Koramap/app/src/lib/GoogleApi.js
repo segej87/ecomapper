@@ -7,7 +7,7 @@ export const GoogleApi = function(opts) {
               'You must pass an apiKey to use GoogleApi');
 
     const apiKey = opts.apiKey;
-    const libraries = opts.libraries || ['places'];
+    const libraries = opts.libraries || ['places','geometry'];
     const client = opts.client;
     const URL = 'https://maps.googleapis.com/maps/api/js';
 

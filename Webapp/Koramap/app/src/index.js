@@ -20,6 +20,8 @@ const mapStyles = {
   }
 }
 
+const countryGeo = require('../res/json/countries.geo.json');
+
 const evtNames = [
   'ready',
   'click',
@@ -43,7 +45,8 @@ const evtNames = [
   'zoom_changed'
 ];
 
-var geoJson;
+var countries;
+var selectedCountries = [];
 
 export {wrapper as GoogleApiWrapper} from './GoogleApiComponent'
 export {Marker} from './components/Marker'
@@ -63,12 +66,13 @@ export class Map extends React.Component {
           currentLocation: {
             lat: this.props.initialCenter.lat,
             lng: this.props.initialCenter.lng
-          }
+          },
+					hasCountries: false
         }
     }
 
     componentDidMount() {
-      if (this.props.centerAroundCurrentLocation) {
+			if (this.props.centerAroundCurrentLocation) {
         if (navigator && navigator.geolocation) {
           this.geoPromise = makeCancelable(
             new Promise((resolve, reject) => {
@@ -119,6 +123,83 @@ export class Map extends React.Component {
         google.maps.event.removeListener(this.listeners[e]);
       });
     }
+		
+		componentWillReceiveProps(nextProps) {
+			if (nextProps.countryFiltering && !this.state.hasCountries) {
+				console.log('Loading countries...');
+        countries = this.map.data.addGeoJson(countryGeo);
+				for (var i = 0; i < countries.length; i++) {
+					if (countries[i].getProperty('name') == "Antarctica") {
+						this.map.data.remove(countries[i]);
+					}
+				}
+				
+				this.setState({
+					hasCountries: true
+				});
+			} else if (!nextProps.countryFiltering && this.state.hasCountries && countries && countries.length > 0) {
+				console.log('Clearing countries...');
+				
+				for (var i = 0; i < countries.length; i++) {
+					this.map.data.remove(countries[i]);
+				}
+				
+				countries = null;
+				
+				this.setState({
+					hasCountries: false
+				});
+				
+				this.props.onFilter(selectedCountries);
+			}
+		}
+		
+		setupCountries() {
+			// Color each shape gray. Change the color when the isColorful property
+			// is set to true.
+			this.map.data.setStyle(function(feature) {
+				var color = 'gray';
+				if (feature.getProperty('isColorful')) {
+					color = 'green';
+				}
+				return /** @type {google.maps.Data.StyleOptions} */({
+					fillColor: color,
+					strokeColor: color,
+					strokeWeight: 2
+				});
+			});
+
+			// When the user clicks, set 'isColorful', changing the color of the letters.
+			this.map.data.addListener('click', function(event) {
+				event.feature.setProperty('isColorful', !event.feature.getProperty('isColorful'));
+				
+				var testArray = [];
+				for (var i = 0; i < selectedCountries.length; i++) {
+					testArray.push(selectedCountries[i].id);
+				}
+				
+				if (testArray.includes(event.feature.getId())) {
+					selectedCountries.splice(selectedCountries.indexOf(event.feature), 1);
+				} else {
+					selectedCountries.push({
+						id: event.feature.getId(),
+						geometry: event.feature.getGeometry()
+					});
+				}
+			});
+
+			// When the user hovers, tempt them to click by outlining the letters.
+			// Call revertStyle() to remove all overrides. This will use the style rules
+			// defined in the function passed to setStyle()
+			this.map.data.addListener('mouseover', function(event) {
+				this.map.data.revertStyle();
+				this.map.data.overrideStyle(event.feature, {strokeWeight: 8});
+			});
+
+			this.map.data.addListener('mouseout', function(event) {
+				this.map.data.revertStyle();
+			});
+		}
 
     loadMap() {
       if (this.props && this.props.google) {
@@ -164,6 +245,12 @@ export class Map extends React.Component {
         });
 
         this.map = new maps.Map(node, mapConfig);
+				
+				this.setupCountries();
+				
+				if (this.props.countryFiltering && !this.state.hasCountries) {
+					this.map.data.addGeoJson(countryGeo);
+				}
 
         evtNames.forEach(e => {
           this.listeners[e] = this.map.addListener(e, this.handleEvent(e));
@@ -231,7 +318,7 @@ export class Map extends React.Component {
     }
 
     render() {
-      const style = Object.assign({}, mapStyles.map, this.props.style, {
+			const style = Object.assign({}, mapStyles.map, this.props.style, {
         display: this.props.visible ? 'inherit' : 'none'
       });
 
@@ -282,7 +369,7 @@ Map.propTypes = {
 evtNames.forEach(e => Map.propTypes[camelize(e)] = T.func)
 
 Map.defaultProps = {
-  zoom: 14,
+  zoom: 5,
   initialCenter: {
     lat: 37.774929,
     lng: -122.419416

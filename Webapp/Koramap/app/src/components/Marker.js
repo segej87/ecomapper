@@ -2,6 +2,7 @@ import React, { PropTypes as T } from 'react'
 
 import { camelize } from '../lib/String'
 const evtNames = ['click', 'mouseover', 'recenter', 'dragend'];
+var markerIcon;
 
 const wrappedPromise = function() {
     var wrappedPromise = {},
@@ -17,8 +18,21 @@ const wrappedPromise = function() {
 }
 
 export class Marker extends React.Component {
-
   componentDidMount() {
+		switch(this.props.featureProps.datatype) {
+			case 'note':
+				markerIcon = require('../../res/img/markers/note-marker.png');
+				break;
+			case 'meas':
+				markerIcon = require('../../res/img/markers/meas-marker.png');
+				break;
+			case 'photo':
+				markerIcon = require('../../res/img/markers/photo-marker.png');
+				break;
+			default:
+				break;
+		}
+		
     this.markerPromise = wrappedPromise();
     this.renderMarker();
   }
@@ -34,7 +48,7 @@ export class Marker extends React.Component {
   }
 
   componentWillUnmount() {
-    if (this.marker) {
+		if (this.marker) {
       this.marker.setMap(null);
     }
   }
@@ -51,15 +65,33 @@ export class Marker extends React.Component {
     if (!(pos instanceof google.maps.LatLng)) {
       position = new google.maps.LatLng(pos.lat, pos.lng);
     }
+		
+		var markerSize;
+		var markerAnchor;
+		markerSize = new google.maps.Size(20, 34);
+		markerAnchor = new google.maps.Point(10, 34);
+		
+		if (!markerIcon) {
+			markerIcon = icon;
+		} else {
+			markerIcon = {
+				url: markerIcon, // url
+				scaledSize: markerSize, // scaled size
+				origin: new google.maps.Point(0,0), // origin
+				anchor: markerAnchor // anchor
+			};
+		}
 
     const pref = {
       map: map,
       position: position,
-      icon: icon,
+      icon: markerIcon,
       label: label,
-      draggable: draggable
+      draggable: draggable,
+			animation: google.maps.Animation.DROP
     };
     this.marker = new google.maps.Marker(pref);
+		this.marker.set
 
     evtNames.forEach(e => {
       this.marker.addListener(e, this.handleEvent(e));
@@ -73,7 +105,7 @@ export class Marker extends React.Component {
   }
 
   handleEvent(evt) {
-    return (e) => {
+		return (e) => {
       const evtName = `on${camelize(evt)}`
       if (this.props[evtName]) {
         this.props[evtName](this.props, this.marker, e);

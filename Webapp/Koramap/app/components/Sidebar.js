@@ -23,6 +23,7 @@ var Sidebar = React.createClass({
 				filters={this.props.filters}
 				lists={this.props.lists}
 				onFilterChange={this.handleFilterChange}
+				toggleGeoFilter={this.props.toggleGeoFilter}
 				/>
 			</div>
 		);

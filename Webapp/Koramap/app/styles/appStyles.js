@@ -81,7 +81,7 @@ login = {
 	},
 	a: {
 		position: 'relative',
-		width: '75',
+		width: 75,
 		left: '50%',
 		margin: '0 -37.5px',
 		marginBottom: 5,
