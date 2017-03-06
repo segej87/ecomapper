@@ -40,7 +40,7 @@ var MapContainer = React.createClass({
 			selectedPlace: {},
 			loadingLists: false,
 			loadingData: false,
-			countryFiltering: false
+			geoFiltering: null
 		};
 	},
 	
@@ -95,8 +95,15 @@ var MapContainer = React.createClass({
 	},
 	
 	toggleGeoFilter: function (type) {
+		var newState;
+		if (type == this.state.geoFiltering) {
+			newState = null;
+		} else {
+			newState =type;
+		}
+		
 		this.setState({
-			countryFiltering: !this.state.countryFiltering
+			geoFiltering: newState
 		});
 	},
 	
@@ -178,7 +185,7 @@ var MapContainer = React.createClass({
 	},
 	
 	loadRecords: function (filters = this.state.filters, override = false) {
-		if (this.props.userInfo.userId != null && !this.props.offline && !this.state.countryFiltering && (!this.state.loadingData || override)) {
+		if (this.props.userInfo.userId != null && !this.props.offline && !this.state.geoFiltering && (!this.state.loadingData || override)) {
 			this.setState({loadingData: true});
 			console.log('Loading data');
 			const formData='GUID=' + this.props.userInfo.userId + '&filters=' + JSON.stringify(filters);
@@ -321,7 +328,7 @@ var MapContainer = React.createClass({
 				filters={this.state.filters} 
 				handleSelected={this.handleSelectedPlace}
 				resetRecords={this.resetRecords}
-				countryFiltering={this.state.countryFiltering}
+				geoFiltering={this.state.geoFiltering}
 				/>
 			</div>
 		)

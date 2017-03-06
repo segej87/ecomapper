@@ -21,6 +21,7 @@ const mapStyles = {
 }
 
 const countryGeo = require('../res/json/countries.geo.json');
+const usStatesGeo = require('../res/json/us-states.geo.json');
 
 const evtNames = [
   'ready',
@@ -45,8 +46,8 @@ const evtNames = [
   'zoom_changed'
 ];
 
-var countries;
-var selectedCountries = [];
+var geoFilters;
+var selectedGeos = [];
 
 export {wrapper as GoogleApiWrapper} from './GoogleApiComponent'
 export {Marker} from './components/Marker'
@@ -67,7 +68,7 @@ export class Map extends React.Component {
             lat: this.props.initialCenter.lat,
             lng: this.props.initialCenter.lng
           },
-					hasCountries: false
+					hasGeos: false
         }
     }
 
@@ -125,32 +126,45 @@ export class Map extends React.Component {
     }
 		
 		componentWillReceiveProps(nextProps) {
-			if (nextProps.countryFiltering && !this.state.hasCountries) {
-				console.log('Loading countries...');
-        countries = this.map.data.addGeoJson(countryGeo);
-				for (var i = 0; i < countries.length; i++) {
-					if (countries[i].getProperty('name') == "Antarctica") {
-						this.map.data.remove(countries[i]);
+			if (nextProps.geoFiltering && !this.state.hasGeos) {
+				console.log('Loading ' + nextProps.geoFiltering + '...');
+				
+				var geos;
+				switch (nextProps.geoFiltering) {
+					case 'Countries':
+						geos = countryGeo;
+						break;
+					case 'US States':
+						geos = usStatesGeo;
+						break;
+					default:
+						geos = countryGeo;
+				}
+				
+        geoFilters = this.map.data.addGeoJson(geos);
+				for (var i = 0; i < geoFilters.length; i++) {
+					if (geoFilters[i].getProperty('name') == "Antarctica") {
+						this.map.data.remove(geoFilters[i]);
 					}
 				}
 				
 				this.setState({
-					hasCountries: true
+					hasGeos: true
 				});
-			} else if (!nextProps.countryFiltering && this.state.hasCountries && countries && countries.length > 0) {
-				console.log('Clearing countries...');
+			} else if (nextProps.geoFiltering == null && this.state.hasGeos && geoFilters && geoFilters.length > 0) {
+				console.log('Clearing geoFilters...');
 				
-				for (var i = 0; i < countries.length; i++) {
-					this.map.data.remove(countries[i]);
+				for (var i = 0; i < geoFilters.length; i++) {
+					this.map.data.remove(geoFilters[i]);
 				}
 				
-				countries = null;
+				geoFilters = null;
 				
 				this.setState({
-					hasCountries: false
+					hasGeos: false
 				});
 				
-				this.props.onFilter(selectedCountries);
+				this.props.onFilter(selectedGeos);
 			}
 		}
 		
@@ -174,14 +188,14 @@ export class Map extends React.Component {
 				event.feature.setProperty('isColorful', !event.feature.getProperty('isColorful'));
 				
 				var testArray = [];
-				for (var i = 0; i < selectedCountries.length; i++) {
-					testArray.push(selectedCountries[i].id);
+				for (var i = 0; i < selectedGeos.length; i++) {
+					testArray.push(selectedGeos[i].id);
 				}
 				
 				if (testArray.includes(event.feature.getId())) {
-					selectedCountries.splice(selectedCountries.indexOf(event.feature), 1);
+					selectedGeos.splice(testArray.indexOf(event.feature.getId()), 1);
 				} else {
-					selectedCountries.push({
+					selectedGeos.push({
 						id: event.feature.getId(),
 						geometry: event.feature.getGeometry()
 					});
@@ -248,7 +262,7 @@ export class Map extends React.Component {
 				
 				this.setupCountries();
 				
-				if (this.props.countryFiltering && !this.state.hasCountries) {
+				if (this.props.geoFiltering && !this.state.hasGeos) {
 					this.map.data.addGeoJson(countryGeo);
 				}
 

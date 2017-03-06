@@ -99,42 +99,6 @@ var Container = React.createClass({
 			return features;
 		}
 		
-		// var geoFilteredFeats = [];
-		// for (var i = 0; i < this.markers.length; i++) {
-			// const position = new google.maps.LatLng(this.markers[i].props.position.lat, this.markers[i].props.position.lng);
-			// for (var j = 0; j < filterGeos.length; j++) {
-				// var paths=[];
-				// if (filterGeos[j].geometry.getType() == 'MultiPolygon') {
-					// const testPolys = filterGeos[j].geometry.getArray();
-					// for (var k = 0; k < testPolys.length; k++) {
-						// testPolys[k].forEachLatLng((LatLng) => {
-							// paths.push(LatLng);
-						// });	
-					// }
-				// } else if (filterGeos[j].geometry.getType() == 'Polygon') {
-					// filterGeos[j].geometry.forEachLatLng((LatLng) => {
-						// paths.push(LatLng);
-					// })
-				// }
-				
-				// const testPoly = new google.maps.Polygon({paths: paths});
-				// if (google.maps.geometry.poly.containsLocation(position, testPoly)) {
-					// geoFilteredFeats.push({
-							// id: this.markers[i].props.fuid,
-							// properties: this.markers[i].props.featureProps,
-							// geometry: {
-									// coordinates: [this.markers[i].props.position.lat, this.markers[i].props.position.lng]
-								// },
-							// type: 'Feature'
-						// });
-					// break;
-				// }
-				// if (google.maps.geometry.poly.containsLocation(this.markers[i].position, testPoly)) {
-					// console.log(this.markers[i].name);
-				// }
-			// }
-		// }
-		
 		var geoFilteredFeats = [];
 		for (var i = 0; i < features.length; i++) {
 			const position = new google.maps.LatLng(features[i].geometry.coordinates[0], features[i].geometry.coordinates[1]);
@@ -158,13 +122,9 @@ var Container = React.createClass({
 					geoFilteredFeats.push(features[i]);
 					break;
 				}
-				// if (google.maps.geometry.poly.containsLocation(this.markers[i].position, testPoly)) {
-					// console.log(this.markers[i].name);
-				// }
 			}
 		}
 		
-		// this.processData(geoFilteredFeats);
 		return (geoFilteredFeats);
 	},
   
@@ -212,10 +172,19 @@ var Container = React.createClass({
 	  }
 	  
 	  if (nextProps.records.features) {
+			this.setState({
+				hasMarkers: false
+			});
 			this.processData(nextProps.records.features);
 	  } else {
 		  this.processData('reset');
 	  }
+		
+		if (nextProps.geoFiltering && !this.props.geoFiltering) {
+			this.setState({
+				hasMarkers: false
+			});
+		}
   },
   
   render() {
@@ -223,14 +192,14 @@ var Container = React.createClass({
 		return <div style={{textAlign: 'center', paddingTop: 75, fontSize: 24, color: 'white'}}>Loading Map...</div>
 	}
 	
-	if (!this.state.hasMarkers || this.props.countryFiltering) {
+	if (!this.state.hasMarkers || this.props.geoFiltering) {
 		return (
 			<div>
 				<Map google={google}
 				  zoom={5}
 				  onClick={this.onMapClicked}
 				  guid={this.props.userInfo.userId}
-					countryFiltering={this.props.countryFiltering}
+					geoFiltering={this.props.geoFiltering}
 					onFilter={this.receiveGeo}>
 			  </Map>
 			  </div>
@@ -239,14 +208,14 @@ var Container = React.createClass({
 	
     return (
       <div>
-		<Map google={google}
+				<Map google={google}
           zoom={5}
           onClick={this.onMapClicked}
 					guid={this.props.userInfo.userId}
-					countryFiltering={this.props.countryFiltering}
+					geoFiltering={this.props.geoFiltering}
 					onFilter={this.receiveGeo}>
-		{this.markers}
-      </Map>
+					{this.markers}
+				</Map>
 	  </div>
     )
   }

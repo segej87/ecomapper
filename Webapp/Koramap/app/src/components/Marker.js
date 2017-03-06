@@ -19,6 +19,8 @@ const wrappedPromise = function() {
 
 export class Marker extends React.Component {
   componentDidMount() {
+    this.markerPromise = wrappedPromise();
+		
 		switch(this.props.featureProps.datatype) {
 			case 'note':
 				markerIcon = require('../../res/img/markers/note-marker.png');
@@ -33,7 +35,6 @@ export class Marker extends React.Component {
 				break;
 		}
 		
-    this.markerPromise = wrappedPromise();
     this.renderMarker();
   }
 
@@ -60,6 +61,10 @@ export class Marker extends React.Component {
     if (!google) {
       return null
     }
+		
+		if (markerIcon == null) {
+				markerIcon = icon;
+		}
 
     let pos = position || mapCenter;
     if (!(pos instanceof google.maps.LatLng)) {
