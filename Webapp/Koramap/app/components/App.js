@@ -43,12 +43,6 @@ var HelloWorld = React.createClass({
 				loggingIn: false
 			}
 		);
-		
-		if (result) {
-			console.log('Logged in');
-		} else {
-			console.log('Login canceled');
-		}
 	},
 	
 	handleMapping: function (result) {
@@ -70,8 +64,6 @@ var HelloWorld = React.createClass({
 			bodyJSX = <Home loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping} />;
 			navType = 'home'
 		}
-		
-		console.log('Rendering app with navType: ' + navType);
 		
 		return (
 			<div style={appStyles.app}>

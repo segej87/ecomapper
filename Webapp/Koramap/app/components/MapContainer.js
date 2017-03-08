@@ -1,10 +1,18 @@
 React = require('react');
 let Sidebar = require('./Sidebar');
 let Container = require('./Container').default;
+const GeoFilterInfoPanel = require('./GeoFilterInfoPanel');
 let Values = require('../res/values');
 let mapStyles = require('../styles/map/mapStyles');
 let mainStyles = require('../styles/home/mainStyles');
 import TimerMixin from 'react-timer-mixin';
+
+//TODO: REMOVE AFTER TESTING
+// let testJson = require('../res/json/crashes.json');
+
+var firstListLoad = true;
+var loadingLists = false;
+var loadingData = false;
 
 var MapContainer = React.createClass({
 	mixins: [TimerMixin],
@@ -19,7 +27,6 @@ var MapContainer = React.createClass({
 		monthago.setMilliseconds(0);
 		
 		return {
-			firstListLoad: true,
 			lists: {
 				datatype: ['Meas','Photo','Note'],
 				submitters: [],
@@ -37,10 +44,11 @@ var MapContainer = React.createClass({
 				date: [monthago, today]
 			},
 			records: {},
+			//TODO: LOAD SHAPES FROM DB
+			shapes: {Geo: ['Countries','US States']},
 			selectedPlace: {},
-			loadingLists: false,
-			loadingData: false,
-			geoFiltering: null
+			geoFiltering: null,
+			selectedGeo: null
 		};
 	},
 	
@@ -91,7 +99,13 @@ var MapContainer = React.createClass({
 			filters: newFilters
 		});
 		
-		this.loadRecords(newFilters,true);
+		this.loadRecords(newFilters, true);
+	},
+	
+	setSelectedGeo: function (names) {
+		this.setState({
+			selectedGeo: names
+		});
 	},
 	
 	toggleGeoFilter: function (type) {
@@ -99,7 +113,7 @@ var MapContainer = React.createClass({
 		if (type == this.state.geoFiltering) {
 			newState = null;
 		} else {
-			newState =type;
+			newState = type;
 		}
 		
 		this.setState({
@@ -108,8 +122,8 @@ var MapContainer = React.createClass({
 	},
 	
 	loadLists: function () {
-		if (this.props.userInfo.userId != null && !this.props.offline && !this.state.loadingLists) {
-			this.setState({loadingLists: true});
+		if (this.props.userInfo.userId != null && !this.props.offline && !loadingLists) {
+			loadingLists = true;
 			console.log('Loading lists');
 			const formData='GUID=' + this.props.userInfo.userId;
 		
@@ -161,20 +175,18 @@ var MapContainer = React.createClass({
 							species: speciesArray,
 							date: this.state.filters.date
 						},
-						loadingLists: false
 					});
 					
-					if (this.state.firstListLoad) {
-						this.setState({
-							firstListLoad: false
-						});
-						
+					if (firstListLoad) {
+						firstListLoad = false;
 						this.loadRecords();
 					}
+					
+					loadingLists = false;
 				} else {
 					console.log('Status: ' + request.status);
 					console.log('Status text: ' + request.statusText);
-					this.setState({loadingLists: false});
+					loadingLists = false;
 				}
 			};
 
@@ -185,8 +197,8 @@ var MapContainer = React.createClass({
 	},
 	
 	loadRecords: function (filters = this.state.filters, override = false) {
-		if (this.props.userInfo.userId != null && !this.props.offline && !this.state.geoFiltering && (!this.state.loadingData || override)) {
-			this.setState({loadingData: true});
+		if (this.props.userInfo.userId != null && !this.props.offline && !this.state.geoFiltering && (!loadingData || override)) {
+			loadingData = true;
 			console.log('Loading data');
 			const formData='GUID=' + this.props.userInfo.userId + '&filters=' + JSON.stringify(filters);
 		
@@ -202,21 +214,26 @@ var MapContainer = React.createClass({
 
 				if (request.status === 200) {
 					const geoJsonIn = JSON.parse(request.responseText);
+					const loadDate = new Date();
+					const loadTime = loadDate.getTime();
 					
 					if (Object.keys(geoJsonIn).includes('text') && geoJsonIn.text == "Warning: geojson not found") {
 						if (Object.keys(this.state.records).length > 0){
 							this.setState({
 								records: {},
-								loadingData: false
 							});
+							loadingData = false;
 						}
 					} else {
 						if (Object.keys(this.state.records).length == 0) {
 							console.log('Setting initial data');
+							var newRecords = geoJsonIn;
+							newRecords.updated = loadTime
+							
 							this.setState({
-								records: geoJsonIn,
-								loadingData: false
+								records: newRecords,
 							});
+							loadingData = false;
 						} else {
 							var currentRecords = this.state.records;
 							var currentFeats = currentRecords.features;
@@ -245,19 +262,19 @@ var MapContainer = React.createClass({
 									}
 								}
 								
-								let newRecords = {type: currentRecords.type, features: currentFeats};
+								let newRecords = {updated: loadTime, type: currentRecords.type, features: currentFeats};
 								
 								this.setState({
 									records: newRecords,
-									loadingData: false
 								});
+								loadingData = false;
 							}
 						}
 					}
 				} else {
 					console.log('Status: ' + request.status);
 					console.log('Status text: ' + request.statusText);
-					this.setState({loadingData: false});
+					loadingData = false;
 				}
 			};
 
@@ -268,6 +285,7 @@ var MapContainer = React.createClass({
 	},
 	
 	resetRecords: function () {
+		firstListLoad = true;
 		this.setState(this.getInitialState());
 		
 		this.loadLists();
@@ -302,6 +320,8 @@ var MapContainer = React.createClass({
 	},
   
 	componentDidMount: function () {
+		firstListLoad = true;
+		
 		this.setInterval(
 			() => { this.loadRecords(); },
 			30000
@@ -309,6 +329,17 @@ var MapContainer = React.createClass({
 	},
 	
 	render: function () {
+		var gfp;
+		if (this.state.geoFiltering) {
+			gfp = (
+				<GeoFilterInfoPanel
+				geoFiltering={this.state.geoFiltering}
+				selectedGeo={this.state.selectedGeo}
+				toggleGeoFilter={this.toggleGeoFilter}
+				/>
+			);
+		}
+		
 		return (
 			<div style={mapStyles.main}>
 				<Sidebar 
@@ -318,18 +349,19 @@ var MapContainer = React.createClass({
 				lists={this.state.lists}
 				handleDelete={this.handleDelete}
 				onFilterChange={this.handleFilterChange}
+				shapes={this.state.shapes}
 				toggleGeoFilter={this.toggleGeoFilter}
 				/>
 				<Container 
-				offline={this.props.offline}
 				userInfo={this.props.userInfo} 
-				loadRecords={this.loadRecords} 
+				geoFiltering={this.state.geoFiltering}
 				records={this.state.records} 
 				filters={this.state.filters} 
+				setSelectedGeo={this.setSelectedGeo}
 				handleSelected={this.handleSelectedPlace}
 				resetRecords={this.resetRecords}
-				geoFiltering={this.state.geoFiltering}
 				/>
+				{gfp}
 			</div>
 		)
 	}

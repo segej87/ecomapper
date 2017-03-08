@@ -48,6 +48,9 @@ const evtNames = [
 
 var geoFilters;
 var selectedGeos = [];
+var clickListener;
+var hoverListener;
+var leaveListener;
 
 export {wrapper as GoogleApiWrapper} from './GoogleApiComponent'
 export {Marker} from './components/Marker'
@@ -127,8 +130,6 @@ export class Map extends React.Component {
 		
 		componentWillReceiveProps(nextProps) {
 			if (nextProps.geoFiltering && !this.state.hasGeos) {
-				console.log('Loading ' + nextProps.geoFiltering + '...');
-				
 				var geos;
 				switch (nextProps.geoFiltering) {
 					case 'Countries':
@@ -141,22 +142,26 @@ export class Map extends React.Component {
 						geos = countryGeo;
 				}
 				
+				this.setupActiveGeos();
+				
         geoFilters = this.map.data.addGeoJson(geos);
-				for (var i = 0; i < geoFilters.length; i++) {
-					if (geoFilters[i].getProperty('name') == "Antarctica") {
-						this.map.data.remove(geoFilters[i]);
-					}
-				}
 				
 				this.setState({
 					hasGeos: true
 				});
 			} else if (nextProps.geoFiltering == null && this.state.hasGeos && geoFilters && geoFilters.length > 0) {
-				console.log('Clearing geoFilters...');
+				let selectedGeoIds = [];
+				for (var i = 0; i < Object.keys(selectedGeos).length; i++) {
+					selectedGeoIds.push(selectedGeos[Object.keys(selectedGeos)[i]].id)
+				}
 				
 				for (var i = 0; i < geoFilters.length; i++) {
-					this.map.data.remove(geoFilters[i]);
+					if (!selectedGeoIds.includes(geoFilters[i].getId())) {
+						this.map.data.remove(geoFilters[i]);
+					}
 				}
+				
+				this.setupInactiveGeos();
 				
 				geoFilters = null;
 				
@@ -168,9 +173,12 @@ export class Map extends React.Component {
 			}
 		}
 		
-		setupCountries() {
-			// Color each shape gray. Change the color when the isColorful property
-			// is set to true.
+		//TODO: Figure out how to show currently selected feature
+		setSelectedGeos() {
+			this.props.setSelectedGeo(selectedGeos);
+		}
+		
+		setupActiveGeos() {
 			this.map.data.setStyle(function(feature) {
 				var color = 'gray';
 				if (feature.getProperty('isColorful')) {
@@ -179,12 +187,12 @@ export class Map extends React.Component {
 				return /** @type {google.maps.Data.StyleOptions} */({
 					fillColor: color,
 					strokeColor: color,
-					strokeWeight: 2
+					strokeWeight: 2,
+					clickable: true
 				});
 			});
 
-			// When the user clicks, set 'isColorful', changing the color of the letters.
-			this.map.data.addListener('click', function(event) {
+			clickListener = this.map.data.addListener('click', function(event) {
 				event.feature.setProperty('isColorful', !event.feature.getProperty('isColorful'));
 				
 				var testArray = [];
@@ -202,17 +210,31 @@ export class Map extends React.Component {
 				}
 			});
 
-			// When the user hovers, tempt them to click by outlining the letters.
-			// Call revertStyle() to remove all overrides. This will use the style rules
-			// defined in the function passed to setStyle()
-			this.map.data.addListener('mouseover', function(event) {
+			hoverListener = this.map.data.addListener('mouseover', function(event) {
 				this.map.data.revertStyle();
 				this.map.data.overrideStyle(event.feature, {strokeWeight: 8});
 			});
 
-			this.map.data.addListener('mouseout', function(event) {
+			leaveListener = this.map.data.addListener('mouseout', function(event) {
 				this.map.data.revertStyle();
 			});
+		}
+		
+		setupInactiveGeos() {
+			// Color each shape gray. Change the color when the isColorful property
+			// is set to true.
+			this.map.data.setStyle(function(feature) {
+				return /** @type {google.maps.Data.StyleOptions} */({
+					fillColor: 'rgba(0,0,0,0)',
+					strokeColor: 'red',
+					strokeWeight: 2,
+					clickable: false
+				});
+			});
+			
+			google.maps.event.removeListener(clickListener);
+			google.maps.event.removeListener(hoverListener);
+			google.maps.event.removeListener(leaveListener);
 		}
 
     loadMap() {
@@ -259,8 +281,6 @@ export class Map extends React.Component {
         });
 
         this.map = new maps.Map(node, mapConfig);
-				
-				this.setupCountries();
 				
 				if (this.props.geoFiltering && !this.state.hasGeos) {
 					this.map.data.addGeoJson(countryGeo);
@@ -333,7 +353,11 @@ export class Map extends React.Component {
 
     render() {
 			const style = Object.assign({}, mapStyles.map, this.props.style, {
-        display: this.props.visible ? 'inherit' : 'none'
+        display: this.props.visible ? 'inherit' : 'none',
+				textAlign: 'center', 
+				paddingTop: 75, 
+				fontSize: 24, 
+				color: 'white'
       });
 
       const containerStyles = Object.assign({},

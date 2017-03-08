@@ -1,7 +1,7 @@
 React = require('react');
 SidebarStyles = require('../styles/map/sidebarStyles');
 SidebarDropdown = require('./SidebarDropdown');
-let Draggable = require('react-draggable');
+// let Draggable = require('react-draggable');
 
 var FilterButton = React.createClass({
 	getInitialState: function () {
@@ -20,29 +20,29 @@ var FilterButton = React.createClass({
 		this.props.handleDragRemove(this.props.type, this.props.item, 'Remove');
 	},
 	
-	handleDrag: function (e, ui) {
-		const {x, y} = this.state.deltaPosition;
-		this.setState({
-			deltaPosition: {
-				x: x + ui.deltaX,
-				y: y + ui.deltaY
-			}
-		});
-	},
+	// handleDrag: function (e, ui) {
+		// const {x, y} = this.state.deltaPosition;
+		// this.setState({
+			// deltaPosition: {
+				// x: x + ui.deltaX,
+				// y: y + ui.deltaY
+			// }
+		// });
+	// },
 	
-	handleStart: function () {
-		this.setState({activeDrags: ++this.state.activeDrags});
-	},
+	// handleStart: function () {
+		// this.setState({activeDrags: ++this.state.activeDrags});
+	// },
 	
-	handleStop: function () {
-		let {x, y} = this.state.deltaPosition;
+	// handleStop: function () {
+		// let {x, y} = this.state.deltaPosition;
 		
-		this.setState(this.getInitialState());
+		// this.setState(this.getInitialState());
 		
-		if (x != 0 && y != 0) {
-			this.handleFilterChange();
-		}
-	},
+		// if (x != 0 && y != 0) {
+			// this.handleFilterChange();
+		// }
+	// },
 	
 	handleTagClick: function (ev) {
 		if (this.state.deltaPosition.x == 0 && this.state.deltaPosition.y == 0) {

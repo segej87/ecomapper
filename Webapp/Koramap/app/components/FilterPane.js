@@ -1,6 +1,7 @@
 React = require('react');
 SidebarToggle = require('./SidebarToggle');
 FilterContent = require('./FilterContent').default;
+GeoFilterButton = require('./GeoFilterButton');
 SidebarStyles = require('../styles/map/sidebarStyles');
 
 var FilterPane = React.createClass({
@@ -20,8 +21,8 @@ var FilterPane = React.createClass({
 		this.props.onFilterChange(type, val, result);
 	},
 	
-	toggleGeoFilter: function (e) {
-		this.props.toggleGeoFilter(e.target.id);
+	toggleGeoFilter: function (result) {
+		this.props.toggleGeoFilter(result);
 	},
 	
 	render: function () {
@@ -30,7 +31,7 @@ var FilterPane = React.createClass({
 				<div style={SidebarStyles.sidebarContainer}>
 					<div style={SidebarStyles.sidebarOpen.filter}>
 						<FilterContent filters={this.props.filters} lists={this.props.lists} onFilterChange={this.handleFilterChange}/>
-						<button id='Countries' onClick={this.toggleGeoFilter} >Country Filter</button>
+						<GeoFilterButton shapes={this.props.shapes} toggleGeoFilter={this.toggleGeoFilter}/>
 					</div>
 					<SidebarToggle type="filter" onClick={this.openChange} open={this.state.open} />
 				</div>

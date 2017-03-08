@@ -200,7 +200,6 @@ deleteButton = {
 	fontFamily: 'Lato, Open Sans, sans-serif',
 	fontSize: Numbers.buttonFontSize,
 	height: Numbers.buttonHeight,
-	width: '9vh',
 	border: 'none',
 	cursor: 'pointer',
 	borderRadius: 2,
@@ -421,6 +420,7 @@ dateField = {
 	maxHeight: 20,
 	color: 'white',
 	textAlign: 'left',
+	cursor: 'pointer',
 	label: {
 		fontSize: 11,
 		marginTop: 2,
@@ -453,6 +453,59 @@ pointer = {
 	fontSize: 20
 };
 
+geoButton = {
+	padding: '10px 5px',
+	textAlign: 'left',
+	color: 'white',
+	width: '100%',
+	border: 'none',
+	backgroundColor: 'rgba(255,255,255,0.2)',
+	cursor: 'pointer',
+	marginTop: 20,
+	highlighted: {
+		padding: '10px 7px',
+		textAlign: 'left',
+		color: 'white',
+		width: '100%',
+		border: 'none',
+		backgroundColor: 'rgba(255,255,255,0.4)',
+		cursor: 'pointer',
+		marginTop: 20,
+		boxShadow: '0px 0px 3px 0px rgba(0, 0, 0, 0.4)',
+	},
+	pointer: {
+		color: 'white',
+		position: 'absolute',
+		left: 300,
+		top: 0,
+		fontSize: 20
+	}
+};
+
+geoInfo = {
+	position: 'relative',
+	textAlign: 'center',
+	backgroundColor: 'white',
+	float: 'right',
+	right: 30,
+	top: 50,
+	width: 175,
+	borderRadius: 7,
+	padding: 10,
+	boxShadow: '4px 0px 4px 0px rgba(0, 0, 0, 0.4)',
+	a: {
+		position: 'relative',
+		width: 75,
+		left: '50%',
+		margin: '0 -37.5px',
+		marginBottom: 5,
+		display: 'block',
+		color: 'blue',
+		cursor: 'pointer',
+		boxShadow: '4px 0px 4px 0px rgba(0, 0, 0, 0.4)',
+	},
+};
+
 module.exports = {
 	sidebarContainer,
 	sidebarOpen,
@@ -482,5 +535,7 @@ module.exports = {
 	addDisplay,
 	dateField,
 	closeButton,
-	pointer
+	pointer,
+	geoButton,
+	geoInfo
 };
