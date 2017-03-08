@@ -16,7 +16,6 @@ var HelloWorld = React.createClass({
 				userId: '10101010-1010-1010-1010-101010101010'
 			},
 			loggingIn: false,
-			faded: false,
 			mapping: false,
 			offline: false
 		};

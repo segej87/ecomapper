@@ -53,16 +53,17 @@ var DateField = React.createClass({
 	
 	if (date == null) {
 		this.props.onChange(this.props.type,'none','Replace');
+		return;
 	}
 	this.props.onChange(this.props.type, date, 'Replace');
   },
  
   render: function() {
     return <DatePicker
-		customInput={<CustomDateInput />}
-		isClearable={true}
-        selected={this.state.startDate}
-        onChange={this.handleChange} />;
+			customInput={<CustomDateInput />}
+			isClearable={true}
+      selected={this.state.startDate}
+      onChange={this.handleChange} />;
   }
 });
 
