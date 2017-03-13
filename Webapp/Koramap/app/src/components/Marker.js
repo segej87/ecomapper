@@ -2,6 +2,10 @@ import React, { PropTypes as T } from 'react'
 
 import { camelize } from '../lib/String'
 const evtNames = ['click', 'mouseover', 'recenter', 'dragend'];
+
+const noteIcon = require('../../res/img/markers/note-marker.png');
+const measIcon = require('../../res/img/markers/meas-marker.png');
+const photoIcon = require('../../res/img/markers/photo-marker.png');
 var markerIcon;
 
 const wrappedPromise = function() {
@@ -23,13 +27,13 @@ export class Marker extends React.Component {
 		
 		switch(this.props.featureProps.datatype) {
 			case 'note':
-				markerIcon = require('../../res/img/markers/note-marker.png');
+				markerIcon = noteIcon;
 				break;
 			case 'meas':
-				markerIcon = require('../../res/img/markers/meas-marker.png');
+				markerIcon = measIcon;
 				break;
 			case 'photo':
-				markerIcon = require('../../res/img/markers/photo-marker.png');
+				markerIcon = photoIcon;
 				break;
 			default:
 				break;

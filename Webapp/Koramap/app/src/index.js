@@ -48,6 +48,8 @@ const evtNames = [
 
 var geoFilters;
 var selectedGeos = [];
+var selectedGeoNames = [];
+var currentGeoLen = 0;
 var clickListener;
 var hoverListener;
 var leaveListener;
@@ -99,7 +101,7 @@ export class Map extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-      if (prevProps.google !== this.props.google) {
+			if (prevProps.google !== this.props.google) {
         this.loadMap();
       }
       if (this.props.visible !== prevProps.visible) {
@@ -173,11 +175,6 @@ export class Map extends React.Component {
 			}
 		}
 		
-		//TODO: Figure out how to show currently selected feature
-		setSelectedGeos() {
-			this.props.setSelectedGeo(selectedGeos);
-		}
-		
 		setupActiveGeos() {
 			this.map.data.setStyle(function(feature) {
 				var color = 'gray';
@@ -202,12 +199,16 @@ export class Map extends React.Component {
 				
 				if (testArray.includes(event.feature.getId())) {
 					selectedGeos.splice(testArray.indexOf(event.feature.getId()), 1);
+					selectedGeoNames.splice(testArray.indexOf(event.feature.getId()), 1);
 				} else {
 					selectedGeos.push({
 						id: event.feature.getId(),
 						geometry: event.feature.getGeometry()
 					});
+					selectedGeoNames.push(event.feature.getProperty('name'))
 				}
+				
+				document.getElementById('geoinfodescrip').innerHTML = selectedGeoNames.join(", ");
 			});
 
 			hoverListener = this.map.data.addListener('mouseover', function(event) {

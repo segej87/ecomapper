@@ -97,10 +97,6 @@ var Container = React.createClass({
 		this.processData(this.props.records.features);
 	},
 	
-	setSelectedGeo: function (names) {
-		this.props.setSelectedGeo(names);
-	},
-	
 	//TODO: wrap in promise?
 	filterGeo: function (features) {
 		if (filterGeos.length == 0) {
@@ -209,8 +205,7 @@ var Container = React.createClass({
 				  onClick={this.onMapClicked}
 				  guid={this.props.userInfo.userId}
 					geoFiltering={this.props.geoFiltering}
-					onFilter={this.receiveGeo}
-					setSelectedGeo={this.setSelectedGeo}>
+					onFilter={this.receiveGeo}>
 			  </Map>
 			  </div>
 		);

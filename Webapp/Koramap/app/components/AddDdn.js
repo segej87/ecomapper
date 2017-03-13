@@ -1,6 +1,7 @@
-var React = require('react');
-var SidebarStyles = require('../styles/map/sidebarStyles');
-var NavbarDropdownItem = require('./NavbarDropdownItem');
+const React = require('react');
+const SidebarStyles = require('../styles/map/sidebarStyles');
+const NavbarDropdownItem = require('./NavbarDropdownItem');
+const SearchArea = require('./SearchArea');
 const koraLogo = require('../res/img/assets/koralogo.png');
 const publicIcon = require('../res/img/icons/public-icon2.png');
 const privateIcon = require('../res/img/icons/private-icon2.png');
@@ -22,6 +23,12 @@ var NavbarDropdown = React.createClass({
 		Note: noteIcon,
 		segej87: 'https://ecomapper.blob.core.windows.net/profiles/segej87.jpg',
 		rsege: 'https://ecomapper.blob.core.windows.net/profiles/rsege.jpg'
+	},
+	
+	getInitialState: function () {
+		return ({
+			searchString: ''
+		});
 	},
 	
 	filterString: function (value) {
@@ -48,7 +55,7 @@ var NavbarDropdown = React.createClass({
 	},
 	
 	handleClose: function (e) {
-		document.getElementById('search').value = '';
+		this.setState(this.getInitialState());
 		this.props.onClose(e);
 	},
 	
@@ -59,7 +66,11 @@ var NavbarDropdown = React.createClass({
 	componentWillReceiveProps: function (nextProps) {
 		if (nextProps.items[nextProps.type] != null) {
 			this.inItems = nextProps.items[nextProps.type];
-			this.items = this.filterString(document.getElementById('search').value);
+			this.items = this.filterString(this.state.searchString);
+		}
+		
+		if (this.props.highlighted && !nextProps.highlighted || nextProps.type != this.props.type) {
+			this.state = this.getInitialState();
 		}
 	},
 	
@@ -101,10 +112,7 @@ var NavbarDropdown = React.createClass({
 		return (
 			<div style={linkStyle}>
 				<button style={SidebarStyles.closeButton} onClick={this.handleClose}>&#x2e3;</button>
-				<div style={SidebarStyles.addDisplay.searchHolder}>
-					<p style={SidebarStyles.addDisplay.p}>Search:</p>
-					<input type="text" id="search" style={SidebarStyles.addDisplay.input} onChange={this.handleInput}/>
-				</div>
+				<SearchArea val={this.state.searchString} handleInput={this.handleInput}/>
 				<ul style={SidebarStyles.addDisplay.ul}>
 					{showItems}
 				</ul>

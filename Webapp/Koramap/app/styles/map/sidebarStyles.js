@@ -395,7 +395,7 @@ addDisplay = {
 		left: '50%',
 		margin: '0 -101px',
 		boxShadow: '0px 0px 2px 0px rgba(0, 0, 0, 0.4)',
-		hover: {
+		highlighted: {
 			textAlign: 'center',
 			borderBottom: '1.5px solid rgb(255,75,100)',
 			position: 'relative',
@@ -404,7 +404,7 @@ addDisplay = {
 			top: '7%',
 			left: '50%',
 			margin: '0 -101px',
-			boxShadow: '0px 0px 3px 0px rgba(0, 0, 0, 0.4)',
+			boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.4)',
 		}
 	}
 	

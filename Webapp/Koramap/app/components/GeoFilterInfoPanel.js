@@ -37,13 +37,6 @@ const GeoFilterInfoPanel = React.createClass({
 	},
 	
 	render: function () {
-		var header = '';
-		var selected = '';
-		if (this.props.selectedGeo) {
-			header = 'Currently selected:'
-			selected = this.props.selectedGeo.join(', ');
-		}
-		
 		return (
 		<Draggable
 			zIndex={10000000000}
@@ -51,15 +44,14 @@ const GeoFilterInfoPanel = React.createClass({
 			onDrag={this.handleDrag}
 			onStop={this.dragStop}>
 				<div style={SidebarStyles.geoInfo}>
-					<p>{header}</p>
-					<p>{selected}</p>
+					<p id='geoinfoheader' style={{fontWeight: 'bold'}}>Filtering by:</p>
+					<p id='geoinfodescrip'>Nothing yet...</p>
 					<button style={SidebarStyles.deleteButton} onClick={this.handleConfirm}>Filter</button>
 				</div>
 			</Draggable>
 		);
 	}
 });
-
 
 
 module.exports = GeoFilterInfoPanel;

@@ -47,8 +47,7 @@ var MapContainer = React.createClass({
 			//TODO: LOAD SHAPES FROM DB
 			shapes: {Geo: ['Countries','US States']},
 			selectedPlace: {},
-			geoFiltering: null,
-			selectedGeo: null
+			geoFiltering: null
 		};
 	},
 	
@@ -100,12 +99,6 @@ var MapContainer = React.createClass({
 		});
 		
 		this.loadRecords(newFilters, true);
-	},
-	
-	setSelectedGeo: function (names) {
-		this.setState({
-			selectedGeo: names
-		});
 	},
 	
 	toggleGeoFilter: function (type) {
@@ -284,6 +277,57 @@ var MapContainer = React.createClass({
 		}
 	},
 	
+	standardizeUnits: function () {
+		const url = "http://192.168.220.128/ocpu/library/kora.scripts/R/standardizeunits/json";
+		const method = "POST";
+		
+		//TODO: remove after testing
+		const len = 1000000;
+		
+		const testVals = [];
+		for (var i=0, t=len; i<t; i++) {
+				testVals.push(Math.round(Math.random() * 20))
+		}
+		
+		const unitOps = ['ppm','ppb','mg/l','g/l','ppq'];
+		const testUnits = [];
+		for (var i=0, t=len; i<t; i++) {
+			testUnits.push(unitOps[Math.floor(Math.random() * unitOps.length)])
+		}
+		
+		const testTarget = 'ppm';
+		const testConvs = {
+			'ppb': 'x/1000',
+			'mg/l': 'x',
+			'g/l': 'x/1000',
+		};
+		const formData=JSON.stringify({vals: testVals, units: testUnits, target: testTarget, conversions: testConvs});
+		
+		var request = new XMLHttpRequest;
+		
+		request.onreadystatechange = (e) => {
+			if (request.readyState !== 4) {
+				console.log(request.readyState);
+				return;
+			}
+			
+			if (request.status === 200) {
+				console.log(JSON.parse(request.response).length)
+				const endDate = new Date();
+				console.log(endDate-startDate);
+			} else {
+				console.log(request.status);
+				console.log(request.statusText);
+			}
+		};
+		
+		request.open(method, url, true);
+		request.setRequestHeader("Content-type", "application/json");
+		request.send(formData);
+		
+		const startDate = new Date();
+	},
+	
 	resetRecords: function () {
 		firstListLoad = true;
 		this.setState(this.getInitialState());
@@ -317,6 +361,7 @@ var MapContainer = React.createClass({
 	
 	componentWillMount: function () {
 		this.loadLists();
+		this.standardizeUnits();
 	},
   
 	componentDidMount: function () {
@@ -357,7 +402,6 @@ var MapContainer = React.createClass({
 				geoFiltering={this.state.geoFiltering}
 				records={this.state.records} 
 				filters={this.state.filters} 
-				setSelectedGeo={this.setSelectedGeo}
 				handleSelected={this.handleSelectedPlace}
 				resetRecords={this.resetRecords}
 				/>
