@@ -69,7 +69,7 @@ var MessagePane = React.createClass({
 		if (this.props.selectedPlace.featureProps) {
 			const ownFeature = this.props.userInfo.userName == this.props.selectedPlace.featureProps.submitter;
 			body = (
-				<FeatureInfo selectedPlace={this.props.selectedPlace} handleDelete={this.handleDelete} ownFeature={ownFeature}/>
+		<FeatureInfo selectedPlace={this.props.selectedPlace} handleDelete={this.handleDelete} ownFeature={ownFeature} selectedMeasDist = {this.props.selectedMeasDist} selectedMeasStand={this.props.selectedMeasStand} selectedMeasUnit={this.props.selectedMeasUnit}/>
 			);
 		}
 		

@@ -14,6 +14,10 @@ var firstListLoad = true;
 var loadingLists = false;
 var loadingData = false;
 
+var standIds = [];
+var standVals = [];
+var standUnits = [];
+
 var MapContainer = React.createClass({
 	mixins: [TimerMixin],
 	
@@ -44,6 +48,8 @@ var MapContainer = React.createClass({
 				date: [monthago, today]
 			},
 			records: {},
+			measObj: {},
+			selectedMeasDist: [],
 			//TODO: LOAD SHAPES FROM DB
 			shapes: {Geo: ['Countries','US States']},
 			selectedPlace: {},
@@ -206,7 +212,8 @@ var MapContainer = React.createClass({
 				}
 
 				if (request.status === 200) {
-					const geoJsonIn = JSON.parse(request.responseText);
+					const geoJsonIn = JSON.parse(request.responseText).collection;
+					const measObjIn = JSON.parse(request.responseText).measObj;
 					const loadDate = new Date();
 					const loadTime = loadDate.getTime();
 					
@@ -214,6 +221,7 @@ var MapContainer = React.createClass({
 						if (Object.keys(this.state.records).length > 0){
 							this.setState({
 								records: {},
+								measObj: {}
 							});
 							loadingData = false;
 						}
@@ -225,6 +233,7 @@ var MapContainer = React.createClass({
 							
 							this.setState({
 								records: newRecords,
+								measObj: measObjIn
 							});
 							loadingData = false;
 						} else {
@@ -259,11 +268,15 @@ var MapContainer = React.createClass({
 								
 								this.setState({
 									records: newRecords,
+									measObj: measObjIn
 								});
 								loadingData = false;
 							}
 						}
 					}
+					
+					
+					this.standardizeUnits(measObjIn);
 				} else {
 					console.log('Status: ' + request.status);
 					console.log('Status text: ' + request.statusText);
@@ -277,55 +290,54 @@ var MapContainer = React.createClass({
 		}
 	},
 	
-	standardizeUnits: function () {
+	standardizeUnits: function (unitObj) {
+		if (unitObj == null) {
+			return
+		}
+		
 		const url = "http://192.168.220.128/ocpu/library/kora.scripts/R/standardizeunits/json";
 		const method = "POST";
 		
-		//TODO: remove after testing
-		const len = 1000000;
-		
-		const testVals = [];
-		for (var i=0, t=len; i<t; i++) {
-				testVals.push(Math.round(Math.random() * 20))
+		for (var i = 0; i < Object.keys(unitObj).length; i++) {
+			(function(i){
+				const sourceObj = unitObj[Object.keys(unitObj)[i]];
+				const testVals = sourceObj.vals;
+				const testUnits = sourceObj.units;
+				const testTarget = sourceObj.target;
+				const testConvs = sourceObj.convs;
+				const formData=JSON.stringify({vals: testVals, units: testUnits, target: testTarget, conversions: testConvs});
+				
+				var request = new XMLHttpRequest;
+				
+				request.onreadystatechange = (e) => {
+					if (request.readyState !== 4) {
+						return;
+					}
+					
+					if (request.status === 200) {
+						console.log(request.response);
+						
+						for (var j = 0; j < sourceObj.ids.length; j++) {
+							if (!standIds.includes(sourceObj.ids[j])) {
+								standIds.push(sourceObj.ids[j]);
+								standVals.push(JSON.parse(request.response)[j])
+								standUnits.push(testTarget);
+							} else if (standVals[standIds.indexOf(sourceObj.ids[j])] != JSON.parse(request.response)[j] || standUnits[standIds.indexOf(sourceObj.ids[j])] != testTarget) {
+								standVals[standIds.indexOf(sourceObj.ids[j])] = JSON.parse(request.response)[j];
+								standUnits[standIds.indexOf(sourceObj.ids[j])] = testTarget;
+							}
+						}
+					} else {
+						console.log(request.status);
+						console.log(request.statusText);
+					}
+				};
+				
+				request.open(method, url, true);
+				request.setRequestHeader("Content-type", "application/json");
+				request.send(formData);
+			})(i);
 		}
-		
-		const unitOps = ['ppm','ppb','mg/l','g/l','ppq'];
-		const testUnits = [];
-		for (var i=0, t=len; i<t; i++) {
-			testUnits.push(unitOps[Math.floor(Math.random() * unitOps.length)])
-		}
-		
-		const testTarget = 'ppm';
-		const testConvs = {
-			'ppb': 'x/1000',
-			'mg/l': 'x',
-			'g/l': 'x/1000',
-		};
-		const formData=JSON.stringify({vals: testVals, units: testUnits, target: testTarget, conversions: testConvs});
-		
-		var request = new XMLHttpRequest;
-		
-		request.onreadystatechange = (e) => {
-			if (request.readyState !== 4) {
-				console.log(request.readyState);
-				return;
-			}
-			
-			if (request.status === 200) {
-				console.log(JSON.parse(request.response).length)
-				const endDate = new Date();
-				console.log(endDate-startDate);
-			} else {
-				console.log(request.status);
-				console.log(request.statusText);
-			}
-		};
-		
-		request.open(method, url, true);
-		request.setRequestHeader("Content-type", "application/json");
-		request.send(formData);
-		
-		const startDate = new Date();
 	},
 	
 	resetRecords: function () {
@@ -353,15 +365,50 @@ var MapContainer = React.createClass({
 		});
 	},
 	
+	setMeasDist: function (type) {
+		if (this.state.records.features) {
+			var ids = [];
+			var vals = [];
+			for (var i = 0; i < this.state.records.features.length; i++) {
+				if (this.state.records.features[i].properties.species == type) {
+					ids.push(this.state.records.features[i].id);
+				}
+			}
+			
+			for (var i = 0; i < ids.length; i++) {
+				vals.push(standVals[standIds.indexOf(ids[i])]);
+			}
+			
+			return vals;
+		}
+	},
+	
 	handleSelectedPlace: function (selected) {
+		var vals = [];
+		var selectedMeasStand;
+		var selectedMeasUnit;
+		
+		if (selected.featureProps) {
+			if (selected.featureProps.datatype == 'meas') {
+				const ind = standIds.indexOf(selected.fuid);
+				vals = this.setMeasDist(selected.featureProps.species[0]);
+				selectedMeasStand = standVals[ind];
+				selectedMeasUnit = standUnits[ind];
+			}
+		}
+		
+		console.log(vals);
+		
 		this.setState({
-			selectedPlace: selected
+			selectedPlace: selected,
+			selectedMeasDist: vals,
+			selectedMeasStand: selectedMeasStand,
+			selectedMeasUnit: selectedMeasUnit
 		});
 	},
 	
 	componentWillMount: function () {
 		this.loadLists();
-		this.standardizeUnits();
 	},
   
 	componentDidMount: function () {
@@ -390,6 +437,9 @@ var MapContainer = React.createClass({
 				<Sidebar 
 				userInfo={this.props.userInfo} 
 				selectedPlace={this.state.selectedPlace} 
+				selectedMeasDist={this.state.selectedMeasDist}
+				selectedMeasStand={this.state.selectedMeasStand}
+				selectedMeasUnit={this.state.selectedMeasUnit}
 				filters={this.state.filters}
 				lists={this.state.lists}
 				handleDelete={this.handleDelete}

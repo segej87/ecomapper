@@ -3,10 +3,13 @@ TabArea = require('./TabArea');
 SidebarStyles = require('../styles/map/sidebarStyles');
 
 var FeatureInfo = React.createClass({
+	plot: null,
+	
 	getInitialState: function () {
 		return ({
 			photo: false,
-			activeButtons: 'tags'
+			activeButtons: 'tags',
+			plot: false
 		});
 	},
 	
@@ -24,6 +27,59 @@ var FeatureInfo = React.createClass({
 				activeButtons: 'tags'
 			});
 		}
+	},
+	
+	getRImage: function (sesh) {
+		const url = 'http://192.168.220.128/ocpu/tmp/' + sesh + '/graphics/last/svg';
+		method = 'GET';
+		
+		var request = new XMLHttpRequest;
+		
+		request.onreadystatechange = (e) => {
+			if (request.readyState !== 4) {
+				return;
+			}
+			
+			if (request.status === 200) {
+				this.plot = request.response;
+				this.setState({plot: true});
+			} else {
+				console.log(request.status);
+			}
+		};
+		
+		request.open(method, url, true);
+		request.send();
+	},
+	
+	getHist: function () {
+		const allVals = this.props.selectedMeasDist;
+		const selVal = this.props.selectedMeasStand;
+		const species = this.props.selectedPlace.featureProps.species;
+		
+		const url = "http://192.168.220.128/ocpu/library/kora.scripts/R/plotbox";
+		const method = "POST";
+		
+		const formData=JSON.stringify({allVals: allVals, selVal: selVal, species: species});
+		
+		var request = new XMLHttpRequest;
+		
+		request.onreadystatechange = (e) => {
+			if (request.readyState !== 4) {
+				return;
+			}
+			
+			if (request.status === 200) {
+				this.plot = request.response;
+			} else {
+				const sesh = request.response.split('/tmp/')[1].split('/R/')[0];
+				this.getRImage(sesh);
+			}
+		};
+		
+		request.open(method, url, true);
+		request.setRequestHeader("Content-type", "application/json");
+		request.send(formData);
 	},
 	
 	componentWillReceiveProps: function (nextProps) {
@@ -45,13 +101,25 @@ var FeatureInfo = React.createClass({
 				photo: true
 			});
 		}
+		
+		if (this.props.selectedPlace.featureProps && this.props.selectedPlace.featureProps.datatype == 'meas') {
+			this.getHist();
+		}
 	},
 	
 	render: function () {
 		var meas;
+		var plot;
 		
 		if (this.props.selectedPlace.featureProps.datatype == 'meas') {
-			meas = <p>{this.props.selectedPlace.featureProps.species + ': ' + this.props.selectedPlace.featureProps.value + ' ' + this.props.selectedPlace.featureProps.units}</p>
+			var val = this.props.selectedMeasStand;
+			var unit = this.props.selectedMeasUnit;
+			
+			if (val == "NA") {
+				val = this.props.selectedPlace.featureProps.value;
+				unit = this.props.selectedPlace.featureProps.units;
+			}
+			meas = <p>{this.props.selectedPlace.featureProps.species + ': ' + val + ' ' + unit}</p>
 		}
 		
 		var photo;
@@ -81,6 +149,7 @@ var FeatureInfo = React.createClass({
 						<a style={SidebarStyles.date}>{this.props.selectedPlace.featureProps.datetime}</a>
 					</div>
 				</div>
+				{plot}
 				{meas}
 				{photo}
 				<p style={SidebarStyles.p}>Note:</p>

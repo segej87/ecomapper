@@ -18,6 +18,9 @@ var Sidebar = React.createClass({
 				selectedPlace={this.props.selectedPlace} 
 				filters={this.props.filters}
 				handleDelete={this.props.handleDelete}
+				selectedMeasDist={this.props.selectedMeasDist}
+				selectedMeasStand={this.props.selectedMeasStand}
+				selectedMeasUnit={this.props.selectedMeasUnit}
 				/>
 				<FilterPane 
 				filters={this.props.filters}
