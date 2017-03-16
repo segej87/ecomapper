@@ -17,6 +17,7 @@ var loadingData = false;
 var standIds = [];
 var standVals = [];
 var standUnits = [];
+var workingSet = [];
 
 var MapContainer = React.createClass({
 	mixins: [TimerMixin],
@@ -264,6 +265,14 @@ var MapContainer = React.createClass({
 									}
 								}
 								
+								for (var i = standIds.length-1; i >=0; i--) {
+									if (!newIds.includes(standIds[i])) {
+										standIds.splice(i, 1);
+										standVals.splice(i, 1);
+										standUnits.splice(i, 1);
+									}
+								}
+								
 								let newRecords = {updated: loadTime, type: currentRecords.type, features: currentFeats};
 								
 								this.setState({
@@ -288,6 +297,10 @@ var MapContainer = React.createClass({
 			request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 			request.send(formData);
 		}
+	},
+	
+	setWorkingSet: function (ids) {
+		workingSet = ids;
 	},
 	
 	standardizeUnits: function (unitObj) {
@@ -370,7 +383,7 @@ var MapContainer = React.createClass({
 			var ids = [];
 			var vals = [];
 			for (var i = 0; i < this.state.records.features.length; i++) {
-				if (this.state.records.features[i].properties.species == type) {
+				if ((workingSet.length == 0 || workingSet.includes(this.state.records.features[i].id)) && this.state.records.features[i].properties.species == type) {
 					ids.push(this.state.records.features[i].id);
 				}
 			}
@@ -454,6 +467,7 @@ var MapContainer = React.createClass({
 				filters={this.state.filters} 
 				handleSelected={this.handleSelectedPlace}
 				resetRecords={this.resetRecords}
+				setWorkingSet={this.setWorkingSet}
 				/>
 				{gfp}
 			</div>

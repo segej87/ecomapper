@@ -30,8 +30,8 @@ var FeatureInfo = React.createClass({
 	},
 	
 	getRImage: function (sesh) {
-		const url = 'http://192.168.220.128/ocpu/tmp/' + sesh + '/graphics/last/svg';
-		method = 'GET';
+		const url = 'http://192.168.220.128/ocpu/tmp/' + sesh + '/graphics/last/png?width=300&height=200';
+ 		method = 'GET';
 		
 		var request = new XMLHttpRequest;
 		
@@ -41,7 +41,8 @@ var FeatureInfo = React.createClass({
 			}
 			
 			if (request.status === 200) {
-				this.plot = request.response;
+				let imageDat = btoa(unescape(encodeURIComponent(request.response)));
+				this.plot = imageDat;
 				this.setState({plot: true});
 			} else {
 				console.log(request.status);
@@ -120,6 +121,7 @@ var FeatureInfo = React.createClass({
 				unit = this.props.selectedPlace.featureProps.units;
 			}
 			meas = <p>{this.props.selectedPlace.featureProps.species + ': ' + val + ' ' + unit}</p>
+			plot = <img src={"data:image/png;base64,"+this.plot} width="300" height="200"/>
 		}
 		
 		var photo;

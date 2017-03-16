@@ -92,6 +92,7 @@ var Container = React.createClass({
 	  });
   },
 	
+	//TODO: move up to MapContainer
 	receiveGeo: function (polygons) {
 		filterGeos = polygons;
 		this.processData(this.props.records.features);
@@ -100,10 +101,12 @@ var Container = React.createClass({
 	//TODO: wrap in promise?
 	filterGeo: function (features) {
 		if (filterGeos.length == 0) {
+			this.props.setWorkingSet([]);
 			return features;
 		}
 		
 		var geoFilteredFeats = [];
+		var workingSet = [];
 		for (var i = 0; i < features.length; i++) {
 			const position = new google.maps.LatLng(features[i].geometry.coordinates[1], features[i].geometry.coordinates[0]);
 			for (var j = 0; j < filterGeos.length; j++) {
@@ -129,11 +132,13 @@ var Container = React.createClass({
 				
 				if (google.maps.geometry.poly.containsLocation(position, testPoly)) {
 					geoFilteredFeats.push(features[i]);
+					workingSet.push(features[i].id);
 					break;
 				}
 			}
 		}
 		
+		this.props.setWorkingSet(workingSet);
 		return (geoFilteredFeats);
 	},
   
