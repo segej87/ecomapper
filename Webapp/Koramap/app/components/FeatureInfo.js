@@ -2,14 +2,15 @@ React = require('react');
 TabArea = require('./TabArea');
 SidebarStyles = require('../styles/map/sidebarStyles');
 
+let plotTypes = ['box','hist'];
+
 var FeatureInfo = React.createClass({
-	plot: null,
-	
 	getInitialState: function () {
 		return ({
 			photo: false,
 			activeButtons: 'tags',
-			plot: false
+			plot: null,
+			plotIndex: 0
 		});
 	},
 	
@@ -30,7 +31,7 @@ var FeatureInfo = React.createClass({
 	},
 	
 	getRImage: function (sesh) {
-		const url = 'http://192.168.220.128/ocpu/tmp/' + sesh + '/graphics/last/png?width=300&height=200';
+		const url = 'http://192.168.220.128/ocpu/tmp/' + sesh + '/files/out.svg';
  		method = 'GET';
 		
 		var request = new XMLHttpRequest;
@@ -42,8 +43,7 @@ var FeatureInfo = React.createClass({
 			
 			if (request.status === 200) {
 				let imageDat = btoa(unescape(encodeURIComponent(request.response)));
-				this.plot = imageDat;
-				this.setState({plot: true});
+				this.setState({plot: imageDat});
 			} else {
 				console.log(request.status);
 			}
@@ -53,15 +53,17 @@ var FeatureInfo = React.createClass({
 		request.send();
 	},
 	
-	getHist: function () {
-		const allVals = this.props.selectedMeasDist;
-		const selVal = this.props.selectedMeasStand;
-		const species = this.props.selectedPlace.featureProps.species;
+	getPlot: function (props = this.props) {
+		this.setState({plot: false});
+		const allVals = props.selectedMeasDist;
+		const selVal = props.selectedMeasStand;
+		const species = props.selectedPlace.featureProps.species[0];
+		const units = props.selectedMeasUnit;
 		
-		const url = "http://192.168.220.128/ocpu/library/kora.scripts/R/plotbox";
+		const url = "http://192.168.220.128/ocpu/library/kora.scripts/R/plot"+plotTypes[this.state.plotIndex];
 		const method = "POST";
 		
-		const formData=JSON.stringify({allVals: allVals, selVal: selVal, species: species});
+		const formData=JSON.stringify({allVals: allVals, selVal: selVal, species: species, units: units});
 		
 		var request = new XMLHttpRequest;
 		
@@ -69,18 +71,32 @@ var FeatureInfo = React.createClass({
 			if (request.readyState !== 4) {
 				return;
 			}
-			
 			if (request.status === 200) {
-				this.plot = request.response;
-			} else {
+			}
+			if (request.status === 201) {
 				const sesh = request.response.split('/tmp/')[1].split('/R/')[0];
 				this.getRImage(sesh);
+			} else {
+				console.log(request.status);
+				console.log(request.statusText);
 			}
 		};
 		
 		request.open(method, url, true);
 		request.setRequestHeader("Content-type", "application/json");
 		request.send(formData);
+	},
+	
+	changePlotIndex: function (e) {
+		let id = e.target.id;
+		var newInd = this.state.plotIndex;
+		if (id == 'backButton' && newInd > 0) {
+			newInd--;
+			this.setState({plotIndex: newInd});
+		} else if (id == 'nextButton' && newInd < (plotTypes.length-1)) {
+			newInd++;
+			this.setState({plotIndex: newInd});
+		}
 	},
 	
 	componentWillReceiveProps: function (nextProps) {
@@ -91,8 +107,16 @@ var FeatureInfo = React.createClass({
 			this.setState({
 				photo: true
 			});
-		} else {
-			this.getInitialState();
+		} else if (nextProps.selectedPlace.featureProps && nextProps.selectedPlace.featureProps.datatype == 'meas' && nextProps.selectedPlace.fuid != this.props.selectedPlace.fuid) {
+			this.getPlot(nextProps);
+		} else if (nextProps.selectedPlace.featureProps && nextProps.selectedPlace.featureProps.datatype != 'meas') {
+			this.setState(this.getInitialState());
+		}
+	},
+	
+	componentDidUpdate(prevProps, prevState) {
+		if (prevState.plotIndex != this.state.plotIndex) {
+			this.getPlot()
 		}
 	},
 	
@@ -104,7 +128,7 @@ var FeatureInfo = React.createClass({
 		}
 		
 		if (this.props.selectedPlace.featureProps && this.props.selectedPlace.featureProps.datatype == 'meas') {
-			this.getHist();
+			this.getPlot();
 		}
 	},
 	
@@ -121,7 +145,22 @@ var FeatureInfo = React.createClass({
 				unit = this.props.selectedPlace.featureProps.units;
 			}
 			meas = <p>{this.props.selectedPlace.featureProps.species + ': ' + val + ' ' + unit}</p>
-			plot = <img src={"data:image/png;base64,"+this.plot} width="300" height="200"/>
+			
+			let srcString;
+			if (this.state.plot) {
+				srcString = "data:image/svg+xml;base64,"+this.state.plot;
+			}
+			plot = (
+			<div>
+				<div style={{width: 290, height: 225, textAlign: 'center', marginTop: 30, marginBottom: 25, borderRadius: '3px 3px 3px 3px'}}>
+					<img src={srcString} width="290" height="225" style={{margin: '0 auto', borderColor: '1px solid black'}}/>
+				</div>
+				<div style={{textAlign: 'center'}}>
+					<button style={SidebarStyles.tagsButton} onClick={this.changePlotIndex} id='backButton'>Back</button>
+					<button style={SidebarStyles.tagsButton} onClick={this.changePlotIndex} id='nextButton'>Next</button>
+				</div>
+				</div>
+			);
 		}
 		
 		var photo;
