@@ -1,6 +1,7 @@
 React = require('react');
 var Keys = require('../res/values').keys;
 const mapStyles = require('../styles/map/mapStyles');
+const Geoutils = require('../src/utils/Geoutils');
 
 var GoogleApiWrapper = require('../src/index').GoogleApiWrapper
 var Map = require('../src/index').Map
@@ -33,7 +34,10 @@ var Container = React.createClass({
 		
 		console.log('Processing');
 		
-		let geoFilteredFeats = this.filterGeo(features);
+		// let geoFilteredFeats = this.filterGeo(features);
+		let filteredGeos = Geoutils.filterGeo(filterGeos, features, google);
+		let geoFilteredFeats = filteredGeos.geoFilteredFeats;
+		this.props.setWorkingSet(filteredGeos.workingSet);
 	  
 	  if (this.markers) {
 		  var currentIds = [];
@@ -96,50 +100,6 @@ var Container = React.createClass({
 	receiveGeo: function (polygons) {
 		filterGeos = polygons;
 		this.processData(this.props.records.features);
-	},
-	
-	//TODO: wrap in promise?
-	filterGeo: function (features) {
-		if (filterGeos.length == 0) {
-			this.props.setWorkingSet([]);
-			return features;
-		}
-		
-		var geoFilteredFeats = [];
-		var workingSet = [];
-		for (var i = 0; i < features.length; i++) {
-			const position = new google.maps.LatLng(features[i].geometry.coordinates[1], features[i].geometry.coordinates[0]);
-			for (var j = 0; j < filterGeos.length; j++) {
-				var testPoly;
-				if (filterGeos[j] instanceof google.maps.Polygon) {
-					testPoly = filterGeos[j]
-				} else {
-					var paths=[];
-					if (filterGeos[j].geometry.getType() == 'MultiPolygon') {
-						const testPolys = filterGeos[j].geometry.getArray();
-						for (var k = 0; k < testPolys.length; k++) {
-							testPolys[k].forEachLatLng((LatLng) => {
-								paths.push(LatLng);
-							});	
-						}
-					} else if (filterGeos[j].geometry.getType() == 'Polygon') {
-						filterGeos[j].geometry.forEachLatLng((LatLng) => {
-							paths.push(LatLng);
-						})
-					}
-					testPoly = new google.maps.Polygon({paths: paths});
-				}
-				
-				if (google.maps.geometry.poly.containsLocation(position, testPoly)) {
-					geoFilteredFeats.push(features[i]);
-					workingSet.push(features[i].id);
-					break;
-				}
-			}
-		}
-		
-		this.props.setWorkingSet(workingSet);
-		return (geoFilteredFeats);
 	},
   
   onMarkerClick: function(props, marker, e) {

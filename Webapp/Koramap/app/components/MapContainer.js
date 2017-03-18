@@ -6,6 +6,8 @@ let Values = require('../res/values');
 let mapStyles = require('../styles/map/mapStyles');
 let mainStyles = require('../styles/home/mainStyles');
 import TimerMixin from 'react-timer-mixin';
+let Serverutils = require('../src/utils/Serverutils');
+let Rutils = require('../src/utils/Rutils');
 
 //TODO: REMOVE AFTER TESTING
 // let testJson = require('../res/json/crashes.json');
@@ -33,9 +35,9 @@ var MapContainer = React.createClass({
 		
 		return {
 			lists: {
-				datatype: ['Meas','Photo','Note'],
+				datatype: Object.values(Values.standards.datatypes),
 				submitters: [],
-				access: ['Public','Private'],
+				access: Object.values(Values.standards.access),
 				tags: [],
 				species: [],
 				date: ['none', 'none']
@@ -124,178 +126,47 @@ var MapContainer = React.createClass({
 	loadLists: function () {
 		if (this.props.userInfo.userId != null && !this.props.offline && !loadingLists) {
 			loadingLists = true;
-			console.log('Loading lists');
-			const formData='GUID=' + this.props.userInfo.userId;
-		
-			var request = new XMLHttpRequest;
 			
-			var method = 'POST';
-			var url = 'http://ecocollector.azurewebsites.net/get_lists.php';
-			
-			request.onreadystatechange = (e) => {
-				if (request.readyState !== 4) {
-					return;
-				}
-
-				if (request.status === 200) {
-					const result = JSON.parse(request.responseText);
-					
-					var tagsArray = [];
-					if (Object.keys(result).includes('tags') && !result.tags.includes("Warning: tags not found")) {
-						tagsArray = result.tags;
-					}
-					
-					var accessArray = this.state.lists.access;
-					if (Object.keys(result).includes('institutions') && !result.institutions.includes("Warning: institutions not found")) {
-						for (var j = 0; j < result.institutions.length; j++) {
-							accessArray.push(result.institutions[j]);
-						}
-					}
-					
-					var speciesArray = this.state.lists.species;
-					if (Object.keys(result).includes('species') && !result.species.includes("Warning: species not found")) {
-						for (var j = 0; j < result.species.length; j++) {
-							speciesArray.push(result.species[j]);
-						}
-					}
-					
-					var submittersArray = this.state.lists.submitters;
-					if (Object.keys(result).includes('submitters') && !result.submitters.includes("Warning: submitters not found")) {
-						for (var j = 0; j < result.submitters.length; j++) {
-							submittersArray.push(result.submitters[j]);
-						}
-					}
-					
-					this.setState({
-						lists: {
-							datatype: this.state.lists.datatype,
-							submitters: submittersArray,
-							access: accessArray,
-							tags: tagsArray,
-							species: speciesArray,
-							date: this.state.filters.date
-						},
-					});
-					
+			let callback = function (result, success) {
+				if (success) {
+					this.setState(result)
+				
 					if (firstListLoad) {
 						firstListLoad = false;
 						this.loadRecords();
 					}
-					
-					loadingLists = false;
-				} else {
-					console.log('Status: ' + request.status);
-					console.log('Status text: ' + request.statusText);
-					loadingLists = false;
 				}
-			};
-
-			request.open(method, url, true);
-			request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			request.send(formData);
+				
+				loadingLists = false;
+			}.bind(this);
+			
+			Serverutils.loadLists(this.props.userInfo.userId, this.state.lists, this.state.filters, callback);
 		}
 	},
 	
 	loadRecords: function (filters = this.state.filters, override = false) {
 		if (this.props.userInfo.userId != null && !this.props.offline && !this.state.geoFiltering && (!loadingData || override)) {
 			loadingData = true;
-			console.log('Loading data');
-			const formData='GUID=' + this.props.userInfo.userId + '&filters=' + JSON.stringify(filters);
-		
-			var request = new XMLHttpRequest;
 			
-			var method = 'POST';
-			var url = 'http://ecocollector.azurewebsites.net/get_geojson.php';
-			
-			request.onreadystatechange = (e) => {
-				if (request.readyState !== 4) {
-					return;
-				}
-
-				if (request.status === 200) {
-					const geoJsonIn = JSON.parse(request.responseText).collection;
-					const measObjIn = JSON.parse(request.responseText).measObj;
-					const loadDate = new Date();
-					const loadTime = loadDate.getTime();
-					
-					if (Object.keys(geoJsonIn).includes('text') && geoJsonIn.text == "Warning: geojson not found") {
-						if (Object.keys(this.state.records).length > 0){
-							this.setState({
-								records: {},
-								measObj: {}
-							});
-							loadingData = false;
-						}
-					} else {
-						if (Object.keys(this.state.records).length == 0) {
-							console.log('Setting initial data');
-							var newRecords = geoJsonIn;
-							newRecords.updated = loadTime
-							
-							this.setState({
-								records: newRecords,
-								measObj: measObjIn
-							});
-							loadingData = false;
-						} else {
-							var currentRecords = this.state.records;
-							var currentFeats = currentRecords.features;
-							const newFeats = geoJsonIn.features;
-							
-							if (currentFeats) {
-								var currentIds = [];
-								for (var i = 0; i < currentFeats.length; i++) {
-									currentIds.push(currentFeats[i].id);
-								}
-								
-								var newIds =[]
-								for (var i = 0; i < geoJsonIn.features.length; i++) {
-									newIds.push(geoJsonIn.features[i].id);
-								}
-								
-								for (var i = 0; i < newIds.length; i++) {
-									if (!currentIds.includes(newIds[i])) {
-										currentFeats.push(newFeats[i]);
-									}
-								}
-								
-								for (var i = currentFeats.length-1; i >=0; i--) {
-									if (!newIds.includes(currentFeats[i].id)) {
-										currentFeats.splice(i, 1);
-									}
-								}
-								
-								for (var i = standIds.length-1; i >=0; i--) {
-									if (!newIds.includes(standIds[i])) {
-										standIds.splice(i, 1);
-										standVals.splice(i, 1);
-										standUnits.splice(i, 1);
-									}
-								}
-								
-								let newRecords = {updated: loadTime, type: currentRecords.type, features: currentFeats};
-								
-								this.setState({
-									records: newRecords,
-									measObj: measObjIn
-								});
-								loadingData = false;
-							}
+			let callback = function (newState, newIds, success) {
+				if (success) {
+					this.setState(newState);
+				
+					for (var i = standIds.length-1; i >=0; i--) {
+						if (!newIds.includes(standIds[i])) {
+							standIds.splice(i, 1);
+							standVals.splice(i, 1);
+							standUnits.splice(i, 1);
 						}
 					}
 					
-					
-					this.standardizeUnits(measObjIn);
-				} else {
-					console.log('Status: ' + request.status);
-					console.log('Status text: ' + request.statusText);
-					loadingData = false;
+					this.standardizeUnits(newState.measObj);
 				}
-			};
-
-			request.open(method, url, true);
-			request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			request.send(formData);
+				
+				loadingData = false;
+			}.bind(this);
+			
+			Serverutils.loadRecords(this.props.userInfo.userId, filters, this.state.records, override, callback);
 		}
 	},
 	
@@ -314,41 +185,22 @@ var MapContainer = React.createClass({
 		for (var i = 0; i < Object.keys(unitObj).length; i++) {
 			(function(i){
 				const sourceObj = unitObj[Object.keys(unitObj)[i]];
-				const testVals = sourceObj.vals;
-				const testUnits = sourceObj.units;
-				const testTarget = sourceObj.target;
-				const testConvs = sourceObj.convs;
-				const formData=JSON.stringify({vals: testVals, units: testUnits, target: testTarget, conversions: testConvs});
+				const args={vals: sourceObj.vals, units: sourceObj.units, target: sourceObj.target, conversions: sourceObj.convs};
 				
-				var request = new XMLHttpRequest;
-				
-				request.onreadystatechange = (e) => {
-					if (request.readyState !== 4) {
-						return;
-					}
-					
-					if (request.status === 200) {
-						console.log(request.response);
-						
-						for (var j = 0; j < sourceObj.ids.length; j++) {
-							if (!standIds.includes(sourceObj.ids[j])) {
-								standIds.push(sourceObj.ids[j]);
-								standVals.push(JSON.parse(request.response)[j])
-								standUnits.push(testTarget);
-							} else if (standVals[standIds.indexOf(sourceObj.ids[j])] != JSON.parse(request.response)[j] || standUnits[standIds.indexOf(sourceObj.ids[j])] != testTarget) {
-								standVals[standIds.indexOf(sourceObj.ids[j])] = JSON.parse(request.response)[j];
-								standUnits[standIds.indexOf(sourceObj.ids[j])] = testTarget;
-							}
+				let callback = function (result) {
+					for (var j = 0; j < sourceObj.ids.length; j++) {
+						if (!standIds.includes(sourceObj.ids[j])) {
+							standIds.push(sourceObj.ids[j]);
+							standVals.push(JSON.parse(result)[j])
+							standUnits.push(sourceObj.target);
+						} else if (standVals[standIds.indexOf(sourceObj.ids[j])] != JSON.parse(result)[j] || standUnits[standIds.indexOf(sourceObj.ids[j])] != sourceObj.target) {
+							standVals[standIds.indexOf(sourceObj.ids[j])] = JSON.parse(result)[j];
+							standUnits[standIds.indexOf(sourceObj.ids[j])] = sourceObj.target;
 						}
-					} else {
-						console.log(request.status);
-						console.log(request.statusText);
 					}
-				};
+				}.bind(this);
 				
-				request.open(method, url, true);
-				request.setRequestHeader("Content-type", "application/json");
-				request.send(formData);
+				Rutils.rJson('/library/kora.scripts/R/standardizeunits/json', args, callback);
 			})(i);
 		}
 	},

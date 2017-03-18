@@ -27,11 +27,17 @@ colors = {
 
 keys = {
 	gApi: 'AIzaSyC2w3HapjgzvLCIuf0Vf1wqd3xc_tp6_ws'
-}
+};
+
+standards = {
+	datatypes: ['Meas','Photo','Note'],
+	access: ['Public','Private']
+};
 
 module.exports = {
 	numbers,
 	strings,
 	colors,
-	keys
+	keys,
+	standards
 };

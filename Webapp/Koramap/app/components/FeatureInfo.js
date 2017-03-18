@@ -1,6 +1,7 @@
 React = require('react');
 TabArea = require('./TabArea');
 SidebarStyles = require('../styles/map/sidebarStyles');
+Rutils = require('../src/utils/Rutils.js');
 
 let plotTypes = ['box','hist'];
 
@@ -30,61 +31,14 @@ var FeatureInfo = React.createClass({
 		}
 	},
 	
-	getRImage: function (sesh) {
-		const url = 'http://192.168.220.128/ocpu/tmp/' + sesh + '/files/out.svg';
- 		method = 'GET';
+	getPlot: function (props = this.props) {	
+		let command = '/library/kora.scripts/R/plot'+plotTypes[this.state.plotIndex];
+		let args = {allVals: props.selectedMeasDist, selVal: props.selectedMeasStand, species: props.selectedPlace.featureProps.species[0], units: props.selectedMeasUnit};
+		let callback = function (imageDat) {
+			this.setState({plot: imageDat});
+		}.bind(this)
 		
-		var request = new XMLHttpRequest;
-		
-		request.onreadystatechange = (e) => {
-			if (request.readyState !== 4) {
-				return;
-			}
-			
-			if (request.status === 200) {
-				let imageDat = btoa(unescape(encodeURIComponent(request.response)));
-				this.setState({plot: imageDat});
-			} else {
-				console.log(request.status);
-			}
-		};
-		
-		request.open(method, url, true);
-		request.send();
-	},
-	
-	getPlot: function (props = this.props) {
-		this.setState({plot: false});
-		const allVals = props.selectedMeasDist;
-		const selVal = props.selectedMeasStand;
-		const species = props.selectedPlace.featureProps.species[0];
-		const units = props.selectedMeasUnit;
-		
-		const url = "http://192.168.220.128/ocpu/library/kora.scripts/R/plot"+plotTypes[this.state.plotIndex];
-		const method = "POST";
-		
-		const formData=JSON.stringify({allVals: allVals, selVal: selVal, species: species, units: units});
-		
-		var request = new XMLHttpRequest;
-		
-		request.onreadystatechange = (e) => {
-			if (request.readyState !== 4) {
-				return;
-			}
-			if (request.status === 200) {
-			}
-			if (request.status === 201) {
-				const sesh = request.response.split('/tmp/')[1].split('/R/')[0];
-				this.getRImage(sesh);
-			} else {
-				console.log(request.status);
-				console.log(request.statusText);
-			}
-		};
-		
-		request.open(method, url, true);
-		request.setRequestHeader("Content-type", "application/json");
-		request.send(formData);
+		Rutils.rPlot(command, args, callback);
 	},
 	
 	changePlotIndex: function (e) {
