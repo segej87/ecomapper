@@ -25,24 +25,32 @@ export class Marker extends React.Component {
   componentDidMount() {
     this.markerPromise = wrappedPromise();
 		
-		switch(this.props.featureProps.datatype) {
-			case 'note':
-				markerIcon = noteIcon;
-				break;
-			case 'meas':
-				markerIcon = measIcon;
-				break;
-			case 'photo':
-				markerIcon = photoIcon;
-				break;
-			default:
-				break;
-		}
+		// if (this.props.singleMeas) {
+			// markerIcon = (
+				// <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+					// <circle cx="100" cy="100" r="100"/>
+				// </svg>
+			// );
+		// } else {
+			// switch(this.props.featureProps.datatype) {
+				// case 'note':
+					// markerIcon = noteIcon;
+					// break;
+				// case 'meas':
+					// markerIcon = measIcon;
+					// break;
+				// case 'photo':
+					// markerIcon = photoIcon;
+					// break;
+				// default:
+					// break;
+			// }
+		// }
 		
     this.renderMarker();
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if ((this.props.map !== prevProps.map) ||
       (this.props.position !== prevProps.position)) {
         if (this.marker) {
@@ -59,7 +67,29 @@ export class Marker extends React.Component {
   }
 
   renderMarker() {
-    let {
+		if (this.props.singleMeas) {
+			markerIcon = (
+				<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+					<circle cx="100" cy="100" r="100"/>
+				</svg>
+			);
+		} else {
+			switch(this.props.featureProps.datatype) {
+				case 'note':
+					markerIcon = noteIcon;
+					break;
+				case 'meas':
+					markerIcon = measIcon;
+					break;
+				case 'photo':
+					markerIcon = photoIcon;
+					break;
+				default:
+					break;
+			}
+		}
+		
+		let {
       map, google, position, mapCenter, icon, label, draggable
     } = this.props;
     if (!google) {
@@ -82,6 +112,17 @@ export class Marker extends React.Component {
 		
 		if (!markerIcon) {
 			markerIcon = icon;
+		} else if (this.props.singleMeas) {
+			console.log(this.props.frac);
+			let scaledColor = 'rgb(' + 255 * this.props.frac + ', 0, 0)'
+			
+			markerIcon = {
+				path: google.maps.SymbolPath.CIRCLE,
+				fillOpacity: 1,
+				fillColor: scaledColor,
+				strokeWeight: 0,
+				scale: 4
+			}
 		} else {
 			markerIcon = {
 				url: markerIcon, // url

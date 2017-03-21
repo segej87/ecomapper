@@ -103,8 +103,14 @@ var MapContainer = React.createClass({
 			}
 		}
 		
+		let vals = [];
+		if (newFilters.datatype.length == 1 && newFilters.datatype[0] == 'Meas' && newFilters.species.length == 1) {
+			vals = this.setMeasDist(newFilters.species[0]);
+		}
+		
 		this.setState({
-			filters: newFilters
+			filters: newFilters,
+			selectedMeasDist: vals
 		});
 		
 		this.loadRecords(newFilters, true);
@@ -320,6 +326,7 @@ var MapContainer = React.createClass({
 				handleSelected={this.handleSelectedPlace}
 				resetRecords={this.resetRecords}
 				setWorkingSet={this.setWorkingSet}
+				selectedMeasDist={this.state.selectedMeasDist}
 				/>
 				{gfp}
 			</div>

@@ -18,7 +18,8 @@ var Container = React.createClass({
     return {
       activeMarker: {},
       selectedPlace: {},
-	  hasMarkers: false
+			hasMarkers: false,
+			singleMeas: false
     }
   },
 	
@@ -34,10 +35,20 @@ var Container = React.createClass({
 		
 		console.log('Processing');
 		
-		// let geoFilteredFeats = this.filterGeo(features);
+		let singleMeas = this.props.filters.datatype.length == 1 && this.props.filters.datatype[0] == 'Meas' && this.props.filters.species.length == 1;
+		
 		let filteredGeos = Geoutils.filterGeo(filterGeos, features, google);
 		let geoFilteredFeats = filteredGeos.geoFilteredFeats;
 		this.props.setWorkingSet(filteredGeos.workingSet);
+		let maxVal;
+		if (singleMeas) {
+			maxVal = this.props.selectedMeasDist[0];
+			for (var j = 0; j < this.props.selectedMeasDist.length; j++) {
+				if (this.props.selectedMeasDist[j] > maxVal) {
+					maxVal = this.props.selectedMeasDist[j]
+				}
+			}
+		}
 	  
 	  if (this.markers) {
 		  var currentIds = [];
@@ -58,8 +69,14 @@ var Container = React.createClass({
 		  }
 		  
 		  for (var i = 0; i < featureIds.length; i++) {
-			  if (!currentIds.includes(featureIds[i])) {
+				if (!currentIds.includes(featureIds[i])) {
 				  const feature = geoFilteredFeats[i];
+					let frac;
+					if (singleMeas) {
+						frac = feature.properties.value/maxVal;
+					} else {
+						frac = 1;
+					}
 				  newMarkers.push(
 					<Marker key={feature.id} 
 					  onClick={this.onMarkerClick} 
@@ -69,7 +86,9 @@ var Container = React.createClass({
 					  datetime={feature.properties.datetime} 
 					  tags={feature.properties.tags} 
 					  featureProps={feature.properties} 
-					  position={{lat: feature.geometry.coordinates[1], lng: feature.geometry.coordinates[0]}}/>
+					  position={{lat: feature.geometry.coordinates[1], lng: feature.geometry.coordinates[0]}}
+						singleMeas={this.state.singleMeas}
+						frac={frac}/>
 				  );
 			  }
 		  }
@@ -77,6 +96,12 @@ var Container = React.createClass({
 		  this.markers = newMarkers;
 	  } else {
 		  this.markers = geoFilteredFeats.map((feature, i) => {
+			let frac;
+				if (singleMeas) {
+					frac = feature.properties.value/maxVal;
+				} else {
+					frac = 1;
+				}
 			  return (
 			  <Marker key={feature.id} 
 			  onClick={this.onMarkerClick} 
@@ -86,7 +111,9 @@ var Container = React.createClass({
 			  datetime={feature.properties.datetime} 
 			  tags={feature.properties.tags} 
 			  featureProps={feature.properties} 
-			  position={{lat: feature.geometry.coordinates[1], lng: feature.geometry.coordinates[0]}}/>
+			  position={{lat: feature.geometry.coordinates[1], lng: feature.geometry.coordinates[0]}}
+				singleMeas={this.state.singleMeas}
+				frac={frac}/>
 			  );
 		  });
 	  }
@@ -135,6 +162,15 @@ var Container = React.createClass({
 		if (prevProps.google != this.props.google) {
 			google = this.props.google;
 		}
+		
+		if (lastLoadRecords != prevProps.records.updated) {
+			if (prevState.singleMeas != this.state.singleMeas) {
+				this.processData('reset');
+			}
+			if (this.props.records.features) {
+				this.processData(this.props.records.features);
+			}
+		}
 	},
   
   componentWillReceiveProps: function (nextProps) {
@@ -142,10 +178,18 @@ var Container = React.createClass({
 		  this.props.resetRecords();
 	  }
 	  
-		// TODO: Cut down on processing of features
 	  if (nextProps.records.features && nextProps.records.updated != lastLoadRecords) {
 			lastLoadRecords = nextProps.records.updated;
-			this.processData(nextProps.records.features);
+			
+			if (nextProps.filters.datatype.length == 1 && nextProps.filters.datatype[0] == 'Meas' && nextProps.filters.species.length == 1 && !this.state.singleMeas) {
+				this.setState({singleMeas: true});
+			}
+			
+			if (this.state.singleMeas && (!(nextProps.filters.datatype.length == 1 && nextProps.filters.datatype[0] == 'Meas') || nextProps.filters.species.length != 1)) {
+				this.setState({singleMeas: false});
+			}
+			
+			// this.processData(nextProps.records.features);
 	  } else if (nextProps.records.features == null || Object.keys(nextProps.records.features).length == 0) {
 		  this.processData('reset');
 	  }
@@ -158,38 +202,38 @@ var Container = React.createClass({
   },
   
   render() {
-	if (!this.props.loaded) {
-		return <div style={{textAlign: 'center', paddingTop: 75, fontSize: 24, color: 'white'}}>Loading Map...</div>
-	}
-	
-	if (!this.state.hasMarkers || this.props.geoFiltering) {
-		return (
-			<div>
-				<Map google={google}
-				  zoom={5}
-				  onClick={this.onMapClicked}
-				  guid={this.props.userInfo.userId}
-					geoFiltering={this.props.geoFiltering}
-					onFilter={this.receiveGeo}>
-			  </Map>
-			  </div>
-		);
-	}
-	
-    return (
-      <div>
-				<Map google={google}
-          zoom={5}
-          onClick={this.onMapClicked}
-					guid={this.props.userInfo.userId}
-					geoFiltering={this.props.geoFiltering}
-					onFilter={this.receiveGeo}>
-					{this.markers}
-				</Map>
-	  </div>
-    )
-  }
-});
+		if (!this.props.loaded) {
+			return <div style={{textAlign: 'center', paddingTop: 75, fontSize: 24, color: 'white'}}>Loading Map...</div>
+		}
+		
+		if (!this.state.hasMarkers || this.props.geoFiltering) {
+			return (
+				<div>
+					<Map google={google}
+						zoom={5}
+						onClick={this.onMapClicked}
+						guid={this.props.userInfo.userId}
+						geoFiltering={this.props.geoFiltering}
+						onFilter={this.receiveGeo}>
+					</Map>
+					</div>
+			);
+		}
+		
+			return (
+				<div>
+					<Map google={google}
+						zoom={5}
+						onClick={this.onMapClicked}
+						guid={this.props.userInfo.userId}
+						geoFiltering={this.props.geoFiltering}
+						onFilter={this.receiveGeo}>
+						{this.markers}
+					</Map>
+			</div>
+			)
+		}
+	});
 
 export default GoogleApiWrapper({
   apiKey: Keys.gApi
