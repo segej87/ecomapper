@@ -8,6 +8,8 @@ const measIcon = require('../../res/img/markers/meas-marker.png');
 const photoIcon = require('../../res/img/markers/photo-marker.png');
 var markerIcon;
 
+var addedMarker = false;
+
 const wrappedPromise = function() {
     var wrappedPromise = {},
         promise = new Promise(function (resolve, reject) {
@@ -25,28 +27,6 @@ export class Marker extends React.Component {
   componentDidMount() {
     this.markerPromise = wrappedPromise();
 		
-		// if (this.props.singleMeas) {
-			// markerIcon = (
-				// <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-					// <circle cx="100" cy="100" r="100"/>
-				// </svg>
-			// );
-		// } else {
-			// switch(this.props.featureProps.datatype) {
-				// case 'note':
-					// markerIcon = noteIcon;
-					// break;
-				// case 'meas':
-					// markerIcon = measIcon;
-					// break;
-				// case 'photo':
-					// markerIcon = photoIcon;
-					// break;
-				// default:
-					// break;
-			// }
-		// }
-		
     this.renderMarker();
   }
 
@@ -63,6 +43,10 @@ export class Marker extends React.Component {
   componentWillUnmount() {
 		if (this.marker) {
       this.marker.setMap(null);
+			if (this.props.markerClusterer) {
+				this.props.markerClusterer.removeMarker(this.marker);
+				addedMarker = false;
+			}
     }
   }
 
@@ -114,14 +98,15 @@ export class Marker extends React.Component {
 			markerIcon = icon;
 		} else if (this.props.singleMeas) {
 			console.log(this.props.frac);
-			let scaledColor = 'rgb(' + 255 * this.props.frac + ', 0, 0)'
+			let hue = Math.floor(120-(this.props.frac*120));
+			let scaledColor = 'hsl('+hue+',80%,50%)'
 			
 			markerIcon = {
 				path: google.maps.SymbolPath.CIRCLE,
 				fillOpacity: 1,
 				fillColor: scaledColor,
-				strokeWeight: 0,
-				scale: 4
+				strokeWeight: 0.5,
+				scale: 4.5
 			}
 		} else {
 			markerIcon = {
@@ -142,6 +127,10 @@ export class Marker extends React.Component {
     };
     this.marker = new google.maps.Marker(pref);
 		this.marker.set
+		
+		if (this.props.markerClusterer && !addedMarker) {
+			this.props.markerClusterer.addMarker(this.marker);
+		}
 
     evtNames.forEach(e => {
       this.marker.addListener(e, this.handleEvent(e));

@@ -5,6 +5,8 @@ import {makeCancelable} from './lib/cancelablePromise'
 import invariant from 'invariant'
 Numbers = require('../res/values').numbers;
 
+var MarkerClusterer = require('marker-clusterer-plus');
+
 const mapStyles = {
   container: {
     position: 'absolute',
@@ -283,6 +285,8 @@ export class Map extends React.Component {
 
         this.map = new maps.Map(node, mapConfig);
 				
+				this.props.setMap(this.map);
+				
 				if (this.props.geoFiltering && !this.state.hasGeos) {
 					this.map.data.addGeoJson(countryGeo);
 				}
@@ -342,14 +346,18 @@ export class Map extends React.Component {
       const {children} = this.props;
 
       if (!children) return;
-
-      return React.Children.map(children, c => {
+			
+			var markers = React.Children.map(children, c => {
         return React.cloneElement(c, {
           map: this.map,
           google: this.props.google,
           mapCenter: this.state.currentLocation
         });
       })
+			
+			// var markerClusterer = new MarkerClusterer(this.map, markers);
+			
+			return markers;
     }
 
     render() {

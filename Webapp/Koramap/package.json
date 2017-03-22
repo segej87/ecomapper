@@ -27,6 +27,7 @@
     "react-date-picker": "^5.3.28",
     "style-loader": "^0.13.2",
     "webpack": "^2.2.1",
-    "webpack-dev-server": "^1.16.3"
+    "webpack-dev-server": "^1.16.3",
+		"marker-clusterer-plus": "^2.1.4"
   }
 }

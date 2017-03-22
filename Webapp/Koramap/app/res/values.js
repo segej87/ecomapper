@@ -31,7 +31,13 @@ keys = {
 
 standards = {
 	datatypes: ['Meas','Photo','Note'],
-	access: ['Public','Private']
+	access: ['Public','Private'],
+	login: {
+				userName: 'public',
+				firstName: 'Guest',
+				lastName: 'Person',
+				userId: '10101010-1010-1010-1010-101010101010'
+			}
 };
 
 module.exports = {

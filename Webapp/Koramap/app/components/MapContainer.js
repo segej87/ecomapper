@@ -327,6 +327,8 @@ var MapContainer = React.createClass({
 				resetRecords={this.resetRecords}
 				setWorkingSet={this.setWorkingSet}
 				selectedMeasDist={this.state.selectedMeasDist}
+				standIds={standIds}
+				standVals={standVals}
 				/>
 				{gfp}
 			</div>

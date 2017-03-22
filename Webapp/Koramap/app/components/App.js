@@ -4,17 +4,13 @@ Login = require('./Login');
 Navbar = require('./Navbar');
 Home = require('./Home');
 MapContainer = require('./MapContainer').default;
+Values = require('../res/values');
 
 var HelloWorld = React.createClass({
 	getInitialState: function () {
 		return {
 			loggedIn: false,
-			userInfo: {
-				userName: 'public',
-				firstName: 'Guest',
-				lastName: 'Person',
-				userId: '10101010-1010-1010-1010-101010101010'
-			},
+			userInfo: Values.standards.login,
 			loggingIn: false,
 			mapping: false,
 			offline: false

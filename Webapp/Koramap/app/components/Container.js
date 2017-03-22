@@ -3,6 +3,8 @@ var Keys = require('../res/values').keys;
 const mapStyles = require('../styles/map/mapStyles');
 const Geoutils = require('../src/utils/Geoutils');
 
+let MarkerClusterer = require('marker-clusterer-plus');
+
 var GoogleApiWrapper = require('../src/index').GoogleApiWrapper
 var Map = require('../src/index').Map
 import Marker from '../src/components/Marker'
@@ -12,6 +14,8 @@ import InfoWindow from '../src/components/InfoWindow'
 var google;
 var filterGeos = [];
 var lastLoadRecords;
+
+const clustering = false;
 
 var Container = React.createClass({
   getInitialState: function() {
@@ -27,6 +31,7 @@ var Container = React.createClass({
   processData: function (features) {
 	  if (features == 'reset') {
 		  delete this.markers;
+			delete this.markerClusterer;
 			this.setState({
 				hasMarkers: false
 			});
@@ -41,13 +46,22 @@ var Container = React.createClass({
 		let geoFilteredFeats = filteredGeos.geoFilteredFeats;
 		this.props.setWorkingSet(filteredGeos.workingSet);
 		let maxVal;
+		let minVal;
 		if (singleMeas) {
 			maxVal = this.props.selectedMeasDist[0];
+			minVal = this.props.selectedMeasDist[0];
 			for (var j = 0; j < this.props.selectedMeasDist.length; j++) {
 				if (this.props.selectedMeasDist[j] > maxVal) {
 					maxVal = this.props.selectedMeasDist[j]
 				}
+				if (this.props.selectedMeasDist[j] < minVal) {
+					minVal = this.props.selectedMeasDist[j]
+				}
 			}
+		}
+		
+		if (this.map & clustering) {
+			this.markerClusterer = new MarkerClusterer(this.map);
 		}
 	  
 	  if (this.markers) {
@@ -73,12 +87,14 @@ var Container = React.createClass({
 				  const feature = geoFilteredFeats[i];
 					let frac;
 					if (singleMeas) {
-						frac = feature.properties.value/maxVal;
+						frac = (this.props.standVals[this.props.standIds.indexOf(feature.id)]-minVal)/(maxVal-minVal);
 					} else {
 						frac = 1;
 					}
 				  newMarkers.push(
 					<Marker key={feature.id} 
+						markerClusterer={this.markerClusterer}
+						draggable={false}
 					  onClick={this.onMarkerClick} 
 					  fuid={feature.id}
 					  name={feature.properties.name} 
@@ -98,12 +114,14 @@ var Container = React.createClass({
 		  this.markers = geoFilteredFeats.map((feature, i) => {
 			let frac;
 				if (singleMeas) {
-					frac = feature.properties.value/maxVal;
+					frac = (this.props.standVals[this.props.standIds.indexOf(feature.id)]-minVal)/(maxVal-minVal);
 				} else {
 					frac = 1;
 				}
 			  return (
 			  <Marker key={feature.id} 
+				markerClusterer={this.markerClusterer}
+				draggable={false}
 			  onClick={this.onMarkerClick} 
 			  fuid={feature.id}
 			  name={feature.properties.name} 
@@ -122,6 +140,10 @@ var Container = React.createClass({
 		  hasMarkers: true
 	  });
   },
+	
+	setMap: function (map) {
+		this.map = map;
+	},
 	
 	//TODO: move up to MapContainer
 	receiveGeo: function (polygons) {
@@ -214,7 +236,8 @@ var Container = React.createClass({
 						onClick={this.onMapClicked}
 						guid={this.props.userInfo.userId}
 						geoFiltering={this.props.geoFiltering}
-						onFilter={this.receiveGeo}>
+						onFilter={this.receiveGeo}
+						setMap={this.setMap}>
 					</Map>
 					</div>
 			);
@@ -227,7 +250,8 @@ var Container = React.createClass({
 						onClick={this.onMapClicked}
 						guid={this.props.userInfo.userId}
 						geoFiltering={this.props.geoFiltering}
-						onFilter={this.receiveGeo}>
+						onFilter={this.receiveGeo}
+						setMap={this.setMap}>
 						{this.markers}
 					</Map>
 			</div>
