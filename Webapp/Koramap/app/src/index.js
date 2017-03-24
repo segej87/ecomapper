@@ -134,47 +134,107 @@ export class Map extends React.Component {
 		
 		componentWillReceiveProps(nextProps) {
 			if (nextProps.geoFiltering && !this.state.hasGeos) {
-				var geos;
-				switch (nextProps.geoFiltering) {
-					case 'Countries':
-						geos = countryGeo;
-						break;
-					case 'US States':
-						geos = usStatesGeo;
-						break;
-					default:
-						geos = countryGeo;
-				}
-				
-				this.setupActiveGeos();
-				
-        geoFilters = this.map.data.addGeoJson(geos);
-				
-				this.setState({
-					hasGeos: true
-				});
+				this.startGeoFilter(nextProps);
 			} else if (nextProps.geoFiltering == null && this.state.hasGeos && geoFilters && geoFilters.length > 0) {
-				let selectedGeoIds = [];
-				for (var i = 0; i < Object.keys(selectedGeos).length; i++) {
-					selectedGeoIds.push(selectedGeos[Object.keys(selectedGeos)[i]].id)
-				}
-				
-				for (var i = 0; i < geoFilters.length; i++) {
-					if (!selectedGeoIds.includes(geoFilters[i].getId())) {
-						this.map.data.remove(geoFilters[i]);
-					}
-				}
-				
-				this.setupInactiveGeos();
-				
-				geoFilters = null;
-				
-				this.setState({
-					hasGeos: false
-				});
-				
-				this.props.onFilter(selectedGeos);
+				this.stopGeoFilter();
 			}
+			
+			if (nextProps.drawingShape) {
+				this.startDrawingShape(nextProps.drawingShape)
+			} else if (this.props.drawingShape) {
+				this.stopDrawingShape()
+			}
+		}
+		
+		startDrawingShape(type) {
+			this.drawingManager = new google.maps.drawing.DrawingManager({
+				drawingMode: google.maps.drawing.OverlayType[type.toUpperCase()],
+				drawingControl: false,
+				circleOptions: {
+					fillColor: '#ffff00',
+					fillOpacity: 1,
+					strokeWeight: 5,
+					clickable: false,
+					editable: true,
+					zIndex: 1
+				},
+				polygonOptions: {
+					fillColor: '#009cde',
+					fillOpacity: 0.5,
+					strokeColor: '#009cde',
+					editable: false
+				},
+				polylineOptions: {
+					strokeWeight: 5
+				}
+			});
+			
+			let completion = function (e) {
+				this.stopDrawingShape();
+				this.props.showNewShapeDialog(e.overlay, e.type);
+			}.bind(this);
+			
+			let cancel = function (e) {
+				console.log(e.code)
+				if (e.code == '0x0001') {
+					this.stopDrawingShape();
+				}
+			}.bind(this);
+			
+			google.maps.event.addListener(this.drawingManager, 'overlaycomplete', completion);
+			
+			this.drawingManager.setMap(this.map);
+		}
+		
+		stopDrawingShape() {
+			this.drawingManager.setMap(null);
+			this.props.onStartDrawShape(null);
+			// google.maps.event.removeListener(cancelShape);
+		}
+		
+		startGeoFilter(nextProps) {
+			var geos;
+			switch (nextProps.geoFiltering) {
+				case 'Countries':
+					geos = countryGeo;
+					break;
+				case 'US States':
+					geos = usStatesGeo;
+					break;
+				default:
+					geos = countryGeo;
+			}
+			
+			this.setupActiveGeos();
+			
+			geoFilters = this.map.data.addGeoJson(geos);
+			
+			this.setState({
+				hasGeos: true
+			});
+		}
+		
+		stopGeoFilter() {
+			let selectedGeoIds = [];
+			for (var i = 0; i < Object.keys(selectedGeos).length; i++) {
+				selectedGeoIds.push(selectedGeos[Object.keys(selectedGeos)[i]].id)
+			}
+			
+			for (var i = 0; i < geoFilters.length; i++) {
+				if (!selectedGeoIds.includes(geoFilters[i].getId())) {
+					this.map.data.remove(geoFilters[i]);
+				}
+			}
+			
+			this.setupInactiveGeos();
+			
+			geoFilters = null;
+			
+			this.setState({
+				hasGeos: false
+			});
+			
+			this.props.onFilter(selectedGeos);
 		}
 		
 		setupActiveGeos() {

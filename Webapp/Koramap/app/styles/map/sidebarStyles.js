@@ -15,7 +15,7 @@ sidebarOpen = {
 	filter: {
 		position: 'relative',
 		float: 'left',
-		zIndex: '1000003',
+		zIndex: '1000004',
 		marginTop: 0,
 		backgroundColor: Colors.filterColor,
 		width: 300,
@@ -27,9 +27,21 @@ sidebarOpen = {
 	message: {
 		position: 'relative',
 		float: 'left',
-		zIndex: '1000004',
+		zIndex: '1000005',
 		marginTop: 0,
 		backgroundColor: Colors.messageColor,
+		width: 300,
+		height: Numbers.sidebarHeight,
+		fontFamily: 'Oswald, sans-serif',
+		padding: '0px 10px 0px 10px',
+		boxShadow: '4px 0px 4px 0px rgba(0, 0, 0, 0.4)'
+	},
+	shapes: {
+		position: 'relative',
+		float: 'left',
+		zIndex: '1000006',
+		marginTop: 0,
+		backgroundColor: Colors.shapesColor,
 		width: 300,
 		height: Numbers.sidebarHeight,
 		fontFamily: 'Oswald, sans-serif',
@@ -63,6 +75,21 @@ toggle = {
 		color: 'white',
 		fontWeight: '900',
 		backgroundColor: Colors.messageColor,
+		cursor: 'pointer',
+		border: 'none',
+		borderRadius: '0px 7px 7px 0px',
+		boxShadow: '4px 2px 4px 0px rgba(0, 0, 0, 0.4)'
+	},
+	shapes: {
+		position: 'relative',
+		float: 'left',
+		top: Numbers.toggleHeight*2,
+		height: Numbers.toggleHeight,
+		width: 30,
+		zIndex: '1000003',
+		color: 'white',
+		fontWeight: '900',
+		backgroundColor: Colors.shapesColor,
 		cursor: 'pointer',
 		border: 'none',
 		borderRadius: '0px 7px 7px 0px',
@@ -366,14 +393,18 @@ addDisplay = {
 		textAlign: 'left',
 		paddingLeft: 10,
 	},
-	ul: {
+	scrollBars: {
+		width: '100%',
+		height: '80%',
+		borderTop: '2px solid rgba(100,100,100,0.5)',
 		position: 'relative',
 		top : '9%',
-		borderTop: '2px solid rgba(100,100,100,0.5)',
+		marginTop: 10,
 		padding: 0,
-		paddingTop: 10,
-		height: '70%',
-		overflow: 'auto'
+		paddingTop: 10
+	},
+	ul: {
+		padding: 0
 	},
 	li: {
 		paddingLeft: 5,
@@ -506,6 +537,25 @@ geoInfo = {
 	},
 };
 
+shapeButton = {
+	display: 'inline-block',
+	border: '1px solid white',
+	borderRadius: 4,
+	marginLeft: 10,
+	marginRight: 10,
+	cursor: 'pointer',
+	boxShadow: '0px 0px 2px 2px rgba(255, 255, 255, 0.4)',
+	hovered: {
+		display: 'inline-block',
+		border: '1px solid white',
+		borderRadius: 4,
+		marginLeft: 10,
+		marginRight: 10,
+		cursor: 'pointer',
+		boxShadow: '0px 0px 4px 4px rgba(255, 255, 255, 0.4)'
+	}
+};
+
 module.exports = {
 	sidebarContainer,
 	sidebarOpen,
@@ -537,5 +587,6 @@ module.exports = {
 	closeButton,
 	pointer,
 	geoButton,
-	geoInfo
+	geoInfo,
+	shapeButton
 };

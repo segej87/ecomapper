@@ -2,12 +2,14 @@ React = require('react');
 let Sidebar = require('./Sidebar');
 let Container = require('./Container').default;
 const GeoFilterInfoPanel = require('./GeoFilterInfoPanel');
+const DrawingShapeInfoPanel = require('./DrawingShapeInfoPanel');
 let Values = require('../res/values');
 let mapStyles = require('../styles/map/mapStyles');
 let mainStyles = require('../styles/home/mainStyles');
 import TimerMixin from 'react-timer-mixin';
 let Serverutils = require('../src/utils/Serverutils');
 let Rutils = require('../src/utils/Rutils');
+import { assembleShapeGeoJson } from '../src/utils/Geoutils';
 
 //TODO: REMOVE AFTER TESTING
 // let testJson = require('../res/json/crashes.json');
@@ -54,9 +56,11 @@ var MapContainer = React.createClass({
 			measObj: {},
 			selectedMeasDist: [],
 			//TODO: LOAD SHAPES FROM DB
-			shapes: {Geo: ['Countries','US States']},
+			shapes: Values.standards.shapes,
 			selectedPlace: {},
-			geoFiltering: null
+			geoFiltering: null,
+			drawingShape: null,
+			pendingOverlay: false
 		};
 	},
 	
@@ -114,6 +118,41 @@ var MapContainer = React.createClass({
 		});
 		
 		this.loadRecords(newFilters, true);
+	},
+	
+	onStartDrawShape: function (type) {
+		this.setState({
+			drawingShape: type
+		});
+	},
+	
+	showNewShapeDialog: function (overlay, overlayType) {
+		this.newOverlay = overlay;
+		this.newOverlayType = overlayType;
+		
+		this.setState({
+			pendingOverlay: true
+		});
+	},
+	
+	saveShape: function (props, collection) {
+		let outShape = assembleShapeGeoJson(this.newOverlay, this.newOverlayType, props);
+		this.removePendingShape();
+		
+		let callback = function (result) {
+			console.log(result);
+		};
+		
+		Serverutils.saveShape(this.props.userInfo.userId, outShape, collection, callback);
+	},
+	
+	removePendingShape: function () {
+		delete this.newOverlay;
+		delete this.newOverlayType;
+		
+		this.setState({
+			pendingOverlay: false
+		});
 	},
 	
 	toggleGeoFilter: function (type) {
@@ -303,6 +342,19 @@ var MapContainer = React.createClass({
 			);
 		}
 		
+		var dsp;
+		if (this.state.drawingShape || this.state.pendingOverlay) {
+			dsp = (
+				<DrawingShapeInfoPanel 
+				drawingShape={this.state.drawingShape}
+				onStartDrawShape={this.onStartDrawShape}
+				removePendingShape={this.removePendingShape}
+				saveShape={this.saveShape}
+				pendingOverlay={this.state.pendingOverlay}
+				collections={{'6b94e72a-a47f-4dd5-9b8d-049324540ed2': 'My Shapes'}}/>
+			);
+		}
+		
 		return (
 			<div style={mapStyles.main}>
 				<Sidebar 
@@ -315,6 +367,8 @@ var MapContainer = React.createClass({
 				lists={this.state.lists}
 				handleDelete={this.handleDelete}
 				onFilterChange={this.handleFilterChange}
+				onStartDrawShape={this.onStartDrawShape}
+				drawingShape={this.state.drawingShape}
 				shapes={this.state.shapes}
 				toggleGeoFilter={this.toggleGeoFilter}
 				/>
@@ -329,8 +383,12 @@ var MapContainer = React.createClass({
 				selectedMeasDist={this.state.selectedMeasDist}
 				standIds={standIds}
 				standVals={standVals}
+				drawingShape={this.state.drawingShape}
+				onStartDrawShape={this.onStartDrawShape}
+				showNewShapeDialog={this.showNewShapeDialog}
 				/>
 				{gfp}
+				{dsp}
 			</div>
 		)
 	}

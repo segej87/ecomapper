@@ -12,7 +12,9 @@
   "dependencies": {
     "dateformat": "^2.0.0",
     "google-maps-react": "^1.0.19",
+    "marker-clusterer-plus": "^2.1.4",
     "react": "^15.4.2",
+    "react-custom-scrollbars": "^4.0.2",
     "react-datepicker": "^0.41.1",
     "react-dom": "^15.4.2",
     "react-timer-mixin": "^0.13.3"
@@ -28,6 +30,6 @@
     "style-loader": "^0.13.2",
     "webpack": "^2.2.1",
     "webpack-dev-server": "^1.16.3",
-		"marker-clusterer-plus": "^2.1.4"
+    "marker-clusterer-plus": "^2.1.4"
   }
 }

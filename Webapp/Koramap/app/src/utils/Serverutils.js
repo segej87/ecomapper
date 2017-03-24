@@ -171,5 +171,34 @@ function loadLists(userId, lists, filters, callback) {
 		request.send(formData);
 	};
 	
+	function saveShape(userId, shape, collection, callback) {
+		const formData="GUID=" + userId + "&shape=" + JSON.stringify(shape) + "&collection=" + collection;
+	
+		var request = new XMLHttpRequest;
+		
+		var method = 'POST';
+		var url = 'http://ecocollector.azurewebsites.net/add_shape.php';
+		
+		request.onreadystatechange = (e) => {
+			if (request.readyState !== 4) {
+				return;
+			}
+
+			if (request.status === 200) {
+				const result = request.responseText;
+				
+				callback(result);
+			} else {
+				console.log('Status: ' + request.status);
+				console.log('Status text: ' + request.statusText);
+			}
+		};
+
+		request.open(method, url, true);
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		request.send(formData);
+	};
+	
 	exports.loadLists = loadLists;
 	exports.loadRecords = loadRecords;
+	exports.saveShape = saveShape;

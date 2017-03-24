@@ -99,13 +99,15 @@ export class Marker extends React.Component {
 		} else if (this.props.singleMeas) {
 			console.log(this.props.frac);
 			let hue = Math.floor(120-(this.props.frac*120));
-			let scaledColor = 'hsl('+hue+',80%,50%)'
+			let scaledFill = 'hsl('+hue+',80%,50%)';
+			let scaledStroke = 'hsl('+hue+',80%,25%)';
 			
 			markerIcon = {
 				path: google.maps.SymbolPath.CIRCLE,
 				fillOpacity: 1,
-				fillColor: scaledColor,
-				strokeWeight: 0.5,
+				fillColor: scaledFill,
+				strokeWeight: 1,
+				strokeColor: scaledStroke,
 				scale: 4.5
 			}
 		} else {

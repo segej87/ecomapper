@@ -2,7 +2,7 @@ React = require('react');
 appStyles = require('../styles/appStyles');
 Login = require('./Login');
 Navbar = require('./Navbar');
-Home = require('./Home');
+Home = require('./Home').default;
 MapContainer = require('./MapContainer').default;
 Values = require('../res/values');
 

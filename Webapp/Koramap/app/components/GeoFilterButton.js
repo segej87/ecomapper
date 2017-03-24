@@ -1,6 +1,6 @@
 const React = require('react');
 const SidebarStyles = require('../styles/map/sidebarStyles');
-const AddDdn = require('./AddDdn');
+const AddDdn = require('./AddDdn').default;
 
 const GeoFilterButton = React.createClass({
 	getInitialState: function () {
@@ -55,7 +55,7 @@ const GeoFilterButton = React.createClass({
 		
 		return (
 			<div>
-				<AddDdn items={this.props.shapes} type={'Geo'} highlighted={this.state.showingDdn} onClose={this.closeAdd} onAdd={this.toggleGeoFilter}/>
+				<AddDdn items={{Geo: this.props.shapes}} type={'Geo'} highlighted={this.state.showingDdn} onClose={this.closeAdd} onAdd={this.toggleGeoFilter}/>
 				<div style={{display: 'inline-block', position: 'relative', float: 'right', width: '100%'}}>
 					<button style={style} onClick={this.handleClick} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>{filterText}</button>
 					{pointer}

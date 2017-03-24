@@ -16,6 +16,12 @@ var SidebarToggle = React.createClass({
 			case "message":
 				style = SidebarStyles.toggle.message;
 				break;
+			case "shapes":
+				style = SidebarStyles.toggle.shapes;
+				break;
+			default:
+				style = SidebarStyles.toggle.filter;
+				break;
 		}
 		
 		if (this.props.open) {

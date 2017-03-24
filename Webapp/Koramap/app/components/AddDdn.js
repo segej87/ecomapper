@@ -8,6 +8,7 @@ const privateIcon = require('../res/img/icons/private-icon2.png');
 const measIcon = require('../res/img/icons/meas-icon2.png');
 const photoIcon = require('../res/img/icons/photo-icon2.png');
 const noteIcon = require('../res/img/icons/note-icon2.png');
+import { Scrollbars } from 'react-custom-scrollbars'
 
 var NavbarDropdown = React.createClass({
 	inItems: [],
@@ -113,12 +114,14 @@ var NavbarDropdown = React.createClass({
 			<div style={linkStyle}>
 				<button style={SidebarStyles.closeButton} onClick={this.handleClose}>&#x2e3;</button>
 				<SearchArea val={this.state.searchString} handleInput={this.handleInput}/>
-				<ul style={SidebarStyles.addDisplay.ul}>
-					{showItems}
-				</ul>
+				<Scrollbars style={SidebarStyles.addDisplay.scrollBars}>
+					<ul style={SidebarStyles.addDisplay.ul}>
+						{showItems}
+					</ul>
+				</Scrollbars>
 			</div>
 		);
 	}
 });
 
-module.exports = NavbarDropdown;
+export default NavbarDropdown;

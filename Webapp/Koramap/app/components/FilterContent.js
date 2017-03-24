@@ -1,7 +1,7 @@
 const React = require('react');
 const SidebarStyles = require('../styles/map/sidebarStyles');
 const FilterButton = require('./FilterButton');
-const AddDdn = require('./AddDdn');
+const AddDdn = require('./AddDdn').default;
 const DateField = require('./DateField');
 
 var FilterContent = React.createClass({

@@ -60,7 +60,7 @@ var Container = React.createClass({
 			}
 		}
 		
-		if (this.map & clustering) {
+		if (this.map && clustering) {
 			this.markerClusterer = new MarkerClusterer(this.map);
 		}
 	  
@@ -145,6 +145,14 @@ var Container = React.createClass({
 		this.map = map;
 	},
 	
+	onStartDrawShape: function (type) {
+		this.props.onStartDrawShape(type);
+	},
+	
+	showNewShapeDialog: function (overlay, overlayType) {
+		this.props.showNewShapeDialog(overlay, overlayType);
+	},
+	
 	//TODO: move up to MapContainer
 	receiveGeo: function (polygons) {
 		filterGeos = polygons;
@@ -156,15 +164,6 @@ var Container = React.createClass({
       selectedPlace: props,
       activeMarker: marker
     });
-	
-	this.props.handleSelected(this.state.selectedPlace);
-  },
-
-  onInfoWindowClose: function() {
-    this.setState({
-			selectedPlace: {},
-      activeMarker: null
-    })
 	
 	this.props.handleSelected(this.state.selectedPlace);
   },
@@ -237,9 +236,13 @@ var Container = React.createClass({
 						guid={this.props.userInfo.userId}
 						geoFiltering={this.props.geoFiltering}
 						onFilter={this.receiveGeo}
-						setMap={this.setMap}>
+						setMap={this.setMap}
+						drawingShape={this.props.drawingShape}
+						setDrawingShape={this.props.onStartDrawingShape}
+						onStartDrawShape={this.onStartDrawShape}
+						showNewShapeDialog={this.showNewShapeDialog}>
 					</Map>
-					</div>
+				</div>
 			);
 		}
 		
@@ -251,7 +254,10 @@ var Container = React.createClass({
 						guid={this.props.userInfo.userId}
 						geoFiltering={this.props.geoFiltering}
 						onFilter={this.receiveGeo}
-						setMap={this.setMap}>
+						setMap={this.setMap}
+						drawingShape={this.props.drawingShape}
+						onStartDrawShape={this.onStartDrawShape}
+						showNewShapeDialog={this.showNewShapeDialog}>
 						{this.markers}
 					</Map>
 			</div>
@@ -260,5 +266,6 @@ var Container = React.createClass({
 	});
 
 export default GoogleApiWrapper({
-  apiKey: Keys.gApi
+  apiKey: Keys.gApi,
+	libraries: ['places','drawing']
 })(Container)

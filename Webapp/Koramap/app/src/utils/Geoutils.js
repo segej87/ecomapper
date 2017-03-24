@@ -44,4 +44,20 @@ function filterGeo(filterGeos, features, google) {
 	return ({geoFilteredFeats: geoFilteredFeats, workingSet});
 }
 
+function assembleShapeGeoJson(overlay, overlayType, props) {
+	let outShape = {type: 'Feature', properties: props, geometry: {type: overlayType}};
+	
+	let geom = [];
+	overlay.getPaths().forEach((p, i) => {
+		p.forEach((l, i) => {
+			geom.push([l.lng(), l.lat()]);
+		});
+	});
+	
+	outShape.geometry.coordinates = [geom];
+	
+	return outShape;
+}
+
 exports.filterGeo = filterGeo;
+exports.assembleShapeGeoJson = assembleShapeGeoJson;

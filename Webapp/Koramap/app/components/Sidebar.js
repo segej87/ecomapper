@@ -2,17 +2,27 @@ React = require('react');
 SidebarStyles = require('../styles/map/sidebarStyles');
 FilterPane = require('./FilterPane');
 MessagePane = require('./MessagePane');
+ShapesPane = require('./ShapesPane');
 
 var Sidebar = React.createClass({
 	handleFilterChange: function (type, val, result) {
 		this.props.onFilterChange(type, val, result);
 	},
 	
+	onStartDrawShape: function (type) {
+		this.props.onStartDrawShape(type);
+	},
+	
 	render: function () {
-		// console.log(this.props.lists);
-		
 		return (
 			<div>
+				<FilterPane 
+				filters={this.props.filters}
+				lists={this.props.lists}
+				onFilterChange={this.handleFilterChange}
+				shapes={this.props.shapes}
+				toggleGeoFilter={this.props.toggleGeoFilter}
+				/>
 				<MessagePane 
 				userInfo={this.props.userInfo} 
 				selectedPlace={this.props.selectedPlace} 
@@ -22,12 +32,9 @@ var Sidebar = React.createClass({
 				selectedMeasStand={this.props.selectedMeasStand}
 				selectedMeasUnit={this.props.selectedMeasUnit}
 				/>
-				<FilterPane 
-				filters={this.props.filters}
-				lists={this.props.lists}
-				onFilterChange={this.handleFilterChange}
-				shapes={this.props.shapes}
-				toggleGeoFilter={this.props.toggleGeoFilter}
+				<ShapesPane
+				onStartDrawShape={this.onStartDrawShape}
+				drawingShape={this.props.drawingShape}
 				/>
 			</div>
 		);
