@@ -79,6 +79,35 @@ function loadLists(userId, lists, filters, callback) {
 		request.send(formData);
 	};
 	
+	function loadCollections(userId, callback) {
+		console.log('Loading collections');
+		const formData='GUID=' + userId;
+	
+		var request = new XMLHttpRequest;
+		
+		var method = 'POST';
+		var url = 'http://ecocollector.azurewebsites.net/get_collections.php';
+		
+		request.onreadystatechange = (e) => {
+			if (request.readyState !== 4) {
+				return;
+			}
+
+			if (request.status === 200) {
+				const result = JSON.parse(request.responseText);
+				
+				callback(result, true);
+			} else {
+				console.log('Status: ' + request.status);
+				console.log('Status text: ' + request.statusText);
+			}
+		};
+
+		request.open(method, url, true);
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		request.send(formData);
+	};
+	
 	function loadRecords(userId, filters, records, override = false, callback) {
 		console.log('Loading data');
 		const formData='GUID=' + userId + '&filters=' + JSON.stringify(filters);
@@ -199,6 +228,35 @@ function loadLists(userId, lists, filters, callback) {
 		request.send(formData);
 	};
 	
+	function loadShapes(collection, callback) {
+		const formData="collection=" + collection;
+	
+		var request = new XMLHttpRequest;
+		
+		var method = 'POST';
+		var url = 'http://ecocollector.azurewebsites.net/get_shapes.php';
+		
+		request.onreadystatechange = (e) => {
+			if (request.readyState !== 4) {
+				return;
+			}
+
+			if (request.status === 200) {
+				const result = JSON.parse(request.responseText);
+				callback(result);
+			} else {
+				console.log('Status: ' + request.status);
+				console.log('Status text: ' + request.statusText);
+			}
+		};
+
+		request.open(method, url, true);
+		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		request.send(formData);
+	};
+	
 	exports.loadLists = loadLists;
+	exports.loadCollections = loadCollections;
 	exports.loadRecords = loadRecords;
 	exports.saveShape = saveShape;
+	exports.loadShapes = loadShapes;

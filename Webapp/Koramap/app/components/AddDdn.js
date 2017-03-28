@@ -33,10 +33,10 @@ var NavbarDropdown = React.createClass({
 	},
 	
 	filterString: function (value) {
-		var newItems = [];
-		for (var i = 0; i < this.inItems.length; i++) {
-			if (this.inItems[i].includes(value)) {
-				newItems.push(this.inItems[i]);
+		var newItems = {};
+		for (var i = 0; i < Object.values(this.inItems).length; i++) {
+			if (Object.values(this.inItems)[i].includes(value)) {
+				newItems[Object.keys(this.inItems)[i]] = Object.values(this.inItems)[i];
 			}
 		}
 		
@@ -61,7 +61,12 @@ var NavbarDropdown = React.createClass({
 	},
 	
 	addItem: function (e) {
-		this.props.onAdd(e.target.id);
+		//TODO: standardize this
+		if (this.props.type == 'Geo') {
+			this.props.onAdd(e.target.id);
+		} else {
+			this.props.onAdd(this.items[e.target.id]);
+		}
 	},
 	
 	componentWillReceiveProps: function (nextProps) {
@@ -86,7 +91,7 @@ var NavbarDropdown = React.createClass({
 		
 		var showItems = [];
 		if (this.props.type != null) {
-			showItems = this.items.map((item, i) => {
+			showItems = Object.keys(this.items).map((item, i) => {
 				var image = koraLogo;
 				if (this.logos[item.replace(' ','')]) {
 					image = this.logos[item.replace(' ','')];
@@ -102,9 +107,9 @@ var NavbarDropdown = React.createClass({
 					borderRad = 12.5;
 				}
 				return (
-					<li key={i} id={item} style={SidebarStyles.addDisplay.li} onClick={this.addItem}>
+					<li key={item} id={item} style={SidebarStyles.addDisplay.li} onClick={this.addItem}>
 						<img src={image} style={{verticalAlign: 'middle', borderRadius: borderRad}} width={imgSize} id={item} />
-						<p style={{display: 'inline-block', margin: 'auto 10px', verticalAlign: 'middle'}} id={item}>{item}</p>
+						<p style={{display: 'inline-block', margin: 'auto 10px', verticalAlign: 'middle'}} id={item}>{this.items[item]}</p>
 					</li>
 				);
 			});

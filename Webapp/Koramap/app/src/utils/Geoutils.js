@@ -44,8 +44,10 @@ function filterGeo(filterGeos, features, google) {
 	return ({geoFilteredFeats: geoFilteredFeats, workingSet});
 }
 
-function assembleShapeGeoJson(overlay, overlayType, props) {
-	let outShape = {type: 'Feature', properties: props, geometry: {type: overlayType}};
+function assembleShapeGeoJson(overlay, props) {
+	let outShape = {type: 'Feature', properties: props, geometry: {type: overlay.type}};
+	
+	console.log(overlay.getPaths());
 	
 	let geom = [];
 	overlay.getPaths().forEach((p, i) => {
@@ -54,7 +56,13 @@ function assembleShapeGeoJson(overlay, overlayType, props) {
 		});
 	});
 	
+	if (overlay.type.toLowerCase() == 'polygon' && (geom[geom.length-1][0] != geom[0][0] || geom[geom.length-1][1] != geom[0][1])) {
+		geom.push(geom[0]);
+	}
+	
 	outShape.geometry.coordinates = [geom];
+	
+	console.log(outShape);
 	
 	return outShape;
 }

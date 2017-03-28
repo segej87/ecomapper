@@ -41,6 +41,13 @@ function rPlot(command, args, callback, options) {
 	rSesh(command, args, seshCallback, options);
 };
 
+function idw(command, args, callback, options) {
+	let seshCallback = function (sesh) {
+		rData(sesh, '/files/out.png', callback)
+	};
+	rSesh(command, args, seshCallback, options);
+};
+
 function rSesh(command, args, callback, options) {
 	var opts = options || {},
 			url,
@@ -92,9 +99,35 @@ function rData(sesh, out, callback) {
 		
 		request.open(method, url, true);
 		request.send();
-}
+};
+
+function rImage(sesh, out, callback) {
+	const url = server + root + '/tmp/' + sesh + out;
+ 		let method = 'GET';
+		
+		var request = new XMLHttpRequest;
+		
+		request.onreadystatechange = (e) => {
+			if (request.readyState !== 4) {
+				return;
+			}
+			
+			if (request.status === 200) {
+				let imageDat = request.response;
+				callback(imageDat)
+			} else {
+				callback(request.status);
+			}
+		};
+		
+		request.open(method, url, true);
+		request.send();
+};
 
 exports.rJson = rJson;
 exports.rPlot = rPlot;
+exports.idw = idw;
+exports.idw = idw;
 exports.rSesh = rSesh;
 exports.rData = rData;
+exports.rImage = rImage;

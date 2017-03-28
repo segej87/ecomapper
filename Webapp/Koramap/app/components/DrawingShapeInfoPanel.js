@@ -37,7 +37,7 @@ const GeoFilterInfoPanel = React.createClass({
 		if (e.target.id == 'saveButton') {
 			this.props.saveShape({name: document.getElementById('namefield').value}, document.getElementById('collfield').value)
 		} else if (e.target.id == 'cancelButton') {
-			this.props.removePendingShape();
+			this.props.removePendingShape(true);
 		}
 	},
 	

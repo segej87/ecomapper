@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom'
 import { camelize } from './lib/String'
 import {makeCancelable} from './lib/cancelablePromise'
 import invariant from 'invariant'
+let Serverutils = require('../src/utils/Serverutils');
+let Geoutils = require('../src/utils/Geoutils');
+let Rutils = require('../src/utils/Rutils');
 Numbers = require('../res/values').numbers;
 
 var MarkerClusterer = require('marker-clusterer-plus');
@@ -21,9 +24,6 @@ const mapStyles = {
     top: 0
   }
 }
-
-const countryGeo = require('../res/json/countries.geo.json');
-const usStatesGeo = require('../res/json/us-states.geo.json');
 
 const evtNames = [
   'ready',
@@ -162,7 +162,7 @@ export class Map extends React.Component {
 					fillColor: '#009cde',
 					fillOpacity: 0.5,
 					strokeColor: '#009cde',
-					editable: false
+					editable: true
 				},
 				polylineOptions: {
 					strokeWeight: 5
@@ -171,7 +171,9 @@ export class Map extends React.Component {
 			
 			let completion = function (e) {
 				this.stopDrawingShape();
-				this.props.showNewShapeDialog(e.overlay, e.type);
+				let overlay = e.overlay;
+				overlay.type = e.type;
+				this.props.showNewShapeDialog(overlay);
 			}.bind(this);
 			
 			let cancel = function (e) {
@@ -193,18 +195,22 @@ export class Map extends React.Component {
 		}
 		
 		startGeoFilter(nextProps) {
-			var geos;
 			switch (nextProps.geoFiltering) {
-				case 'Countries':
-					geos = countryGeo;
+				case 'countries':
+					this.startGeoActive(require('../res/json/countries.geo.json'));
 					break;
-				case 'US States':
-					geos = usStatesGeo;
+				case 'usstates':
+					this.startGeoActive(require('../res/json/us-states.geo.json'));
 					break;
 				default:
-					geos = countryGeo;
-			}
-			
+					let callback = function (result) {
+						this.startGeoActive(result);
+					}.bind(this);
+					Serverutils.loadShapes(nextProps.geoFiltering, callback);
+			}			
+		}
+		
+		startGeoActive(geos) {
 			this.setupActiveGeos();
 			
 			geoFilters = this.map.data.addGeoJson(geos);
@@ -347,9 +353,7 @@ export class Map extends React.Component {
 				
 				this.props.setMap(this.map);
 				
-				if (this.props.geoFiltering && !this.state.hasGeos) {
-					this.map.data.addGeoJson(countryGeo);
-				}
+				// this.addTestRaster();
 
         evtNames.forEach(e => {
           this.listeners[e] = this.map.addListener(e, this.handleEvent(e));
@@ -358,6 +362,48 @@ export class Map extends React.Component {
         this.forceUpdate();
       }
     }
+		
+		addTestRaster() {
+			let states = require('../res/json/us-states.geo.json').features;
+			let newyork;
+			for (var i = 0; i < states.length; i++) {
+				if (states[i].id == '0400000US36') {
+					newyork = states[i];
+					break;
+				}
+			}
+			let nyColl = {};
+			nyColl.type = 'FeatureCollection';
+			nyColl.features = [newyork];
+			let newyorkPoly = this.map.data.addGeoJson(newyork);
+			
+			// initialize the bounds
+			var bounds = new google.maps.LatLngBounds();
+
+			// iterate over the paths to get overall bounds
+			newyorkPoly[0].getGeometry().forEachLatLng(function(path){
+				bounds.extend(path);
+			});
+			
+			let command = '/library/kora.geo/R/shapeidw'
+			let args = {
+				shapeString: JSON.stringify(nyColl),
+				x: [-73.941410,-74.952605,-77.620694,-74.965896],
+				y: [40.706953,43.036472,42.653883,44.344027],
+				z: [1.34, 5.76, 2.11, 3.11]
+			}
+			let callback = function (imageDat) {
+				// sessionStorage.setItem('testraster',imageDat);
+				// let img = sessionStorage.getItem('testraster');
+				// console.log(img);
+				let base_image = 'data:image/png;base64,' + imageDat;
+				let overlay = new google.maps.GroundOverlay(base_image, bounds);
+				overlay.setMap(this.map);
+				console.log(overlay.getUrl());
+			}.bind(this)
+		
+			Rutils.idw(command, args, callback);
+		}
 
     handleEvent(evtName) {
       let timeout;

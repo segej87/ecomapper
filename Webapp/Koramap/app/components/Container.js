@@ -149,8 +149,8 @@ var Container = React.createClass({
 		this.props.onStartDrawShape(type);
 	},
 	
-	showNewShapeDialog: function (overlay, overlayType) {
-		this.props.showNewShapeDialog(overlay, overlayType);
+	showNewShapeDialog: function (overlay) {
+		this.props.showNewShapeDialog(overlay);
 	},
 	
 	//TODO: move up to MapContainer

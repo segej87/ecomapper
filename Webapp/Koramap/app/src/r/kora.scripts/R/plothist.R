@@ -7,10 +7,6 @@ plothist <- function (allVals, selVal, species, units) {
   plot(hist, xlab=paste('Values (',units,')',sep=""), main=paste('Histogram of',species), col='#b0e0e6',
        cex.axis=1, cex.main=1.5)
   abline(v=selVal, col=rgb(red=1,green=0.2941176,blue=0.3921569,alpha=0.9), lwd=2)
-  # text(x=median(allVals)+(max(allVals)-median(allVals))*3/4,
-  #      y=min(hist$counts) + (max(hist$counts)-min(hist$counts))*3/4,
-  #      labels=paste('n =',
-  #                   length(allVals)))
 
   dev.off()
 

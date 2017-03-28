@@ -126,9 +126,8 @@ var MapContainer = React.createClass({
 		});
 	},
 	
-	showNewShapeDialog: function (overlay, overlayType) {
+	showNewShapeDialog: function (overlay) {
 		this.newOverlay = overlay;
-		this.newOverlayType = overlayType;
 		
 		this.setState({
 			pendingOverlay: true
@@ -136,8 +135,8 @@ var MapContainer = React.createClass({
 	},
 	
 	saveShape: function (props, collection) {
-		let outShape = assembleShapeGeoJson(this.newOverlay, this.newOverlayType, props);
-		this.removePendingShape();
+		let outShape = assembleShapeGeoJson(this.newOverlay, props);
+		this.removePendingShape(false);
 		
 		let callback = function (result) {
 			console.log(result);
@@ -146,12 +145,17 @@ var MapContainer = React.createClass({
 		Serverutils.saveShape(this.props.userInfo.userId, outShape, collection, callback);
 	},
 	
-	removePendingShape: function () {
+	removePendingShape: function (canceled) {
+		if (canceled) {
+			this.newOverlay.setMap(null);
+		}
+		
+		this.newOverlay.setEditable(false);
 		delete this.newOverlay;
-		delete this.newOverlayType;
 		
 		this.setState({
-			pendingOverlay: false
+			pendingOverlay: false,
+			drawingShape: false
 		});
 	},
 	
@@ -189,8 +193,29 @@ var MapContainer = React.createClass({
 		}
 	},
 	
+	loadCollections: function () {
+		if (this.props.userInfo.userId != null && !this.props.offline) {
+			let callback = function (result, success) {
+				if (success) {
+					let newShapes = Values.standards.shapes
+					for (var i = 0; i < Object.keys(result).length; i++) {
+						if (!(Object.values(result)[i].text && Object.values(result)[i].text == 'Warning: empty query result')) {
+							newShapes[Object.keys(result)[i]] = Object.values(result)[i]
+						}
+					}
+					
+					this.setState({
+						shapes: newShapes
+					});
+				}
+			}.bind(this);
+			
+			Serverutils.loadCollections(this.props.userInfo.userId, callback);
+		}
+	},
+	
 	loadRecords: function (filters = this.state.filters, override = false) {
-		if (this.props.userInfo.userId != null && !this.props.offline && !this.state.geoFiltering && (!loadingData || override)) {
+		if (this.props.userInfo.userId != null && !this.props.offline && !this.state.geoFiltering && !this.state.drawingShape && (!loadingData || override)) {
 			loadingData = true;
 			
 			let callback = function (newState, newIds, success) {
@@ -255,6 +280,7 @@ var MapContainer = React.createClass({
 		this.setState(this.getInitialState());
 		
 		this.loadLists();
+		this.loadCollections();
 	},
 	
 	handleDelete: function (id) {
@@ -307,8 +333,6 @@ var MapContainer = React.createClass({
 			}
 		}
 		
-		console.log(vals);
-		
 		this.setState({
 			selectedPlace: selected,
 			selectedMeasDist: vals,
@@ -319,6 +343,7 @@ var MapContainer = React.createClass({
 	
 	componentWillMount: function () {
 		this.loadLists();
+		this.loadCollections();
 	},
   
 	componentDidMount: function () {

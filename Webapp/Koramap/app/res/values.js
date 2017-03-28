@@ -32,7 +32,7 @@ keys = {
 standards = {
 	datatypes: ['Meas','Photo','Note'],
 	access: ['Public','Private','Lots','Of','Other','Items','To','Test','Scroll','Bar','Appearance'],
-	shapes: ['Countries','US States'],
+	shapes: {countries: 'Countries',usstates: 'US States'},
 	login: {
 				userName: 'public',
 				firstName: 'Guest',
