@@ -262,17 +262,14 @@ export class Map extends React.Component {
 				
 				var testArray = [];
 				for (var i = 0; i < selectedGeos.length; i++) {
-					testArray.push(selectedGeos[i].id);
+					testArray.push(selectedGeos[i].getId());
 				}
 				
 				if (testArray.includes(event.feature.getId())) {
 					selectedGeos.splice(testArray.indexOf(event.feature.getId()), 1);
 					selectedGeoNames.splice(testArray.indexOf(event.feature.getId()), 1);
 				} else {
-					selectedGeos.push({
-						id: event.feature.getId(),
-						geometry: event.feature.getGeometry()
-					});
+					selectedGeos.push(event.feature);
 					selectedGeoNames.push(event.feature.getProperty('name'))
 				}
 				
@@ -352,8 +349,6 @@ export class Map extends React.Component {
         this.map = new maps.Map(node, mapConfig);
 				
 				this.props.setMap(this.map);
-				
-				// this.addTestRaster();
 
         evtNames.forEach(e => {
           this.listeners[e] = this.map.addListener(e, this.handleEvent(e));
@@ -362,48 +357,6 @@ export class Map extends React.Component {
         this.forceUpdate();
       }
     }
-		
-		addTestRaster() {
-			let states = require('../res/json/us-states.geo.json').features;
-			let newyork;
-			for (var i = 0; i < states.length; i++) {
-				if (states[i].id == '0400000US36') {
-					newyork = states[i];
-					break;
-				}
-			}
-			let nyColl = {};
-			nyColl.type = 'FeatureCollection';
-			nyColl.features = [newyork];
-			let newyorkPoly = this.map.data.addGeoJson(newyork);
-			
-			// initialize the bounds
-			var bounds = new google.maps.LatLngBounds();
-
-			// iterate over the paths to get overall bounds
-			newyorkPoly[0].getGeometry().forEachLatLng(function(path){
-				bounds.extend(path);
-			});
-			
-			let command = '/library/kora.geo/R/shapeidw'
-			let args = {
-				shapeString: JSON.stringify(nyColl),
-				x: [-73.941410,-74.952605,-77.620694,-74.965896],
-				y: [40.706953,43.036472,42.653883,44.344027],
-				z: [1.34, 5.76, 2.11, 3.11]
-			}
-			let callback = function (imageDat) {
-				// sessionStorage.setItem('testraster',imageDat);
-				// let img = sessionStorage.getItem('testraster');
-				// console.log(img);
-				let base_image = 'data:image/png;base64,' + imageDat;
-				let overlay = new google.maps.GroundOverlay(base_image, bounds);
-				overlay.setMap(this.map);
-				console.log(overlay.getUrl());
-			}.bind(this)
-		
-			Rutils.idw(command, args, callback);
-		}
 
     handleEvent(evtName) {
       let timeout;

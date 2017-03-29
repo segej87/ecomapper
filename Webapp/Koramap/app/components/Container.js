@@ -157,7 +157,58 @@ var Container = React.createClass({
 	receiveGeo: function (polygons) {
 		filterGeos = polygons;
 		this.processData(this.props.records.features);
+		this.props.addTestRaster(filterGeos, this.map);
 	},
+	
+	// addTestRaster: function () {
+		
+		// let newyorkPoly = filterGeos;
+		
+		// initialize the bounds
+		// var bounds = new google.maps.LatLngBounds();
+
+		// iterate over the paths to get overall bounds
+		// newyorkPoly[0].getGeometry().forEachLatLng(function(path){
+			// bounds.extend(path);
+		// });
+		
+		// let nyColl = {type: 'FeatureCollection'};
+		// nyColl.features = [Geoutils.assembleDataShapeGeoJson(newyorkPoly[0])];
+		
+		// let command = '/library/kora.geo/R/shapeidw'
+		
+		
+		
+		// let args = {
+			// shapeString: JSON.stringify(nyColl),
+			// x: [-73.941410,-74.952605,-77.620694,-74.965896],
+			// y: [40.706953,43.036472,42.653883,44.344027],
+			// z: [1.34, 5.76, 2.11, 3.11],
+			// n: 50000,
+			// idp: 2,
+			// alpha: 0.5
+		// }
+		// let uploadcallback = function (result) {
+			// console.log(result);
+		// }.bind(this);
+		
+		// let callback = function (imageDat) {
+			// var reader = new window.FileReader();
+			// reader.readAsDataURL(imageDat);
+			// reader.onloadend = function () {
+				// let base64data = reader.result;
+				// let startInd = base64data.indexOf('data');
+				// let endInd = base64data.indexOf('base64,') + 7;
+				// let data = base64data.replace(base64data.substring(startInd,endInd),'');
+				// Serverutils.add_media(this.props.guid, 'test.png', data, uploadcallback);
+				
+				// let overlay = new google.maps.GroundOverlay(base64data, bounds);
+				// overlay.setMap(this.map);
+			// }.bind(this);
+		// }.bind(this)
+
+		// Rutils.idw(command, args, callback);
+	// },
   
   onMarkerClick: function(props, marker, e) {
     this.setState({
@@ -240,7 +291,8 @@ var Container = React.createClass({
 						drawingShape={this.props.drawingShape}
 						setDrawingShape={this.props.onStartDrawingShape}
 						onStartDrawShape={this.onStartDrawShape}
-						showNewShapeDialog={this.showNewShapeDialog}>
+						showNewShapeDialog={this.showNewShapeDialog}
+						addRaster={this.addTestRaster}>
 					</Map>
 				</div>
 			);
@@ -257,7 +309,8 @@ var Container = React.createClass({
 						setMap={this.setMap}
 						drawingShape={this.props.drawingShape}
 						onStartDrawShape={this.onStartDrawShape}
-						showNewShapeDialog={this.showNewShapeDialog}>
+						showNewShapeDialog={this.showNewShapeDialog}
+						addRaster={this.addTestRaster}>
 						{this.markers}
 					</Map>
 			</div>

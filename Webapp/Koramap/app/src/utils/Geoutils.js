@@ -18,15 +18,15 @@ function filterGeo(filterGeos, features, google) {
 				testPoly = filterGeos[j]
 			} else {
 				var paths=[];
-				if (filterGeos[j].geometry.getType() == 'MultiPolygon') {
-					const testPolys = filterGeos[j].geometry.getArray();
+				if (filterGeos[j].getGeometry().getType() == 'MultiPolygon') {
+					const testPolys = filterGeos[j].getGeometry().getArray();
 					for (var k = 0; k < testPolys.length; k++) {
 						testPolys[k].forEachLatLng((LatLng) => {
 							paths.push(LatLng);
 						});	
 					}
-				} else if (filterGeos[j].geometry.getType() == 'Polygon') {
-					filterGeos[j].geometry.forEachLatLng((LatLng) => {
+				} else if (filterGeos[j].getGeometry().getType() == 'Polygon') {
+					filterGeos[j].getGeometry().forEachLatLng((LatLng) => {
 						paths.push(LatLng);
 					})
 				}
@@ -47,8 +47,6 @@ function filterGeo(filterGeos, features, google) {
 function assembleShapeGeoJson(overlay, props) {
 	let outShape = {type: 'Feature', properties: props, geometry: {type: overlay.type}};
 	
-	console.log(overlay.getPaths());
-	
 	let geom = [];
 	overlay.getPaths().forEach((p, i) => {
 		p.forEach((l, i) => {
@@ -62,10 +60,30 @@ function assembleShapeGeoJson(overlay, props) {
 	
 	outShape.geometry.coordinates = [geom];
 	
-	console.log(outShape);
+	return outShape;
+}
+
+function assembleDataShapeGeoJson(overlay, props) {
+	let outShape = {type: 'Feature', properties: props, geometry: {type: overlay.getGeometry().getType()}};
+	
+	let geom = [];
+	overlay.getGeometry().getArray().forEach((a, i) => {
+		let innerArray = [];
+		a.forEachLatLng((p, i) => {
+			innerArray.push([p.lng(), p.lat()]);
+		});
+		geom.push(innerArray);
+	});
+	
+	if (overlay.getGeometry().getType().toLowerCase() == 'polygon' && (geom[0][geom[0].length-1][0] != geom[0][0][0] || geom[0][geom[0].length-1][1] != geom[0][0][1])) {
+		geom[0].push(geom[0][0]);
+	}
+	
+	outShape.geometry.coordinates = geom;
 	
 	return outShape;
 }
 
 exports.filterGeo = filterGeo;
 exports.assembleShapeGeoJson = assembleShapeGeoJson;
+exports.assembleDataShapeGeoJson = assembleDataShapeGeoJson;

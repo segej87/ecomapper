@@ -43,7 +43,7 @@ function rPlot(command, args, callback, options) {
 
 function idw(command, args, callback, options) {
 	let seshCallback = function (sesh) {
-		rData(sesh, '/files/out.png', callback)
+		rImage(sesh, '/files/out.png', callback)
 	};
 	rSesh(command, args, seshCallback, options);
 };
@@ -68,8 +68,7 @@ function rSesh(command, args, callback, options) {
 			let sesh = request.response.split('/tmp/')[1].split('/R/')[0];
 			callback(sesh)
 		} else {
-			let sesh = request.statusText;
-			callback(sesh);
+			console.log('Session response: ' + request.statusText);
 		}
 	};
 	
@@ -93,7 +92,7 @@ function rData(sesh, out, callback) {
 				let imageDat = btoa(unescape(encodeURIComponent(request.response)));
 				callback(imageDat)
 			} else {
-				callback(request.status);
+				callback('Data retrieval response: ' + request.status);
 			}
 		};
 		
@@ -106,6 +105,7 @@ function rImage(sesh, out, callback) {
  		let method = 'GET';
 		
 		var request = new XMLHttpRequest;
+		request.responseType = 'blob';
 		
 		request.onreadystatechange = (e) => {
 			if (request.readyState !== 4) {
@@ -116,7 +116,11 @@ function rImage(sesh, out, callback) {
 				let imageDat = request.response;
 				callback(imageDat)
 			} else {
-				callback(request.status);
+				var reader = new window.FileReader();
+				reader.readAsText(request.response);
+				reader.onloadend = function () {
+					console.log('Image retrieval response ' + reader.result);
+				}
 			}
 		};
 		

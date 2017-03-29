@@ -9,6 +9,7 @@ let mainStyles = require('../styles/home/mainStyles');
 import TimerMixin from 'react-timer-mixin';
 let Serverutils = require('../src/utils/Serverutils');
 let Rutils = require('../src/utils/Rutils');
+const Geoutils = require('../src/utils/Geoutils');
 import { assembleShapeGeoJson } from '../src/utils/Geoutils';
 
 //TODO: REMOVE AFTER TESTING
@@ -301,6 +302,67 @@ var MapContainer = React.createClass({
 		});
 	},
 	
+	addTestRaster: function (polys, map) {
+		
+		// initialize the bounds
+		var bounds = new google.maps.LatLngBounds();
+
+		// iterate over the paths to get overall bounds
+		polys[0].getGeometry().forEachLatLng(function(path){
+			bounds.extend(path);
+		});
+		
+		let nyColl = {type: 'FeatureCollection'};
+		nyColl.features = [Geoutils.assembleDataShapeGeoJson(polys[0])];
+		
+		let command = '/library/kora.geo/R/shapeidw'
+		
+		let x = [];
+		let y = [];
+		let z = [];
+		for (var i = 0; i < this.state.records.features.length; i++) {
+			if (workingSet.includes(this.state.records.features[i].id) && this.state.records.features[i].properties.datatype == 'meas') {
+				x.push(this.state.records.features[i].geometry.coordinates[0]);
+				y.push(this.state.records.features[i].geometry.coordinates[1]);
+				z.push(standVals[standIds.indexOf(this.state.records.features[i].id)]);
+			}
+		}
+		
+		if (x.length == 0 || y.length == 0 || z.length == 0) {
+			return;
+		}
+		
+		let args = {
+			shapeString: JSON.stringify(nyColl),
+			x: x,
+			y: y,
+			z: z,
+			n: 50000,
+			idp: 2,
+			alpha: 0.5
+		}
+		let uploadcallback = function (result) {
+			console.log(result);
+		}.bind(this);
+		
+		let callback = function (imageDat) {
+			var reader = new window.FileReader();
+			reader.readAsDataURL(imageDat);
+			reader.onloadend = function () {
+				let base64data = reader.result;
+				// let startInd = base64data.indexOf('data');
+				// let endInd = base64data.indexOf('base64,') + 7;
+				// let data = base64data.replace(base64data.substring(startInd,endInd),'');
+				// Serverutils.add_media(this.props.guid, 'test.png', data, uploadcallback);
+				
+				let overlay = new google.maps.GroundOverlay(base64data, bounds);
+				overlay.setMap(map);
+			}.bind(this);
+		}.bind(this)
+
+		Rutils.idw(command, args, callback);
+	},
+	
 	setMeasDist: function (type) {
 		if (this.state.records.features) {
 			var ids = [];
@@ -411,6 +473,7 @@ var MapContainer = React.createClass({
 				drawingShape={this.state.drawingShape}
 				onStartDrawShape={this.onStartDrawShape}
 				showNewShapeDialog={this.showNewShapeDialog}
+				addTestRaster={this.addTestRaster}
 				/>
 				{gfp}
 				{dsp}

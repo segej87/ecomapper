@@ -94,7 +94,7 @@ var FeatureInfo = React.createClass({
 			var val = this.props.selectedMeasStand;
 			var unit = this.props.selectedMeasUnit;
 			
-			if (val == "NA") {
+			if (val == undefined || val == null || val == "NA") {
 				val = this.props.selectedPlace.featureProps.value;
 				unit = this.props.selectedPlace.featureProps.units;
 			}
