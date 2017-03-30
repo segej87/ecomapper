@@ -1,10 +1,13 @@
 React = require('react');
+AppState = require('./AppState');
 appStyles = require('../styles/appStyles');
 Login = require('./Login');
 Navbar = require('./Navbar');
 Home = require('./Home').default;
 MapContainer = require('./MapContainer').default;
 Values = require('../res/values');
+
+let appState = new AppState();
 
 var HelloWorld = React.createClass({
 	getInitialState: function () {
@@ -26,15 +29,11 @@ var HelloWorld = React.createClass({
 	},
 	
 	handleLoginResult: function (result, info) {
+		appState.setUserInfo(info);
+		
 		this.setState(
 			{
 				loggedIn: result,
-				userInfo: {
-					userName: info.userName,
-					firstName: info.firstName,
-					lastName: info.lastName,
-					userId: info.userId
-				},
 				loggingIn: false
 			}
 		);
@@ -53,7 +52,7 @@ var HelloWorld = React.createClass({
 		var navType;
 		
 		if (this.state.mapping) {
-			bodyJSX = <MapContainer offline={this.state.offline} loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping}/>;
+			bodyJSX = <MapContainer appState={appState} offline={this.state.offline} loggedIn={this.state.loggedIn} mapping={this.state.mapping} onClick={this.handleMapping} />;
 			navType = 'map'
 		} else {
 			bodyJSX = <Home loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping} />;
@@ -62,8 +61,8 @@ var HelloWorld = React.createClass({
 		
 		return (
 			<div style={appStyles.app}>
-				<Login offline={this.state.offline} loggingIn={this.state.loggingIn} onSubmit={this.handleLoginResult} parentState = {this.state}/>
-				<Navbar parentState={this.state} onClick={this.handleLoggingIn} onBack={this.handleMapping} navType={navType} />
+				<Login appState={appState} offline={this.state.offline} loggingIn={this.state.loggingIn} onSubmit={this.handleLoginResult} parentState = {this.state}/>
+				<Navbar appState={appState} parentState={this.state} onClick={this.handleLoggingIn} onBack={this.handleMapping} navType={navType} />
 				{bodyJSX}
 			</div>
 		);

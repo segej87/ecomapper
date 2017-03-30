@@ -19,8 +19,8 @@ var Navbar = React.createClass({
 		var set;
 		var navStyle;
 		
-		if (this.props.parentState.loggedIn && this.props.parentState.userInfo.firstName != null) {
-			signInText = "Hi " + this.props.parentState.userInfo.firstName
+		if (this.props.parentState.loggedIn && this.props.appState.getUserInfo().firstName != null) {
+			signInText = "Hi " + this.props.appState.getUserInfo().firstName
 		} else {
 			signInText = Values.strings.login
 		}

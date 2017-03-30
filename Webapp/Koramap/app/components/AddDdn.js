@@ -3,11 +3,6 @@ const SidebarStyles = require('../styles/map/sidebarStyles');
 const NavbarDropdownItem = require('./NavbarDropdownItem');
 const SearchArea = require('./SearchArea');
 const koraLogo = require('../res/img/assets/koralogo.png');
-const publicIcon = require('../res/img/icons/public-icon2.png');
-const privateIcon = require('../res/img/icons/private-icon2.png');
-const measIcon = require('../res/img/icons/meas-icon2.png');
-const photoIcon = require('../res/img/icons/photo-icon2.png');
-const noteIcon = require('../res/img/icons/note-icon2.png');
 import { Scrollbars } from 'react-custom-scrollbars'
 
 var NavbarDropdown = React.createClass({
@@ -16,14 +11,12 @@ var NavbarDropdown = React.createClass({
 	
 	//TODO: get non-standard icons from the server
 	logos: {
-		UCBerkeley: 'http://brand.berkeley.edu/wp-content/uploads/2016/10/ucbseal_139_540.png',
-		Private: privateIcon,
-		Public: publicIcon,
-		Meas: measIcon,
-		Photo: photoIcon,
-		Note: noteIcon,
-		segej87: 'https://ecomapper.blob.core.windows.net/profiles/segej87.jpg',
-		rsege: 'https://ecomapper.blob.core.windows.net/profiles/rsege.jpg'
+		'UC Berkeley': 'http://brand.berkeley.edu/wp-content/uploads/2016/10/ucbseal_139_540.png',
+		'Private': require('../res/img/icons/private-icon2.png'),
+		'Public': require('../res/img/icons/public-icon2.png'),
+		'Meas': require('../res/img/icons/meas-icon2.png'),
+		'Photo': require('../res/img/icons/photo-icon2.png'),
+		'Note': require('../res/img/icons/note-icon2.png')
 	},
 	
 	getInitialState: function () {
@@ -93,8 +86,10 @@ var NavbarDropdown = React.createClass({
 		if (this.props.type != null) {
 			showItems = Object.keys(this.items).map((item, i) => {
 				var image = koraLogo;
-				if (this.logos[item.replace(' ','')]) {
-					image = this.logos[item.replace(' ','')];
+				if (this.props.type == 'submitters') {
+					image = 'https://ecomapper.blob.core.windows.net/profiles/' + this.items[item] + '.jpg';
+				} else if (this.logos[this.items[item]]) {
+					image = this.logos[this.items[item]];
 				}
 				
 				var imgSize;

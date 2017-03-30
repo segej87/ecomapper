@@ -1,8 +1,9 @@
-React = require('react');
+let React = require('react');
 let Sidebar = require('./Sidebar');
 let Container = require('./Container').default;
 const GeoFilterInfoPanel = require('./GeoFilterInfoPanel');
 const DrawingShapeInfoPanel = require('./DrawingShapeInfoPanel');
+let ShapesLayer = require('./ShapesLayer').default;
 let Values = require('../res/values');
 let mapStyles = require('../styles/map/mapStyles');
 let mainStyles = require('../styles/home/mainStyles');
@@ -19,10 +20,8 @@ var firstListLoad = true;
 var loadingLists = false;
 var loadingData = false;
 
-var standIds = [];
-var standVals = [];
-var standUnits = [];
-var workingSet = [];
+let appState;
+let shapesLayer;
 
 var MapContainer = React.createClass({
 	mixins: [TimerMixin],
@@ -56,7 +55,6 @@ var MapContainer = React.createClass({
 			records: {},
 			measObj: {},
 			selectedMeasDist: [],
-			//TODO: LOAD SHAPES FROM DB
 			shapes: Values.standards.shapes,
 			selectedPlace: {},
 			geoFiltering: null,
@@ -143,7 +141,7 @@ var MapContainer = React.createClass({
 			console.log(result);
 		};
 		
-		Serverutils.saveShape(this.props.userInfo.userId, outShape, collection, callback);
+		Serverutils.saveShape(appState.getUserInfo().userId, outShape, collection, callback);
 	},
 	
 	removePendingShape: function (canceled) {
@@ -174,7 +172,7 @@ var MapContainer = React.createClass({
 	},
 	
 	loadLists: function () {
-		if (this.props.userInfo.userId != null && !this.props.offline && !loadingLists) {
+		if (appState.getUserInfo().userId != null && !this.props.offline && !loadingLists) {
 			loadingLists = true;
 			
 			let callback = function (result, success) {
@@ -190,12 +188,12 @@ var MapContainer = React.createClass({
 				loadingLists = false;
 			}.bind(this);
 			
-			Serverutils.loadLists(this.props.userInfo.userId, this.state.lists, this.state.filters, callback);
+			Serverutils.loadLists(appState.getUserInfo().userId, this.state.lists, this.state.filters, callback);
 		}
 	},
 	
 	loadCollections: function () {
-		if (this.props.userInfo.userId != null && !this.props.offline) {
+		if (appState.getUserInfo().userId != null && !this.props.offline) {
 			let callback = function (result, success) {
 				if (success) {
 					let newShapes = Values.standards.shapes
@@ -211,23 +209,25 @@ var MapContainer = React.createClass({
 				}
 			}.bind(this);
 			
-			Serverutils.loadCollections(this.props.userInfo.userId, callback);
+			Serverutils.loadCollections(appState.getUserInfo().userId, callback);
 		}
 	},
 	
 	loadRecords: function (filters = this.state.filters, override = false) {
-		if (this.props.userInfo.userId != null && !this.props.offline && !this.state.geoFiltering && !this.state.drawingShape && (!loadingData || override)) {
+		if (appState.getUserInfo().userId != null && !this.props.offline && !this.state.geoFiltering && !this.state.drawingShape && (!loadingData || override)) {
 			loadingData = true;
 			
 			let callback = function (newState, newIds, success) {
 				if (success) {
+					appState.setRecords(newState.records);
+					
 					this.setState(newState);
 				
-					for (var i = standIds.length-1; i >=0; i--) {
-						if (!newIds.includes(standIds[i])) {
-							standIds.splice(i, 1);
-							standVals.splice(i, 1);
-							standUnits.splice(i, 1);
+					for (var i = appState.getStandIds().length-1; i >=0; i--) {
+						if (!newIds.includes(appState.getStandIds()[i])) {
+							appState.spliceStandId(i, 1);
+							appState.spliceStandVal(i, 1);
+							appState.spliceStandUnit(i, 1);
 						}
 					}
 					
@@ -237,12 +237,12 @@ var MapContainer = React.createClass({
 				loadingData = false;
 			}.bind(this);
 			
-			Serverutils.loadRecords(this.props.userInfo.userId, filters, this.state.records, override, callback);
+			Serverutils.loadRecords(appState.getUserInfo().userId, filters, this.state.records, override, callback);
 		}
 	},
 	
 	setWorkingSet: function (ids) {
-		workingSet = ids;
+		appState.setWorkingSet(ids);
 	},
 	
 	standardizeUnits: function (unitObj) {
@@ -260,13 +260,13 @@ var MapContainer = React.createClass({
 				
 				let callback = function (result) {
 					for (var j = 0; j < sourceObj.ids.length; j++) {
-						if (!standIds.includes(sourceObj.ids[j])) {
-							standIds.push(sourceObj.ids[j]);
-							standVals.push(JSON.parse(result)[j])
-							standUnits.push(sourceObj.target);
-						} else if (standVals[standIds.indexOf(sourceObj.ids[j])] != JSON.parse(result)[j] || standUnits[standIds.indexOf(sourceObj.ids[j])] != sourceObj.target) {
-							standVals[standIds.indexOf(sourceObj.ids[j])] = JSON.parse(result)[j];
-							standUnits[standIds.indexOf(sourceObj.ids[j])] = sourceObj.target;
+						if (!appState.getStandIds().includes(sourceObj.ids[j])) {
+							appState.addStandId(sourceObj.ids[j]);
+							appState.addStandVal(JSON.parse(result)[j])
+							appState.addStandUnit(sourceObj.target);
+						} else if (appState.getStandVals()[appState.getStandIds().indexOf(sourceObj.ids[j])] != JSON.parse(result)[j] || appState.getStandUnits()[appState.getStandIds().indexOf(sourceObj.ids[j])] != sourceObj.target) {
+							appState.getStandVals()[appState.getStandIds().indexOf(sourceObj.ids[j])] = JSON.parse(result)[j];
+							appState.getStandUnits()[appState.getStandIds().indexOf(sourceObj.ids[j])] = sourceObj.target;
 						}
 					}
 				}.bind(this);
@@ -296,6 +296,8 @@ var MapContainer = React.createClass({
 		
 		let newRecords = {type: currentRecords.type, features: currentFeatures};
 		
+		appState.setRecords(newRecords);
+		
 		this.setState({
 			records: newRecords,
 			selectedPlace: {}
@@ -303,64 +305,7 @@ var MapContainer = React.createClass({
 	},
 	
 	addTestRaster: function (polys, map) {
-		
-		// initialize the bounds
-		var bounds = new google.maps.LatLngBounds();
-
-		// iterate over the paths to get overall bounds
-		polys[0].getGeometry().forEachLatLng(function(path){
-			bounds.extend(path);
-		});
-		
-		let nyColl = {type: 'FeatureCollection'};
-		nyColl.features = [Geoutils.assembleDataShapeGeoJson(polys[0])];
-		
-		let command = '/library/kora.geo/R/shapeidw'
-		
-		let x = [];
-		let y = [];
-		let z = [];
-		for (var i = 0; i < this.state.records.features.length; i++) {
-			if (workingSet.includes(this.state.records.features[i].id) && this.state.records.features[i].properties.datatype == 'meas') {
-				x.push(this.state.records.features[i].geometry.coordinates[0]);
-				y.push(this.state.records.features[i].geometry.coordinates[1]);
-				z.push(standVals[standIds.indexOf(this.state.records.features[i].id)]);
-			}
-		}
-		
-		if (x.length == 0 || y.length == 0 || z.length == 0) {
-			return;
-		}
-		
-		let args = {
-			shapeString: JSON.stringify(nyColl),
-			x: x,
-			y: y,
-			z: z,
-			n: 50000,
-			idp: 2,
-			alpha: 0.5
-		}
-		let uploadcallback = function (result) {
-			console.log(result);
-		}.bind(this);
-		
-		let callback = function (imageDat) {
-			var reader = new window.FileReader();
-			reader.readAsDataURL(imageDat);
-			reader.onloadend = function () {
-				let base64data = reader.result;
-				// let startInd = base64data.indexOf('data');
-				// let endInd = base64data.indexOf('base64,') + 7;
-				// let data = base64data.replace(base64data.substring(startInd,endInd),'');
-				// Serverutils.add_media(this.props.guid, 'test.png', data, uploadcallback);
-				
-				let overlay = new google.maps.GroundOverlay(base64data, bounds);
-				overlay.setMap(map);
-			}.bind(this);
-		}.bind(this)
-
-		Rutils.idw(command, args, callback);
+		shapesLayer.addTestRaster(polys);
 	},
 	
 	setMeasDist: function (type) {
@@ -368,13 +313,13 @@ var MapContainer = React.createClass({
 			var ids = [];
 			var vals = [];
 			for (var i = 0; i < this.state.records.features.length; i++) {
-				if ((workingSet.length == 0 || workingSet.includes(this.state.records.features[i].id)) && this.state.records.features[i].properties.species == type) {
+				if ((appState.getWorkingSet().length == 0 || appState.getWorkingSet().includes(this.state.records.features[i].id)) && this.state.records.features[i].properties.species == type) {
 					ids.push(this.state.records.features[i].id);
 				}
 			}
 			
 			for (var i = 0; i < ids.length; i++) {
-				vals.push(standVals[standIds.indexOf(ids[i])]);
+				vals.push(appState.getStandVals()[appState.getStandIds().indexOf(ids[i])]);
 			}
 			
 			return vals;
@@ -388,10 +333,10 @@ var MapContainer = React.createClass({
 		
 		if (selected.featureProps) {
 			if (selected.featureProps.datatype == 'meas') {
-				const ind = standIds.indexOf(selected.fuid);
+				const ind = appState.getStandIds().indexOf(selected.fuid);
 				vals = this.setMeasDist(selected.featureProps.species[0]);
-				selectedMeasStand = standVals[ind];
-				selectedMeasUnit = standUnits[ind];
+				selectedMeasStand = appState.getStandVals()[ind];
+				selectedMeasUnit = appState.getStandUnits()[ind];
 			}
 		}
 		
@@ -404,6 +349,8 @@ var MapContainer = React.createClass({
 	},
 	
 	componentWillMount: function () {
+		appState = this.props.appState;
+		shapesLayer = new ShapesLayer(appState);
 		this.loadLists();
 		this.loadCollections();
 	},
@@ -415,6 +362,12 @@ var MapContainer = React.createClass({
 			() => { this.loadRecords(); },
 			30000
 		);
+	},
+	
+	componentWillReceiveProps: function (nextProps) {
+		if (appState.getUserInfo().userId && nextProps.appState.getUserInfo().userId != appState.getUserInfo().userId) {
+			appState.setUserInfo(nextProps.appState.getUserInfo());
+		}
 	},
 	
 	render: function () {
@@ -445,7 +398,7 @@ var MapContainer = React.createClass({
 		return (
 			<div style={mapStyles.main}>
 				<Sidebar 
-				userInfo={this.props.userInfo} 
+				userInfo={appState.getUserInfo()} 
 				selectedPlace={this.state.selectedPlace} 
 				selectedMeasDist={this.state.selectedMeasDist}
 				selectedMeasStand={this.state.selectedMeasStand}
@@ -460,7 +413,8 @@ var MapContainer = React.createClass({
 				toggleGeoFilter={this.toggleGeoFilter}
 				/>
 				<Container 
-				userInfo={this.props.userInfo} 
+				appState = {appState}
+				userInfo={appState.getUserInfo()} 
 				geoFiltering={this.state.geoFiltering}
 				records={this.state.records} 
 				filters={this.state.filters} 
@@ -468,12 +422,14 @@ var MapContainer = React.createClass({
 				resetRecords={this.resetRecords}
 				setWorkingSet={this.setWorkingSet}
 				selectedMeasDist={this.state.selectedMeasDist}
-				standIds={standIds}
-				standVals={standVals}
+				standIds={appState.getStandIds()}
+				standVals={appState.getStandVals()}
 				drawingShape={this.state.drawingShape}
 				onStartDrawShape={this.onStartDrawShape}
 				showNewShapeDialog={this.showNewShapeDialog}
 				addTestRaster={this.addTestRaster}
+				map={appState.getMap()}
+				shapesLayer={shapesLayer}
 				/>
 				{gfp}
 				{dsp}

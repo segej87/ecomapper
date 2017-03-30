@@ -348,7 +348,7 @@ export class Map extends React.Component {
 
         this.map = new maps.Map(node, mapConfig);
 				
-				this.props.setMap(this.map);
+				this.props.appState.setMap(this.map);
 
         evtNames.forEach(e => {
           this.listeners[e] = this.map.addListener(e, this.handleEvent(e));

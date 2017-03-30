@@ -1,8 +1,10 @@
-shapeidw <- function (shapeString, x, y, z, n, idp, alpha) {
+shapeidw <- function (shapeString, x, y, z, n=50000, idp=2.0, alpha=0.5, save=F, guid=NA, filename=NA) {
   library(rgdal)
   library(gstat)
   library(sp)
   library(raster)
+  library(httr)
+  library(base64enc)
 
   shapejson <- jsonlite::fromJSON(shapeString)
   shapecoords <- shapejson$features$geometry$coordinates
@@ -67,5 +69,14 @@ shapeidw <- function (shapeString, x, y, z, n, idp, alpha) {
   plot.window(xlim=extent(r.m)[1:2], ylim=extent(r.m)[3:4], xaxs="i",yaxs="i")
   raster::plot(r.m,axes=F,box=F,legend=F,breaks=hist$breaks,col=my_palette,alpha=alpha,add=T)
   dev.off()
+
+  rastOut <- raster::writeRaster(r.m, filename, 'GTiff',overwrite=T)
+  if (save) {
+    url <- "http://ecocollector.azurewebsites.net/add_media.php"
+    fileupload <- base64encode(paste(filename,'.tif',sep=""))
+    body <- list('GUID'=guid,'filename'=paste('model',filename,gsub("-","_",Sys.Date()),sep="_"),'file'=fileupload)
+    result <- httr::POST(url=url,body=body,encode="multipart")
+  }
+
   invisible()
 }

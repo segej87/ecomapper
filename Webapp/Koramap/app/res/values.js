@@ -31,7 +31,7 @@ keys = {
 
 standards = {
 	datatypes: ['Meas','Photo','Note'],
-	access: ['Public','Private','Lots','Of','Other','Items','To','Test','Scroll','Bar','Appearance'],
+	access: ['Public','Private'],
 	shapes: {countries: 'Countries',usstates: 'US States'},
 	login: {
 				userName: 'public',
