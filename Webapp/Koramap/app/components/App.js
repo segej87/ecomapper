@@ -1,11 +1,10 @@
-React = require('react');
-AppState = require('./AppState');
-appStyles = require('../styles/appStyles');
-Login = require('./Login');
-Navbar = require('./Navbar');
-Home = require('./Home').default;
-MapContainer = require('./MapContainer').default;
-Values = require('../res/values');
+let React = require('react');
+let AppState = require('./AppState');
+import {app as appStyle} from '../styles/appStyles';
+let Login = require('./Login').default;
+let Navbar = require('./Navbar').default;
+let Home = require('./Home').default;
+let MapContainer = require('./MapContainer').default;
 
 let appState = new AppState();
 
@@ -13,10 +12,8 @@ var HelloWorld = React.createClass({
 	getInitialState: function () {
 		return {
 			loggedIn: false,
-			userInfo: Values.standards.login,
 			loggingIn: false,
-			mapping: false,
-			offline: false
+			mapping: false
 		};
 	},
 	
@@ -52,16 +49,16 @@ var HelloWorld = React.createClass({
 		var navType;
 		
 		if (this.state.mapping) {
-			bodyJSX = <MapContainer appState={appState} offline={this.state.offline} loggedIn={this.state.loggedIn} mapping={this.state.mapping} onClick={this.handleMapping} />;
+			bodyJSX = <MapContainer appState={appState} loggedIn={this.state.loggedIn} mapping={this.state.mapping} onClick={this.handleMapping} />;
 			navType = 'map'
 		} else {
-			bodyJSX = <Home loggedIn={this.state.loggedIn} userInfo={this.state.userInfo} mapping={this.state.mapping} onClick={this.handleMapping} />;
+			bodyJSX = <Home mapping={this.state.mapping} onClick={this.handleMapping} />;
 			navType = 'home'
 		}
 		
 		return (
-			<div style={appStyles.app}>
-				<Login appState={appState} offline={this.state.offline} loggingIn={this.state.loggingIn} onSubmit={this.handleLoginResult} parentState = {this.state}/>
+			<div style={appStyle}>
+				<Login appState={appState} loggedIn={this.state.loggedIn} loggingIn={this.state.loggingIn} onSubmit={this.handleLoginResult} />
 				<Navbar appState={appState} parentState={this.state} onClick={this.handleLoggingIn} onBack={this.handleMapping} navType={navType} />
 				{bodyJSX}
 			</div>
@@ -69,4 +66,4 @@ var HelloWorld = React.createClass({
 	}
 });
 
-module.exports = HelloWorld;
+export default HelloWorld;

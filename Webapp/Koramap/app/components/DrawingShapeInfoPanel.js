@@ -42,8 +42,8 @@ const GeoFilterInfoPanel = React.createClass({
 	},
 	
 	render: function () {
-		let collOpts = Object.keys(this.props.collections).map((c, i) => {
-			return (<option value={c} key={c}>{this.props.collections[c]}</option>);
+		let collOpts = Object.keys(this.props.shapesLayer.getShapes()).map((c, i) => {
+			return (<option value={c} key={c}>{this.props.shapesLayer.getShapes()[c]}</option>);
 		});
 		
 		let show;

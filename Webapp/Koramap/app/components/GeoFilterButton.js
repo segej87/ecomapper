@@ -40,7 +40,7 @@ const GeoFilterButton = React.createClass({
 	render: function () {
 		var filterText = 'Geographic filter';
 		if (this.state.filteringBy) {
-			filterText = 'Filtering by ' + this.state.filteringBy;
+			filterText = 'Filtering by ' + this.props.shapesLayer.getShapes()[this.state.filteringBy];
 		}
 		
 		var style = SidebarStyles.geoButton;
@@ -55,7 +55,7 @@ const GeoFilterButton = React.createClass({
 		
 		return (
 			<div>
-				<AddDdn items={{Geo: this.props.shapes}} type={'Geo'} highlighted={this.state.showingDdn} onClose={this.closeAdd} onAdd={this.toggleGeoFilter}/>
+				<AddDdn items={{Geo: this.props.shapesLayer.getShapes()}} type={'Geo'} highlighted={this.state.showingDdn} onClose={this.closeAdd} onAdd={this.toggleGeoFilter}/>
 				<div style={{display: 'inline-block', position: 'relative', float: 'right', width: '100%'}}>
 					<button style={style} onClick={this.handleClick} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>{filterText}</button>
 					{pointer}

@@ -2,7 +2,7 @@
 	margin: 0,
 	padding: 0,
 	textAlign: 'center',
-	background: 'url("https://ecomapper.blob.core.windows.net/bg-artwork-etc/pond.jpg") no-repeat center center',
+	background: 'url("https://ecomapper.blob.core.windows.net/bg-artwork-etc/LoginImage3.jpg") no-repeat center center',
 	backgroundSize: 'cover',
 	height: 500
 };

@@ -1,7 +1,7 @@
-var React = require('react');
-var Fader = require('./Fader');
-var appStyles = require('../styles/appStyles');
-var Values = require('../res/values');
+let React = require('react');
+let Fader = require('./Fader');
+let appStyles = require('../styles/appStyles');
+let Values = require('../res/values');
 
 var Login = React.createClass({
 	getInitialState: function () {
@@ -32,13 +32,11 @@ var Login = React.createClass({
 	},
 	
 	attemptLogin: function (e) {
-		if (this.props.offline) {
-			this.handleCancel();
-		}
-		
 		e.preventDefault();
 		
-		formData='username=' + this.state.username + '&password=' + this.state.password;
+		const uname = this.state.username;
+		
+		const formData='username=' + uname + '&password=' + this.state.password;
 		
 		var request = new XMLHttpRequest;
 		
@@ -59,7 +57,7 @@ var Login = React.createClass({
 						
 						document.getElementById('uname').value = '';
 						document.getElementById('pword').value = '';
-						this.props.onSubmit(true, {userName: this.state.username, firstName: firstname, lastName: lastname, userId: id});
+						this.props.onSubmit(true, {userName: uname, firstName: firstname, lastName: lastname, userId: id});
 					}
 				} catch (e) {
 					var errorText = 'Can\'t log you in. Please try again.';
@@ -97,7 +95,7 @@ var Login = React.createClass({
 		
 		this.setState(this.getInitialState());
 		
-		this.props.onSubmit(this.props.parentState.loggedIn, this.props.parentState.userInfo);
+		this.props.onSubmit(this.props.loggedIn, this.props.appState.getUserInfo());
 	},
 	
 	render: function () {
@@ -137,4 +135,4 @@ var Login = React.createClass({
 	}
 });
 
-module.exports = Login;
+export default Login;

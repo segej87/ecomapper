@@ -48,14 +48,6 @@ const evtNames = [
   'zoom_changed'
 ];
 
-var geoFilters;
-var selectedGeos = [];
-var selectedGeoNames = [];
-var currentGeoLen = 0;
-var clickListener;
-var hoverListener;
-var leaveListener;
-
 export {wrapper as GoogleApiWrapper} from './GoogleApiComponent'
 export {Marker} from './components/Marker'
 export {InfoWindow} from './components/InfoWindow'
@@ -131,177 +123,6 @@ export class Map extends React.Component {
         google.maps.event.removeListener(this.listeners[e]);
       });
     }
-		
-		componentWillReceiveProps(nextProps) {
-			if (nextProps.geoFiltering && !this.state.hasGeos) {
-				this.startGeoFilter(nextProps);
-			} else if (nextProps.geoFiltering == null && this.state.hasGeos && geoFilters && geoFilters.length > 0) {
-				this.stopGeoFilter();
-			}
-			
-			if (nextProps.drawingShape) {
-				this.startDrawingShape(nextProps.drawingShape)
-			} else if (this.props.drawingShape) {
-				this.stopDrawingShape()
-			}
-		}
-		
-		startDrawingShape(type) {
-			this.drawingManager = new google.maps.drawing.DrawingManager({
-				drawingMode: google.maps.drawing.OverlayType[type.toUpperCase()],
-				drawingControl: false,
-				circleOptions: {
-					fillColor: '#ffff00',
-					fillOpacity: 1,
-					strokeWeight: 5,
-					clickable: false,
-					editable: true,
-					zIndex: 1
-				},
-				polygonOptions: {
-					fillColor: '#009cde',
-					fillOpacity: 0.5,
-					strokeColor: '#009cde',
-					editable: true
-				},
-				polylineOptions: {
-					strokeWeight: 5
-				}
-			});
-			
-			let completion = function (e) {
-				this.stopDrawingShape();
-				let overlay = e.overlay;
-				overlay.type = e.type;
-				this.props.showNewShapeDialog(overlay);
-			}.bind(this);
-			
-			let cancel = function (e) {
-				console.log(e.code)
-				if (e.code == '0x0001') {
-					this.stopDrawingShape();
-				}
-			}.bind(this);
-			
-			google.maps.event.addListener(this.drawingManager, 'overlaycomplete', completion);
-			
-			this.drawingManager.setMap(this.map);
-		}
-		
-		stopDrawingShape() {
-			this.drawingManager.setMap(null);
-			this.props.onStartDrawShape(null);
-			// google.maps.event.removeListener(cancelShape);
-		}
-		
-		startGeoFilter(nextProps) {
-			switch (nextProps.geoFiltering) {
-				case 'countries':
-					this.startGeoActive(require('../res/json/countries.geo.json'));
-					break;
-				case 'usstates':
-					this.startGeoActive(require('../res/json/us-states.geo.json'));
-					break;
-				default:
-					let callback = function (result) {
-						this.startGeoActive(result);
-					}.bind(this);
-					Serverutils.loadShapes(nextProps.geoFiltering, callback);
-			}			
-		}
-		
-		startGeoActive(geos) {
-			this.setupActiveGeos();
-			
-			geoFilters = this.map.data.addGeoJson(geos);
-			
-			this.setState({
-				hasGeos: true
-			});
-		}
-		
-		stopGeoFilter() {
-			let selectedGeoIds = [];
-			for (var i = 0; i < Object.keys(selectedGeos).length; i++) {
-				selectedGeoIds.push(selectedGeos[Object.keys(selectedGeos)[i]].id)
-			}
-			
-			for (var i = 0; i < geoFilters.length; i++) {
-				if (!selectedGeoIds.includes(geoFilters[i].getId())) {
-					this.map.data.remove(geoFilters[i]);
-				}
-			}
-			
-			this.setupInactiveGeos();
-			
-			geoFilters = null;
-			
-			this.setState({
-				hasGeos: false
-			});
-			
-			this.props.onFilter(selectedGeos);
-		}
-		
-		setupActiveGeos() {
-			this.map.data.setStyle(function(feature) {
-				var color = 'gray';
-				if (feature.getProperty('isColorful')) {
-					color = 'green';
-				}
-				return /** @type {google.maps.Data.StyleOptions} */({
-					fillColor: color,
-					strokeColor: color,
-					strokeWeight: 2,
-					clickable: true
-				});
-			});
-
-			clickListener = this.map.data.addListener('click', function(event) {
-				event.feature.setProperty('isColorful', !event.feature.getProperty('isColorful'));
-				
-				var testArray = [];
-				for (var i = 0; i < selectedGeos.length; i++) {
-					testArray.push(selectedGeos[i].getId());
-				}
-				
-				if (testArray.includes(event.feature.getId())) {
-					selectedGeos.splice(testArray.indexOf(event.feature.getId()), 1);
-					selectedGeoNames.splice(testArray.indexOf(event.feature.getId()), 1);
-				} else {
-					selectedGeos.push(event.feature);
-					selectedGeoNames.push(event.feature.getProperty('name'))
-				}
-				
-				document.getElementById('geoinfodescrip').innerHTML = selectedGeoNames.join(", ");
-			});
-
-			hoverListener = this.map.data.addListener('mouseover', function(event) {
-				this.map.data.revertStyle();
-				this.map.data.overrideStyle(event.feature, {strokeWeight: 8});
-			});
-
-			leaveListener = this.map.data.addListener('mouseout', function(event) {
-				this.map.data.revertStyle();
-			});
-		}
-		
-		setupInactiveGeos() {
-			// Color each shape gray. Change the color when the isColorful property
-			// is set to true.
-			this.map.data.setStyle(function(feature) {
-				return /** @type {google.maps.Data.StyleOptions} */({
-					fillColor: 'rgba(0,0,0,0)',
-					strokeColor: 'red',
-					strokeWeight: 2,
-					clickable: false
-				});
-			});
-			
-			google.maps.event.removeListener(clickListener);
-			google.maps.event.removeListener(hoverListener);
-			google.maps.event.removeListener(leaveListener);
-		}
 
     loadMap() {
       if (this.props && this.props.google) {
@@ -349,6 +170,7 @@ export class Map extends React.Component {
         this.map = new maps.Map(node, mapConfig);
 				
 				this.props.appState.setMap(this.map);
+				this.props.shapesLayer.setMap(this.map);
 
         evtNames.forEach(e => {
           this.listeners[e] = this.map.addListener(e, this.handleEvent(e));

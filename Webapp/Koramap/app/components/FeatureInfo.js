@@ -33,7 +33,7 @@ var FeatureInfo = React.createClass({
 	
 	getPlot: function (props = this.props) {	
 		let command = '/library/kora.scripts/R/plot'+plotTypes[this.state.plotIndex];
-		let args = {allVals: props.selectedMeasDist, selVal: props.selectedMeasStand, species: props.selectedPlace.featureProps.species[0], units: props.selectedMeasUnit};
+		let args = {allVals: props.appState.getMeasDist(), selVal: props.selectedMeasStand, species: props.selectedPlace.featureProps.species[0], units: props.selectedMeasUnit};
 		let callback = function (imageDat) {
 			this.setState({plot: imageDat});
 		}.bind(this)

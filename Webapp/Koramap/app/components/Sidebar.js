@@ -20,11 +20,11 @@ var Sidebar = React.createClass({
 				filters={this.props.filters}
 				lists={this.props.lists}
 				onFilterChange={this.handleFilterChange}
-				shapes={this.props.shapes}
+				shapesLayer={this.props.shapesLayer}
 				toggleGeoFilter={this.props.toggleGeoFilter}
 				/>
 				<MessagePane 
-				userInfo={this.props.userInfo} 
+				appState={this.props.appState}
 				selectedPlace={this.props.selectedPlace} 
 				filters={this.props.filters}
 				handleDelete={this.props.handleDelete}

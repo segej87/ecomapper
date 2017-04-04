@@ -31,7 +31,7 @@ var FilterPane = React.createClass({
 				<div style={SidebarStyles.sidebarContainer}>
 					<div style={SidebarStyles.sidebarOpen.filter}>
 						<FilterContent filters={this.props.filters} lists={this.props.lists} onFilterChange={this.handleFilterChange}/>
-						<GeoFilterButton shapes={this.props.shapes} toggleGeoFilter={this.toggleGeoFilter}/>
+						<GeoFilterButton shapesLayer={this.props.shapesLayer} toggleGeoFilter={this.toggleGeoFilter}/>
 					</div>
 					<SidebarToggle type="filter" onClick={this.openChange} open={this.state.open} />
 				</div>

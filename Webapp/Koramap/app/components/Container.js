@@ -48,20 +48,21 @@ var Container = React.createClass({
 		let maxVal;
 		let minVal;
 		if (singleMeas) {
-			maxVal = this.props.selectedMeasDist[0];
-			minVal = this.props.selectedMeasDist[0];
-			for (var j = 0; j < this.props.selectedMeasDist.length; j++) {
-				if (this.props.selectedMeasDist[j] > maxVal) {
-					maxVal = this.props.selectedMeasDist[j]
+			let dist = this.props.appState.getMeasDist();
+			maxVal = dist[0];
+			minVal = dist[0];
+			for (var j = 0; j < dist.length; j++) {
+				if (dist[j] > maxVal) {
+					maxVal = dist[j]
 				}
-				if (this.props.selectedMeasDist[j] < minVal) {
-					minVal = this.props.selectedMeasDist[j]
+				if (dist[j] < minVal) {
+					minVal = dist[j]
 				}
 			}
 		}
 		
-		if (this.props.map && clustering) {
-			this.markerClusterer = new MarkerClusterer(this.props.map);
+		if (this.props.appState.getMap() && clustering) {
+			this.markerClusterer = new MarkerClusterer(this.props.appState.getMap());
 		}
 	  
 	  if (this.markers) {
@@ -87,7 +88,7 @@ var Container = React.createClass({
 				  const feature = geoFilteredFeats[i];
 					let frac;
 					if (singleMeas) {
-						frac = (this.props.standVals[this.props.standIds.indexOf(feature.id)]-minVal)/(maxVal-minVal);
+						frac = (this.props.appState.getStandVals()[this.props.appState.getStandIds().indexOf(feature.id)]-minVal)/(maxVal-minVal);
 					} else {
 						frac = 1;
 					}
@@ -114,7 +115,7 @@ var Container = React.createClass({
 		  this.markers = geoFilteredFeats.map((feature, i) => {
 			let frac;
 				if (singleMeas) {
-					frac = (this.props.standVals[this.props.standIds.indexOf(feature.id)]-minVal)/(maxVal-minVal);
+					frac = (this.props.appState.getStandVals()[this.props.appState.getStandIds().indexOf(feature.id)]-minVal)/(maxVal-minVal);
 				} else {
 					frac = 1;
 				}
@@ -153,8 +154,7 @@ var Container = React.createClass({
 	receiveGeo: function (polygons) {
 		filterGeos = polygons;
 		this.processData(this.props.records.features);
-		this.props.addTestRaster(filterGeos, this.props.map);
-		// this.props.ShapesLayer.addTestRaster(filterGeos);
+		// this.props.shapesLayer.addTestRaster(filterGeos);
 	},
 	
   onMarkerClick: function(props, marker, e) {
@@ -217,6 +217,17 @@ var Container = React.createClass({
 			this.setState({
 				hasMarkers: false
 			});
+			
+			this.props.shapesLayer.startGeoFilter(nextProps.geoFiltering);
+		} else if (this.props.geoFiltering && nextProps.geoFiltering == null) {
+			let geoResult = this.props.shapesLayer.stopGeoFilter();
+			this.receiveGeo(geoResult);
+		}
+		
+		if (nextProps.drawingShape) {
+			this.props.shapesLayer.startDrawingShape(nextProps.drawingShape, this.showNewShapeDialog, this.onStartDrawShape)
+		} else if (this.props.drawingShape) {
+			this.props.shapesLayer.stopDrawingShape(this.onStartDrawShape)
 		}
   },
   
@@ -231,15 +242,8 @@ var Container = React.createClass({
 					<Map google={google}
 						zoom={5}
 						onClick={this.onMapClicked}
-						guid={this.props.userInfo.userId}
-						geoFiltering={this.props.geoFiltering}
-						onFilter={this.receiveGeo}
-						drawingShape={this.props.drawingShape}
-						setDrawingShape={this.props.onStartDrawingShape}
-						onStartDrawShape={this.onStartDrawShape}
-						showNewShapeDialog={this.showNewShapeDialog}
-						addRaster={this.addTestRaster}
-						appState={this.props.appState}>
+						appState={this.props.appState}
+						shapesLayer={this.props.shapesLayer}>
 					</Map>
 				</div>
 			);
@@ -250,14 +254,8 @@ var Container = React.createClass({
 					<Map google={google}
 						zoom={5}
 						onClick={this.onMapClicked}
-						guid={this.props.userInfo.userId}
-						geoFiltering={this.props.geoFiltering}
-						onFilter={this.receiveGeo}
-						drawingShape={this.props.drawingShape}
-						onStartDrawShape={this.onStartDrawShape}
-						showNewShapeDialog={this.showNewShapeDialog}
-						addRaster={this.addTestRaster}
-						appState={this.props.appState}>
+						appState={this.props.appState}
+						shapesLayer={this.props.shapesLayer}>
 						{this.markers}
 					</Map>
 			</div>

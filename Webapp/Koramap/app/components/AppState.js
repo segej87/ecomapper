@@ -2,13 +2,24 @@ let values = require('../res/values');
 
 class AppState {
 	constructor () {
+		this.map = null;
 		this.userInfo = values.standards.login;
 		this.records = {};
 		this.standIds = [];
 		this.standVals = [];
 		this.standUnits = [];
 		this.workingSet = [];
-		this.map = null;
+		this.measDist = [];
+	}
+	
+	
+	//Map
+	setMap (map) {
+		this.map = map;
+	}
+	
+	getMap() {
+		return this.map;
 	}
 	
 	//User info
@@ -97,14 +108,26 @@ class AppState {
 		this.workingSet.splice(index, i);
 	}
 	
-	
-	//Map
-	setMap (map) {
-		this.map = map;
+	setMeasDist (type) {
+		if (this.records.features) {
+			var ids = [];
+			var vals = [];
+			for (var i = 0; i < this.records.features.length; i++) {
+				if ((this.getWorkingSet().length == 0 || this.getWorkingSet().includes(this.records.features[i].id)) && this.records.features[i].properties.species == type) {
+					ids.push(this.records.features[i].id);
+				}
+			}
+			
+			for (var i = 0; i < ids.length; i++) {
+				vals.push(this.getStandVals()[this.getStandIds().indexOf(ids[i])]);
+			}
+			
+			this.measDist = vals;
+		}
 	}
 	
-	getMap() {
-		return this.map;
+	getMeasDist () {
+		return this.measDist;
 	}
 }
 
