@@ -55,7 +55,7 @@ var NavbarDropdown = React.createClass({
 	
 	addItem: function (e) {
 		//TODO: standardize this
-		if (this.props.type == 'Geo') {
+		if (this.props.type == 'Geo' || this.props.type == 'shapes') {
 			this.props.onAdd(e.target.id);
 		} else {
 			this.props.onAdd(this.items[e.target.id]);

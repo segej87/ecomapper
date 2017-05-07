@@ -33,6 +33,7 @@ var Sidebar = React.createClass({
 				selectedMeasUnit={this.props.selectedMeasUnit}
 				/>
 				<ShapesPane
+				shapesLayer={this.props.shapesLayer}
 				onStartDrawShape={this.onStartDrawShape}
 				drawingShape={this.props.drawingShape}
 				/>

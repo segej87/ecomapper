@@ -43,6 +43,9 @@ const GeoFilterInfoPanel = React.createClass({
 	
 	render: function () {
 		let collOpts = Object.keys(this.props.shapesLayer.getShapes()).map((c, i) => {
+			if (c == 'countries' || c == 'usstates') {
+				return;
+			}
 			return (<option value={c} key={c}>{this.props.shapesLayer.getShapes()[c]}</option>);
 		});
 		
@@ -56,6 +59,7 @@ const GeoFilterInfoPanel = React.createClass({
 				<select id='collfield' style={{width: '100%'}}>
 					{collOpts}
 				</select>
+				<a style={SidebarStyles.a}>Add new shape collection</a>
 				<button style={SidebarStyles.deleteButton} onClick={this.handleClick} id='saveButton'>Save</button>
 				<button style={SidebarStyles.deleteButton} onClick={this.handleClick} id='cancelButton'>Cancel</button>
 			</div>

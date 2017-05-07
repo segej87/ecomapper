@@ -544,7 +544,7 @@ shapeButton = {
 	marginLeft: 10,
 	marginRight: 10,
 	cursor: 'pointer',
-	boxShadow: '0px 0px 2px 2px rgba(255, 255, 255, 0.4)',
+	// boxShadow: '0px 0px 2px 2px rgba(255, 255, 255, 0.4)',
 	hovered: {
 		display: 'inline-block',
 		border: '1px solid white',

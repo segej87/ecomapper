@@ -25,7 +25,7 @@ var ShapesPane = React.createClass({
 			return (
 				<div style={SidebarStyles.sidebarContainer}>
 					<div style={SidebarStyles.sidebarOpen.shapes}>
-						<ShapesContent drawingShape={this.props.drawingShape} onStartDrawShape={this.onStartDrawShape} drawingShape={this.props.drawingShape}/>
+						<ShapesContent shapesLayer={this.props.shapesLayer} drawingShape={this.props.drawingShape} onStartDrawShape={this.onStartDrawShape} drawingShape={this.props.drawingShape}/>
 					</div>
 					<SidebarToggle type="shapes" onClick={this.openChange} open={this.state.open} />
 				</div>

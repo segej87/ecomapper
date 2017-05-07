@@ -5,6 +5,8 @@ const Geoutils = require('../src/utils/Geoutils');
 
 let MarkerClusterer = require('marker-clusterer-plus');
 
+let RastersLayer = require('./RastersLayer').default;
+
 var GoogleApiWrapper = require('../src/index').GoogleApiWrapper
 var Map = require('../src/index').Map
 import Marker from '../src/components/Marker'
@@ -12,8 +14,8 @@ import Polygon from '../src/components/Polygon'
 import InfoWindow from '../src/components/InfoWindow'
 
 var google;
-var filterGeos = [];
 var lastLoadRecords;
+var rastersLayer;
 
 const clustering = false;
 
@@ -29,7 +31,7 @@ var Container = React.createClass({
 	
 	//TODO: wrap in promsise?
   processData: function (features) {
-	  if (features == 'reset') {
+	  if (features == 'reset' || features == null) {
 		  delete this.markers;
 			delete this.markerClusterer;
 			this.setState({
@@ -42,9 +44,12 @@ var Container = React.createClass({
 		
 		let singleMeas = this.props.filters.datatype.length == 1 && this.props.filters.datatype[0] == 'Meas' && this.props.filters.species.length == 1;
 		
-		let filteredGeos = Geoutils.filterGeo(filterGeos, features, google);
+		// add test raster
+		// if (google && this.props.shapesLayer.getSelectedGeos().length > 0) {rastersLayer.idw(this.props.shapesLayer.getSelectedGeos());}
+		
+		let filteredGeos = Geoutils.filterGeo(this.props.shapesLayer.getSelectedGeos(), features, google);
 		let geoFilteredFeats = filteredGeos.geoFilteredFeats;
-		this.props.setWorkingSet(filteredGeos.workingSet);
+		this.props.appState.setWorkingSet(filteredGeos.workingSet);
 		let maxVal;
 		let minVal;
 		if (singleMeas) {
@@ -150,13 +155,6 @@ var Container = React.createClass({
 		this.props.showNewShapeDialog(overlay);
 	},
 	
-	//TODO: move up to MapContainer
-	receiveGeo: function (polygons) {
-		filterGeos = polygons;
-		this.processData(this.props.records.features);
-		// this.props.shapesLayer.addTestRaster(filterGeos);
-	},
-	
   onMarkerClick: function(props, marker, e) {
     this.setState({
       selectedPlace: props,
@@ -177,9 +175,15 @@ var Container = React.createClass({
     }
   },
 	
+	componentDidMount() {
+		rastersLayer = new RastersLayer(this.props.appState);
+		rastersLayer.setGoogle(this.props.google);
+	},
+	
 	componentDidUpdate(prevProps, prevState) {
 		if (prevProps.google != this.props.google) {
 			google = this.props.google;
+			rastersLayer.setGoogle(google);
 		}
 		
 		if (lastLoadRecords != prevProps.records.updated) {
@@ -208,7 +212,6 @@ var Container = React.createClass({
 				this.setState({singleMeas: false});
 			}
 			
-			// this.processData(nextProps.records.features);
 	  } else if (nextProps.records.features == null || Object.keys(nextProps.records.features).length == 0) {
 		  this.processData('reset');
 	  }
@@ -220,8 +223,8 @@ var Container = React.createClass({
 			
 			this.props.shapesLayer.startGeoFilter(nextProps.geoFiltering);
 		} else if (this.props.geoFiltering && nextProps.geoFiltering == null) {
-			let geoResult = this.props.shapesLayer.stopGeoFilter();
-			this.receiveGeo(geoResult);
+			this.props.shapesLayer.stopGeoFilter();
+			this.processData(this.props.records.features);
 		}
 		
 		if (nextProps.drawingShape) {

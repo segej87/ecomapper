@@ -1,6 +1,7 @@
 const React = require('react');
 const SidebarStyles = require('../styles/map/sidebarStyles');
 const DrawShapesPane = require('./DrawShapesPane').default;
+const SelectShapesPane = require('./SelectShapesPane').default;
 
 var ShapesContent = React.createClass({
 	getInitialState: function () {
@@ -24,6 +25,7 @@ var ShapesContent = React.createClass({
 				<p style={{borderBottom: '1px solid white', fontSize: 14, fontFamily: 'Lato, Open Sans, sans-serif', paddingBottom: 3, paddingLeft: 5, color: 'white'}}>Draw new shape</p>
 				<DrawShapesPane onStartDraw={this.onStartDrawShape}/>
 				<p style={{borderBottom: '1px solid white', fontSize: 14, fontFamily: 'Lato, Open Sans, sans-serif', paddingBottom: 3, paddingLeft: 5, color: 'white', marginTop: 30}}>{secondHeader}</p>
+				<SelectShapesPane shapesLayer={this.props.shapesLayer}/>
 			</div>
 		);
 	}

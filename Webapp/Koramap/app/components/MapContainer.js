@@ -221,10 +221,6 @@ var MapContainer = React.createClass({
 		}
 	},
 	
-	setWorkingSet: function (ids) {
-		appState.setWorkingSet(ids);
-	},
-	
 	standardizeUnits: function (unitObj) {
 		if (unitObj == null) {
 			return
@@ -377,7 +373,6 @@ var MapContainer = React.createClass({
 				filters={this.state.filters} 
 				handleSelected={this.handleSelectedPlace}
 				resetRecords={this.resetRecords}
-				setWorkingSet={this.setWorkingSet}
 				drawingShape={this.state.drawingShape}
 				onStartDrawShape={this.onStartDrawShape}
 				showNewShapeDialog={this.showNewShapeDialog}
