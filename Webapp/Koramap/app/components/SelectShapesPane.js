@@ -32,7 +32,6 @@ var SelectShapesPane = React.createClass({
 	
 	onCollClick: function (e) {
 		let clickedId = e.target.id;
-		console.log(clickedId);
 		
 		this.setState({showingDdn: true});
 		
@@ -47,6 +46,11 @@ var SelectShapesPane = React.createClass({
 				
 				this.setState({
 					items: {shapes: featNames},
+					shapeColl: result
+				});
+			} else {
+				this.setState({
+					items: {shapes: {}},
 					shapeColl: result
 				});
 			}

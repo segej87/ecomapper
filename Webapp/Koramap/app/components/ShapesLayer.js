@@ -34,7 +34,25 @@ class ShapesLayer {
 	
 	//Show a shape
 	showShape (shape)  {
-		this.addedShapes.push(this.map.data.addGeoJson(shape)[0]);
+		let shapeId = shape.features[0].id;
+		let idMatch = false;
+		for (var i = 0; i < this.addedShapes.length; i++) {
+			if (this.addedShapes[i].getId() === shapeId) {idMatch = true}
+		}
+		if (!idMatch) {
+			this.addedShapes.push(this.map.data.addGeoJson(shape)[0]);
+		}
+		
+		if (!this.clickListener) {
+			this.clickListener = this.map.data.addListener('click', function (event) {
+				console.log('You clicked on ' + event.feature.getId() + '!');
+			});
+		}
+	}
+	
+	//Get shown shapes
+	getShapes() {
+		
 	}
 	
 	//Geofiltering methods
