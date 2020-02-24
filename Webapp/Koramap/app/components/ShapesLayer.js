@@ -34,6 +34,11 @@ class ShapesLayer {
 	
 	//Show a shape
 	showShape (shape)  {
+		//TODO: rethink converting between google's 'polyline' and geoJSON's 'MultiLineString'
+		if (shape.features[0].geometry.type == 'polyline') {
+			shape.features[0].geometry.type = 'MultiLineString';
+		}
+		
 		let shapeId = shape.features[0].id;
 		let idMatch = false;
 		for (var i = 0; i < this.addedShapes.length; i++) {

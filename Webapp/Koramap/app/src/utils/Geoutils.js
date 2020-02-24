@@ -47,12 +47,20 @@ function filterGeo(filterGeos, features, google) {
 function assembleShapeGeoJson(overlay, props) {
 	let outShape = {type: 'Feature', properties: props, geometry: {type: overlay.type}};
 	
+	console.log(overlay.type.toLowerCase());
+	
 	let geom = [];
-	overlay.getPaths().forEach((p, i) => {
-		p.forEach((l, i) => {
-			geom.push([l.lng(), l.lat()]);
+	if (overlay.type.toLowerCase() == 'polyline') {
+		overlay.getPath().forEach((l, i) => {
+			geom.push([l.lng(),l.lat()]);
 		});
-	});
+	} else {
+		overlay.getPaths().forEach((p, i) => {
+			p.forEach((l, i) => {
+				geom.push([l.lng(), l.lat()]);
+			});
+		});
+	}
 	
 	if (overlay.type.toLowerCase() == 'polygon' && (geom[geom.length-1][0] != geom[0][0] || geom[geom.length-1][1] != geom[0][1])) {
 		geom.push(geom[0]);

@@ -15,7 +15,7 @@ var Sidebar = React.createClass({
 	
 	render: function () {
 		return (
-			<div>
+			<div style={{overflow: 'auto'}}>
 				<FilterPane 
 				filters={this.props.filters}
 				lists={this.props.lists}

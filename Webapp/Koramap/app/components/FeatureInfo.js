@@ -53,6 +53,43 @@ var FeatureInfo = React.createClass({
 		}
 	},
 	
+	link: function (data, name){
+            var a = document.createElement('a');
+            a.download = name || self.location.pathname.slice(self.location.pathname.lastIndexOf('/')+1);
+            a.href = data || self.location.href;
+            return a;
+        },
+	
+	startDownload: function (e) {
+		// console.log('Starting download');
+		// console.log(this.props.selectedPlace);
+		// let ta = Uint8Array.from([this.props.selectedPlace]);
+		// console.log(ta);
+		// var blob = new Blob(ta, {type: 'application/octet-binary'});
+		// console.log(blob);
+		// var l = this.link('data:application/octet-stream;base64,' + btoa(JSON.stringify(this.props.selectedPlace)),'test.txt')
+		console.log(this.props.selectedPlace);
+		var placeText = JSON.stringify(this.props.selectedPlace.featureProps);
+		console.log(placeText);
+		
+		var l;
+		if (this.state.photo) {
+			
+			// TODO: make a blob from the feature's filepath
+			let imageDat = btoa(unescape(encodeURIComponent(this.props.selectedPlace.featureProps.filepath)))
+			l = this.link("data:image/jpeg+xml;base64," + imageDat,'test.jpg')
+			// return
+		} else if (this.state.plot) {
+			l = this.link("data:image/svg+xml;base64," + this.state.plot,'test.svg')
+		} else {
+			return
+		}
+		
+		var ev = document.createEvent("MouseEvents");
+    ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+    return l.dispatchEvent(ev);
+	},
+	
 	componentWillReceiveProps: function (nextProps) {
 		if (nextProps.selectedPlace.featureProps && nextProps.selectedPlace.featureProps.datatype == 'photo') {
 			if (nextProps.selectedPlace.featureProps.filepath != this.props.selectedPlace.featureProps.filepath) {
@@ -102,7 +139,7 @@ var FeatureInfo = React.createClass({
 			
 			let srcString;
 			if (this.state.plot) {
-				srcString = "data:image/svg+xml;base64,"+this.state.plot;
+				srcString = "data:image/svg+xml;base64," + this.state.plot;
 			}
 			plot = (
 			<div>
@@ -153,6 +190,9 @@ var FeatureInfo = React.createClass({
 				</div>
 				<TabArea activeButtons={this.state.activeButtons} onClick={this.changeActiveButtons} selectedPlace={this.props.selectedPlace}/>
 				{editArea}
+				<div style={{marginTop: 10, textAlign: 'center'}}>
+					<button style={SidebarStyles.deleteButton} onClick={this.startDownload}>Download</button>
+				</div>
 			</div>
 		);
 	}
